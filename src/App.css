@@ -32,26 +32,6 @@ body {
   gap: 16px;
 }
 
-.eyebrow {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0 0 4px;
-  color: #7e8baa;
-}
-
-h1 {
-  margin: 0 0 6px;
-  font-size: 28px;
-  line-height: 1.2;
-}
-
-.lede {
-  margin: 0;
-  color: #9aa5c6;
-  max-width: 640px;
-}
-
 button {
   border: none;
   border-radius: 10px;
