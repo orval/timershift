@@ -9,6 +9,8 @@ type Timer = {
   running: boolean
 }
 
+const STORAGE_KEY = 'timershift:timers'
+
 const formatTime = (totalSeconds: number): string => {
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
@@ -51,11 +53,30 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
 }
 
 function App (): JSX.Element {
-  const [timers, setTimers] = useState<Timer[]>([
-    { id: 1, label: 'Focus sprint', elapsed: 0, running: false },
-    { id: 2, label: 'Break', elapsed: 0, running: false },
-    { id: 3, label: 'Stretch', elapsed: 0, running: false }
-  ])
+  const [timers, setTimers] = useState<Timer[]>(() => {
+    if (typeof window === 'undefined') {
+      return []
+    }
+
+    const savedRaw = window.localStorage.getItem(STORAGE_KEY)
+    if (savedRaw) {
+      try {
+        const parsed = JSON.parse(savedRaw) as { timers?: Timer[], savedAt?: number }
+        const lastSaved = parsed.savedAt ?? Date.now()
+        const deltaSeconds = Math.max(0, Math.floor((Date.now() - lastSaved) / 1000))
+
+        return (parsed.timers ?? []).map((timer) =>
+          timer.running ? { ...timer, elapsed: timer.elapsed + deltaSeconds } : timer
+        )
+      } catch {
+        // If parsing fails, fall back to defaults below.
+      }
+    }
+
+    return [
+      { id: 1, label: 'Timer 1', elapsed: 0, running: false },
+    ]
+  })
 
   const hasRunningTimer = useMemo(
     () => timers.some((timer) => timer.running),
@@ -75,6 +96,10 @@ function App (): JSX.Element {
 
     return () => clearInterval(interval)
   }, [hasRunningTimer])
+
+  useEffect(() => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt: Date.now() }))
+  }, [timers])
 
   const toggleTimer = (id: number): void => {
     setTimers((prev) =>
