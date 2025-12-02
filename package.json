@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "lint": "ts-standard",
+    "lint": "eslint",
     "sdks:vscode": "yarn dlx @yarnpkg/sdks vscode"
   },
   "dependencies": {
@@ -33,7 +33,6 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-promise": "^6.0.0",
     "globals": "^15.11.0",
-    "ts-standard": "^12.0.2",
     "typescript": "^5.0.2",
     "vite": "^5.0.0"
   },
