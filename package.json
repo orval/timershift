@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "lint": "ts-standard"
+    "lint": "ts-standard",
+    "sdks:vscode": "yarn dlx @yarnpkg/sdks vscode"
   },
   "dependencies": {
     "@tauri-apps/api": "^1",
