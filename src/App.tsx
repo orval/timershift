@@ -1,53 +1,53 @@
-import { useState } from "preact/hooks";
-import preactLogo from "./assets/preact.svg";
-import { invoke } from "@tauri-apps/api/tauri";
-import "./App.css";
+import { useState } from 'preact/hooks'
+import preactLogo from './assets/preact.svg'
+import { invoke } from '@tauri-apps/api/tauri'
+import './App.css'
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+function App () {
+  const [greetMsg, setGreetMsg] = useState('')
+  const [name, setName] = useState('')
 
-  async function greet() {
+  async function greet () {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
+    setGreetMsg(await invoke('greet', { name }))
   }
 
   return (
-    <div class="container">
+    <div class='container'>
       <h1>Welcome to Tauri!</h1>
 
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
+      <div class='row'>
+        <a href='https://vitejs.dev' target='_blank' rel='noreferrer'>
+          <img src='/vite.svg' class='logo vite' alt='Vite logo' />
         </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
+        <a href='https://tauri.app' target='_blank' rel='noreferrer'>
+          <img src='/tauri.svg' class='logo tauri' alt='Tauri logo' />
         </a>
-        <a href="https://preactjs.com" target="_blank">
-          <img src={preactLogo} class="logo preact" alt="Preact logo" />
+        <a href='https://preactjs.com' target='_blank' rel='noreferrer'>
+          <img src={preactLogo} class='logo preact' alt='Preact logo' />
         </a>
       </div>
 
       <p>Click on the Tauri, Vite, and Preact logos to learn more.</p>
 
       <form
-        class="row"
+        class='row'
         onSubmit={(e) => {
-          e.preventDefault();
-          greet();
+          e.preventDefault()
+          greet()
         }}
       >
         <input
-          id="greet-input"
+          id='greet-input'
           onInput={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
+          placeholder='Enter a name...'
         />
-        <button type="submit">Greet</button>
+        <button type='submit'>Greet</button>
       </form>
 
       <p>{greetMsg}</p>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

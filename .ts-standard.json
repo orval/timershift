@@ -1,0 +1,4 @@
+{
+  "ignore": ["dist", "src-tauri/target"],
+  "globals": ["__TAURI__"]
+}
