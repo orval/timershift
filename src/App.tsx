@@ -1,4 +1,5 @@
 import type { JSX } from 'preact'
+import { Pause, Play } from 'lucide-preact'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import './App.css'
 
@@ -40,8 +41,18 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
       <div class='timer-body'>
         <p class='timer-display'>{formatTime(timer.elapsed)}</p>
         <div class='timer-actions'>
-          <button type='button' onClick={() => onToggle(timer.id)}>
-            {timer.running ? 'Pause' : 'Start'}
+          <button
+            type='button'
+            class={`action-btn ${timer.running ? 'action-btn--pause' : 'action-btn--play'}`}
+            aria-label={timer.running ? 'Pause timer' : 'Start timer'}
+            onClick={() => onToggle(timer.id)}
+          >
+            <span class='sr-only'>{timer.running ? 'Pause' : 'Start'}</span>
+            {timer.running ? (
+              <Pause class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+            ) : (
+              <Play class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+            )}
           </button>
           <button type='button' class='ghost-btn' onClick={() => onReset(timer.id)}>
             Reset

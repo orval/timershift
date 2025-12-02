@@ -46,6 +46,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-import", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:2.32.0"],\
           ["eslint-plugin-promise", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:6.6.0"],\
           ["globals", "npm:15.15.0"],\
+          ["lucide-preact", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:0.555.0"],\
           ["preact", "npm:10.22.0"],\
           ["timershift", "workspace:."],\
           ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=5adc0c"],\
@@ -4300,6 +4301,28 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["lucide-preact", [\
+      ["npm:0.555.0", {\
+        "packageLocation": "../../../.yarn/berry/cache/lucide-preact-npm-0.555.0-2a278cf6ea-10c0.zip/node_modules/lucide-preact/",\
+        "packageDependencies": [\
+          ["lucide-preact", "npm:0.555.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:0.555.0", {\
+        "packageLocation": "./.yarn/__virtual__/lucide-preact-virtual-286d35a902/4/.yarn/berry/cache/lucide-preact-npm-0.555.0-2a278cf6ea-10c0.zip/node_modules/lucide-preact/",\
+        "packageDependencies": [\
+          ["@types/preact", null],\
+          ["lucide-preact", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:0.555.0"],\
+          ["preact", "npm:10.22.0"]\
+        ],\
+        "packagePeers": [\
+          "@types/preact",\
+          "preact"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["magic-string", [\
       ["npm:0.30.5", {\
         "packageLocation": "../../../.yarn/berry/cache/magic-string-npm-0.30.5-dffb7e6a73-10c0.zip/node_modules/magic-string/",\
@@ -5339,6 +5362,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-import", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:2.32.0"],\
           ["eslint-plugin-promise", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:6.6.0"],\
           ["globals", "npm:15.15.0"],\
+          ["lucide-preact", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:0.555.0"],\
           ["preact", "npm:10.22.0"],\
           ["timershift", "workspace:."],\
           ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=5adc0c"],\
