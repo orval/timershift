@@ -1,6 +1,6 @@
-# Tauri + Preact + Typescript
+# TimerShift
 
-This template should help get you started developing with Tauri, Preact and Typescript in Vite.
+Run mulitple timers at once and easily move chunks of time between timers.
 
 ## Recommended IDE Setup
 
