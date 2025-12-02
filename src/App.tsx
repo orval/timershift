@@ -116,15 +116,8 @@ function App (): JSX.Element {
   return (
     <div class='app-shell'>
       <header class='page-header'>
-        <div>
-          <p class='eyebrow'>Timershift</p>
-          <h1>Run multiple timers in parallel</h1>
-          <p class='lede'>
-            Stack as many timers as you need. Start, pause, and reset without leaving the list.
-          </p>
-        </div>
-        <button class='primary' type='button' onClick={addTimer}>
-          + New timer
+        <button class='primary' type='button' onClick={addTimer} title='Add new timer'>
+          +
         </button>
       </header>
 
