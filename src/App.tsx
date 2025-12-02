@@ -1,13 +1,14 @@
+import type { JSX } from 'preact'
 import { useState } from 'preact/hooks'
 import preactLogo from './assets/preact.svg'
 import { invoke } from '@tauri-apps/api/tauri'
 import './App.css'
 
-function App () {
+function App (): JSX.Element {
   const [greetMsg, setGreetMsg] = useState('')
   const [name, setName] = useState('')
 
-  async function greet () {
+  async function greet (): Promise<void> {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
     setGreetMsg(await invoke('greet', { name }))
   }
@@ -32,9 +33,9 @@ function App () {
 
       <form
         class='row'
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
-          greet()
+          await greet()
         }}
       >
         <input
