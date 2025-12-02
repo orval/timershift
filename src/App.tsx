@@ -62,12 +62,8 @@ function App (): JSX.Element {
     if (savedRaw) {
       try {
         const parsed = JSON.parse(savedRaw) as { timers?: Timer[], savedAt?: number }
-        const lastSaved = parsed.savedAt ?? Date.now()
-        const deltaSeconds = Math.max(0, Math.floor((Date.now() - lastSaved) / 1000))
-
-        return (parsed.timers ?? []).map((timer) =>
-          timer.running ? { ...timer, elapsed: timer.elapsed + deltaSeconds } : timer
-        )
+        const restored = (parsed.timers ?? []).map((timer) => ({ ...timer, running: false }))
+        if (restored.length > 0) return restored
       } catch {
         // If parsing fails, fall back to defaults below.
       }
