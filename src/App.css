@@ -1,7 +1,7 @@
 :root {
   font-family: 'Space Grotesk', 'Sora', 'SF Pro Display', 'Segoe UI', sans-serif;
-  color: #0e1117;
-  background: radial-gradient(circle at 10% 20%, #f5f7fb 0, #eef2f7 32%, #e5ecf6 68%, #e8eff8 100%);
+  color: #e9ecf5;
+  background: radial-gradient(circle at 15% 20%, #0c1224 0, #0b1020 34%, #0a0f1e 65%, #050911 100%);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -13,6 +13,7 @@
 
 body {
   margin: 0;
+  background: transparent;
 }
 
 .app-shell {
@@ -36,7 +37,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0 0 4px;
-  color: #4c566a;
+  color: #7e8baa;
 }
 
 h1 {
@@ -47,7 +48,7 @@ h1 {
 
 .lede {
   margin: 0;
-  color: #6b7280;
+  color: #9aa5c6;
   max-width: 640px;
 }
 
@@ -66,25 +67,25 @@ button:active {
 }
 
 .primary {
-  background: linear-gradient(120deg, #111827, #1f2937);
-  color: #f9fafb;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
-  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: linear-gradient(120deg, #2c7cf8, #6a5bff);
+  color: #f9fbff;
+  box-shadow: 0 12px 28px rgba(71, 110, 255, 0.35);
+  border: 1px solid rgba(110, 150, 255, 0.4);
 }
 
 .primary:hover {
-  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 16px 34px rgba(71, 110, 255, 0.45);
 }
 
 .ghost-btn {
-  background: transparent;
-  color: #374151;
+  background: rgba(255, 255, 255, 0.04);
+  color: #d8def0;
   padding: 10px 12px;
-  border: 1px solid rgba(55, 65, 81, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .ghost-btn:hover {
-  background: rgba(55, 65, 81, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .timers {
@@ -94,19 +95,19 @@ button:active {
 }
 
 .timer-card {
-  background: #ffffff;
-  border: 1px solid rgba(12, 20, 32, 0.08);
+  background: linear-gradient(145deg, #0f162b, #0c1224 45%, #0b101e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 16px 18px;
-  box-shadow: 0 10px 30px rgba(12, 20, 32, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.02);
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .timer-card--running {
-  border-color: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.18);
+  border-color: rgba(110, 150, 255, 0.6);
+  box-shadow: 0 12px 32px rgba(110, 150, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .timer-heading {
@@ -118,7 +119,7 @@ button:active {
 .timer-label {
   margin: 0;
   font-weight: 700;
-  color: #0b1324;
+  color: #f2f4ff;
 }
 
 .timer-body {
@@ -134,7 +135,8 @@ button:active {
   font-size: 32px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #111827;
+  color: #f9fbff;
+  text-shadow: 0 0 20px rgba(110, 150, 255, 0.35);
 }
 
 .timer-actions {
@@ -144,12 +146,12 @@ button:active {
 
 .empty {
   margin: 16px 0;
-  color: #6b7280;
+  color: #9aa5c6;
   text-align: center;
-  border: 1px dashed rgba(107, 114, 128, 0.5);
+  border: 1px dashed rgba(154, 165, 198, 0.4);
   padding: 20px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 @media (max-width: 720px) {
