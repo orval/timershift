@@ -1,52 +1,148 @@
 import type { JSX } from 'preact'
-import { useState } from 'preact/hooks'
-import preactLogo from './assets/preact.svg'
-import { invoke } from '@tauri-apps/api/tauri'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import './App.css'
 
-function App (): JSX.Element {
-  const [greetMsg, setGreetMsg] = useState('')
-  const [name, setName] = useState('')
+type Timer = {
+  id: number
+  label: string
+  duration: number
+  remaining: number
+  running: boolean
+}
 
-  async function greet (): Promise<void> {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke('greet', { name }))
+const formatTime = (totalSeconds: number): string => {
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+type TimerCardProps = {
+  timer: Timer
+  onToggle: (id: number) => void
+  onReset: (id: number) => void
+  onRemove: (id: number) => void
+}
+
+const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.Element => {
+  return (
+    <div class={`timer-card ${timer.running ? 'timer-card--running' : ''}`}>
+      <div class='timer-heading'>
+        <p class='timer-label'>{timer.label}</p>
+        <button class='ghost-btn' type='button' onClick={() => onRemove(timer.id)}>
+          Remove
+        </button>
+      </div>
+      <div class='timer-body'>
+        <p class='timer-display'>{formatTime(timer.remaining)}</p>
+        <div class='timer-actions'>
+          <button type='button' onClick={() => onToggle(timer.id)}>
+            {timer.running ? 'Pause' : 'Start'}
+          </button>
+          <button type='button' class='ghost-btn' onClick={() => onReset(timer.id)}>
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function App (): JSX.Element {
+  const [timers, setTimers] = useState<Timer[]>([
+    { id: 1, label: 'Focus sprint', duration: 25 * 60, remaining: 25 * 60, running: false },
+    { id: 2, label: 'Break', duration: 5 * 60, remaining: 5 * 60, running: false },
+    { id: 3, label: 'Stretch', duration: 10 * 60, remaining: 10 * 60, running: false }
+  ])
+
+  const hasRunningTimer = useMemo(
+    () => timers.some((timer) => timer.running && timer.remaining > 0),
+    [timers]
+  )
+
+  useEffect(() => {
+    if (!hasRunningTimer) return
+
+    const interval = window.setInterval(() => {
+      setTimers((prev) =>
+        prev.map((timer) => {
+          if (!timer.running || timer.remaining === 0) return timer
+          const next = Math.max(0, timer.remaining - 1)
+          return { ...timer, remaining: next, running: next > 0 }
+        })
+      )
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [hasRunningTimer])
+
+  const toggleTimer = (id: number): void => {
+    setTimers((prev) =>
+      prev.map((timer) =>
+        timer.id === id && timer.remaining > 0
+          ? { ...timer, running: !timer.running }
+          : timer
+      )
+    )
+  }
+
+  const resetTimer = (id: number): void => {
+    setTimers((prev) =>
+      prev.map((timer) =>
+        timer.id === id ? { ...timer, remaining: timer.duration, running: false } : timer
+      )
+    )
+  }
+
+  const removeTimer = (id: number): void => {
+    setTimers((prev) => prev.filter((timer) => timer.id !== id))
+  }
+
+  const addTimer = (): void => {
+    const defaultDuration = 5 * 60
+    const nextId = Date.now()
+    const count = timers.length + 1
+    setTimers((prev) => [
+      ...prev,
+      {
+        id: nextId,
+        label: `Timer ${count}`,
+        duration: defaultDuration,
+        remaining: defaultDuration,
+        running: false
+      }
+    ])
   }
 
   return (
-    <div class='container'>
-      <h1>Welcome to Tauri!</h1>
+    <div class='app-shell'>
+      <header class='page-header'>
+        <div>
+          <p class='eyebrow'>Timershift</p>
+          <h1>Run multiple timers in parallel</h1>
+          <p class='lede'>
+            Stack as many timers as you need. Start, pause, and reset without leaving the list.
+          </p>
+        </div>
+        <button class='primary' type='button' onClick={addTimer}>
+          + New timer
+        </button>
+      </header>
 
-      <div class='row'>
-        <a href='https://vitejs.dev' target='_blank' rel='noreferrer'>
-          <img src='/vite.svg' class='logo vite' alt='Vite logo' />
-        </a>
-        <a href='https://tauri.app' target='_blank' rel='noreferrer'>
-          <img src='/tauri.svg' class='logo tauri' alt='Tauri logo' />
-        </a>
-        <a href='https://preactjs.com' target='_blank' rel='noreferrer'>
-          <img src={preactLogo} class='logo preact' alt='Preact logo' />
-        </a>
-      </div>
-
-      <p>Click on the Tauri, Vite, and Preact logos to learn more.</p>
-
-      <form
-        class='row'
-        onSubmit={async (e) => {
-          e.preventDefault()
-          await greet()
-        }}
-      >
-        <input
-          id='greet-input'
-          onInput={(e) => setName(e.currentTarget.value)}
-          placeholder='Enter a name...'
-        />
-        <button type='submit'>Greet</button>
-      </form>
-
-      <p>{greetMsg}</p>
+      <section class='timers'>
+        {timers.length === 0 ? (
+          <p class='empty'>No timers yet. Create one to get started.</p>
+        ) : (
+          timers.map((timer) => (
+            <TimerCard
+              key={timer.id}
+              timer={timer}
+              onToggle={toggleTimer}
+              onReset={resetTimer}
+              onRemove={removeTimer}
+            />
+          ))
+        )}
+      </section>
     </div>
   )
 }
