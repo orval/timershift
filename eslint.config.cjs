@@ -80,6 +80,7 @@ module.exports = defineConfig([
             ...importPlugin.configs.recommended.rules,
             ...(importPlugin.configs.typescript?.rules ?? {}),
             ...promisePlugin.configs.recommended.rules,
+            semi: ["error", "never"],
         },
     },
 ]);
