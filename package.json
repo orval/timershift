@@ -14,8 +14,15 @@
     "preact": "^10.16.0"
   },
   "devDependencies": {
+    "@babel/code-frame": "^7.27.1",
+    "@babel/core": "^7.28.5",
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@babel/plugin-transform-react-jsx-development": "^7.27.1",
     "@preact/preset-vite": "^2.5.0",
     "@tauri-apps/cli": "^1",
+    "@types/babel__code-frame": "^7",
+    "@types/babel__core": "^7",
+    "babel-plugin-transform-hook-names": "^1.0.2",
     "typescript": "^5.0.2",
     "vite": "^5.0.0"
   },
