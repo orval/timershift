@@ -5,15 +5,18 @@ import './App.css'
 type Timer = {
   id: number
   label: string
-  duration: number
-  remaining: number
+  elapsed: number
   running: boolean
 }
 
 const formatTime = (totalSeconds: number): string => {
-  const minutes = Math.floor(totalSeconds / 60)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  const hh = String(hours).padStart(2, '0')
+  const mm = String(minutes).padStart(2, '0')
+  const ss = String(seconds).padStart(2, '0')
+  return `${hh}:${mm}:${ss}`
 }
 
 type TimerCardProps = {
@@ -33,7 +36,7 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
         </button>
       </div>
       <div class='timer-body'>
-        <p class='timer-display'>{formatTime(timer.remaining)}</p>
+        <p class='timer-display'>{formatTime(timer.elapsed)}</p>
         <div class='timer-actions'>
           <button type='button' onClick={() => onToggle(timer.id)}>
             {timer.running ? 'Pause' : 'Start'}
@@ -49,13 +52,13 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
 
 function App (): JSX.Element {
   const [timers, setTimers] = useState<Timer[]>([
-    { id: 1, label: 'Focus sprint', duration: 25 * 60, remaining: 25 * 60, running: false },
-    { id: 2, label: 'Break', duration: 5 * 60, remaining: 5 * 60, running: false },
-    { id: 3, label: 'Stretch', duration: 10 * 60, remaining: 10 * 60, running: false }
+    { id: 1, label: 'Focus sprint', elapsed: 0, running: false },
+    { id: 2, label: 'Break', elapsed: 0, running: false },
+    { id: 3, label: 'Stretch', elapsed: 0, running: false }
   ])
 
   const hasRunningTimer = useMemo(
-    () => timers.some((timer) => timer.running && timer.remaining > 0),
+    () => timers.some((timer) => timer.running),
     [timers]
   )
 
@@ -64,11 +67,9 @@ function App (): JSX.Element {
 
     const interval = window.setInterval(() => {
       setTimers((prev) =>
-        prev.map((timer) => {
-          if (!timer.running || timer.remaining === 0) return timer
-          const next = Math.max(0, timer.remaining - 1)
-          return { ...timer, remaining: next, running: next > 0 }
-        })
+        prev.map((timer) =>
+          timer.running ? { ...timer, elapsed: timer.elapsed + 1 } : timer
+        )
       )
     }, 1000)
 
@@ -78,18 +79,14 @@ function App (): JSX.Element {
   const toggleTimer = (id: number): void => {
     setTimers((prev) =>
       prev.map((timer) =>
-        timer.id === id && timer.remaining > 0
-          ? { ...timer, running: !timer.running }
-          : timer
+        timer.id === id ? { ...timer, running: !timer.running } : timer
       )
     )
   }
 
   const resetTimer = (id: number): void => {
     setTimers((prev) =>
-      prev.map((timer) =>
-        timer.id === id ? { ...timer, remaining: timer.duration, running: false } : timer
-      )
+      prev.map((timer) => (timer.id === id ? { ...timer, elapsed: 0, running: false } : timer))
     )
   }
 
@@ -98,7 +95,6 @@ function App (): JSX.Element {
   }
 
   const addTimer = (): void => {
-    const defaultDuration = 5 * 60
     const nextId = Date.now()
     const count = timers.length + 1
     setTimers((prev) => [
@@ -106,8 +102,7 @@ function App (): JSX.Element {
       {
         id: nextId,
         label: `Timer ${count}`,
-        duration: defaultDuration,
-        remaining: defaultDuration,
+        elapsed: 0,
         running: false
       }
     ])
