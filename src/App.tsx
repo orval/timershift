@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { Pause, Play, CirclePlus } from 'lucide-preact'
+import { Pause, Play, CirclePlus, RotateCcw } from 'lucide-preact'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import './App.css'
 
@@ -54,8 +54,9 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
               <Play class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
             )}
           </button>
-          <button type='button' class='ghost-btn' onClick={() => onReset(timer.id)}>
-            Reset
+          <button type='button' class='ghost-btn reset-btn' onClick={() => onReset(timer.id)}>
+            <RotateCcw class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+            <span class='sr-only'>Reset</span>
           </button>
         </div>
       </div>

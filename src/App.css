@@ -155,6 +155,27 @@ button:active {
   stroke: currentColor;
 }
 
+.reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(120deg, #ffb566, #ff954f);
+  color: #1f1208;
+  border: 1px solid rgba(255, 181, 102, 0.5);
+  box-shadow: 0 10px 24px rgba(255, 149, 79, 0.35);
+}
+
+.reset-btn:hover {
+  background: linear-gradient(120deg, #975204, #ff9f5d);
+  box-shadow: 0 12px 28px rgba(255, 149, 79, 0.45);
+}
+
+.reset-btn .icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
