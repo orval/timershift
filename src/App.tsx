@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { Pause, Play, Plus } from 'lucide-preact'
+import { Pause, Play, CirclePlus } from 'lucide-preact'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import './App.css'
 
@@ -159,8 +159,8 @@ function App (): JSX.Element {
       </section>
 
       <div class='add-timer'>
-        <button class='primary' type='button' onClick={addTimer} title='Add new timer'>
-          <Plus class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+        <button class='primary' type='button' onClick={addTimer}>
+          <CirclePlus class='icon' size={30} strokeWidth={2.2} aria-hidden='true' />
           <span class='sr-only'>Add new timer</span>
         </button>
       </div>
