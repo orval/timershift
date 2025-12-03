@@ -74,6 +74,11 @@ button:active {
   gap: 14px;
 }
 
+.add-timer {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .timer-card {
   background: linear-gradient(145deg, #0f162b, #0c1224 45%, #0b101e 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);

@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { Pause, Play } from 'lucide-preact'
+import { Pause, Play, Plus } from 'lucide-preact'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import './App.css'
 
@@ -141,13 +141,7 @@ function App (): JSX.Element {
   }
 
   return (
-    <div class='app-shell'>
-      <header class='page-header'>
-        <button class='primary' type='button' onClick={addTimer} title='Add new timer'>
-          +
-        </button>
-      </header>
-
+    <main class='app-shell'>
       <section class='timers'>
         {timers.length === 0 ? (
           <p class='empty'>No timers yet. Create one to get started.</p>
@@ -163,7 +157,14 @@ function App (): JSX.Element {
           ))
         )}
       </section>
-    </div>
+
+      <div class='add-timer'>
+        <button class='primary' type='button' onClick={addTimer} title='Add new timer'>
+          <Plus class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+          <span class='sr-only'>Add new timer</span>
+        </button>
+      </div>
+    </main>
   )
 }
 
