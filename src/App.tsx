@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { Pause, Play, CirclePlus, RotateCcw } from 'lucide-preact'
+import { Pause, Play, CirclePlus, RotateCcw, X } from 'lucide-preact'
 import { useEffect, useMemo, useState } from 'preact/hooks'
 import './App.css'
 
@@ -34,8 +34,9 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
     <div class={`timer-card ${timer.running ? 'timer-card--running' : ''}`}>
       <div class='timer-heading'>
         <p class='timer-label'>{timer.label}</p>
-        <button class='ghost-btn' type='button' onClick={() => onRemove(timer.id)}>
-          Remove
+        <button class='ghost-btn' type='button' onClick={() => onRemove(timer.id)} aria-label='Remove timer'>
+          <X class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+          <span class='sr-only'>Remove</span>
         </button>
       </div>
       <div class='timer-body'>
