@@ -19,10 +19,10 @@ body {
 .app-shell {
   max-width: 960px;
   margin: 0 auto;
-  padding: 48px 24px 64px;
+  padding: 28px 20px 40px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .page-header {
@@ -35,8 +35,8 @@ body {
 button {
   border: none;
   border-radius: 10px;
-  padding: 14px 16px;
-  font-size: 14px;
+  padding: 10px 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: transform 120ms ease, box-shadow 120ms ease, background 150ms ease, color 150ms ease;
@@ -71,7 +71,7 @@ button:active {
 .timers {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .add-timer {
@@ -82,12 +82,12 @@ button:active {
 .timer-card {
   background: linear-gradient(145deg, #0f162b, #0c1224 45%, #0b101e 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 16px 18px;
+  border-radius: 12px;
+  padding: 12px 14px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.02);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .timer-card--running {
@@ -105,6 +105,7 @@ button:active {
   margin: 0;
   font-weight: 700;
   color: #f2f4ff;
+  font-size: 14px;
 }
 
 .timer-body {
@@ -117,7 +118,7 @@ button:active {
 .timer-display {
   margin: 0;
   font-variant-numeric: tabular-nums;
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: #f9fbff;
@@ -130,12 +131,12 @@ button:active {
 }
 
 .action-btn {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 10px;
   color: #0b0f1f;
   background: linear-gradient(120deg, #69e0ff, #5ad1ff);
   border: 1px solid rgba(111, 200, 255, 0.4);
@@ -150,19 +151,20 @@ button:active {
 }
 
 .action-btn .icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   stroke: currentColor;
 }
 
 .reset-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: linear-gradient(120deg, #ffb566, #ff954f);
   color: #1f1208;
   border: 1px solid rgba(255, 181, 102, 0.5);
   box-shadow: 0 10px 24px rgba(255, 149, 79, 0.35);
+  padding: 8px 10px;
 }
 
 .reset-btn:hover {
@@ -171,8 +173,8 @@ button:active {
 }
 
 .reset-btn .icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   stroke: currentColor;
 }
 
