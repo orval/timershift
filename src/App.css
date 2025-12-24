@@ -91,8 +91,8 @@ button:active {
 }
 
 .timer-card--running {
-  border-color: rgba(110, 150, 255, 0.6);
-  box-shadow: 0 12px 32px rgba(110, 150, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-color: rgba(74, 222, 128, 0.6);
+  box-shadow: 0 12px 32px rgba(74, 222, 128, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .timer-heading {
