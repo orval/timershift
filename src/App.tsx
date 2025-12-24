@@ -11,6 +11,7 @@ type Timer = {
 }
 
 const STORAGE_KEY = 'timershift:timers'
+const MAX_LABEL_LENGTH = 30
 
 const formatTime = (totalSeconds: number): string => {
   const hours = Math.floor(totalSeconds / 3600)
@@ -42,6 +43,7 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove, onRename }: TimerCardPr
             value={timer.label}
             onInput={(event) => onRename(timer.id, (event.target as HTMLInputElement).value)}
             aria-label='Timer name'
+            maxLength={MAX_LABEL_LENGTH}
           />
         </div>
         <div class='timer-actions'>
@@ -158,8 +160,9 @@ function App (): JSX.Element {
   }
 
   const renameTimer = (id: number, label: string): void => {
+    const nextLabel = label.slice(0, MAX_LABEL_LENGTH)
     setTimers((prev) =>
-      prev.map((timer) => (timer.id === id ? { ...timer, label } : timer))
+      prev.map((timer) => (timer.id === id ? { ...timer, label: nextLabel } : timer))
     )
   }
 
