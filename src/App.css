@@ -202,16 +202,16 @@ button:active {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  background: rgba(248, 113, 113, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   padding: 0;
 }
 
 .reset-btn:hover {
-  background: rgba(248, 113, 113, 0.2);
-  color: #fecaca;
+  background: rgba(56, 189, 248, 0.2);
+  color: #bae6fd;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
