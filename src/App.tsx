@@ -27,15 +27,22 @@ type TimerCardProps = {
   onToggle: (id: number) => void
   onReset: (id: number) => void
   onRemove: (id: number) => void
+  onRename: (id: number, label: string) => void
 }
 
-const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.Element => {
+const TimerCard = ({ timer, onToggle, onReset, onRemove, onRename }: TimerCardProps): JSX.Element => {
   return (
     <div class={`timer-card ${timer.running ? 'timer-card--running' : ''}`}>
       <div class='timer-body'>
         <div class='timer-info'>
           <p class='timer-display'>{formatTime(timer.elapsed)}</p>
-          <p class='timer-label'>{timer.label}</p>
+          <input
+            class={`timer-label-input ${timer.label.trim() ? '' : 'timer-label-input--empty'}`}
+            type='text'
+            value={timer.label}
+            onInput={(event) => onRename(timer.id, (event.target as HTMLInputElement).value)}
+            aria-label='Timer name'
+          />
         </div>
         <div class='timer-actions'>
           <button
@@ -139,16 +146,21 @@ function App (): JSX.Element {
 
   const addTimer = (): void => {
     const nextId = Date.now()
-    const count = timers.length + 1
     setTimers((prev) => [
       ...prev,
       {
         id: nextId,
-        label: `Timer ${count}`,
+        label: '',
         elapsed: 0,
         running: false
       }
     ])
+  }
+
+  const renameTimer = (id: number, label: string): void => {
+    setTimers((prev) =>
+      prev.map((timer) => (timer.id === id ? { ...timer, label } : timer))
+    )
   }
 
   return (
@@ -164,6 +176,7 @@ function App (): JSX.Element {
               onToggle={toggleTimer}
               onReset={resetTimer}
               onRemove={removeTimer}
+              onRename={renameTimer}
             />
           ))
         )}
