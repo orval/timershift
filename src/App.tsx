@@ -112,6 +112,10 @@ function App (): JSX.Element {
   }, [hasRunningTimer])
 
   useEffect(() => {
+    document.body.classList.toggle('no-running', !hasRunningTimer)
+  }, [hasRunningTimer])
+
+  useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt: Date.now() }))
   }, [timers])
 

@@ -17,6 +17,10 @@ body {
   min-height: 100vh;
 }
 
+body.no-running {
+  background: radial-gradient(circle at 15% 20%, #3b1414 0, #2d1011 34%, #1f0b0d 65%, #140607 100%);
+}
+
 .app-shell {
   max-width: 960px;
   margin: 0 auto;
