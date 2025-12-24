@@ -183,10 +183,20 @@ button:active {
   background: rgba(52, 211, 153, 0.08);
 }
 
+.action-btn--play:hover {
+  background: rgba(52, 211, 153, 0.18);
+  color: #a7f3d0;
+}
+
 .action-btn--pause {
   color: #fb923c;
   border-color: rgba(251, 146, 60, 0.5);
   background: rgba(251, 146, 60, 0.1);
+}
+
+.action-btn--pause:hover {
+  background: rgba(251, 146, 60, 0.2);
+  color: #fed7aa;
 }
 
 .action-btn .icon {
