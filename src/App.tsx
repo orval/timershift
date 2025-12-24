@@ -46,13 +46,13 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
           >
             <span class='sr-only'>{timer.running ? 'Pause' : 'Start'}</span>
             {timer.running ? (
-              <Pause class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+              <Pause class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             ) : (
-              <Play class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+              <Play class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             )}
           </button>
           <button type='button' class='ghost-btn reset-btn' onClick={() => onReset(timer.id)}>
-            <RotateCcw class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
+            <RotateCcw class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Reset</span>
           </button>
           <button
@@ -167,7 +167,7 @@ function App (): JSX.Element {
 
       <div class='add-timer'>
         <button class='primary' type='button' onClick={addTimer}>
-          <CirclePlus class='icon' size={30} strokeWidth={2.2} aria-hidden='true' />
+          <CirclePlus class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
           <span class='sr-only'>Add new timer</span>
         </button>
       </div>
