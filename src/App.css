@@ -159,23 +159,23 @@ button:active {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  color: #0b0f1f;
-  background: linear-gradient(120deg, #69e0ff, #5ad1ff);
-  border: 1px solid rgba(111, 200, 255, 0.4);
-  box-shadow: 0 12px 26px rgba(90, 209, 255, 0.35);
+  color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
   padding: 0;
 }
 
 .action-btn--play {
-  background: linear-gradient(120deg, #6ee7b7, #34d399);
-  border-color: rgba(52, 211, 153, 0.5);
-  box-shadow: 0 12px 26px rgba(52, 211, 153, 0.35);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(52, 211, 153, 0.08);
 }
 
 .action-btn--pause {
-  background: linear-gradient(120deg, #ffb86c, #ff8f70);
-  border-color: rgba(255, 184, 108, 0.45);
-  box-shadow: 0 12px 26px rgba(255, 143, 112, 0.35);
+  color: #fb923c;
+  border-color: rgba(251, 146, 60, 0.5);
+  background: rgba(251, 146, 60, 0.1);
 }
 
 .action-btn .icon {
@@ -188,16 +188,17 @@ button:active {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(120deg, #ffb566, #ff954f);
-  color: #1f1208;
-  border: 1px solid rgba(255, 181, 102, 0.5);
-  box-shadow: 0 10px 24px rgba(255, 149, 79, 0.35);
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   padding: 8px 10px;
 }
 
 .reset-btn:hover {
-  background: linear-gradient(120deg, #975204, #ff9f5d);
-  box-shadow: 0 12px 28px rgba(255, 149, 79, 0.45);
+  background: rgba(248, 113, 113, 0.2);
+  color: #fecaca;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
 .reset-btn .icon {
