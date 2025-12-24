@@ -32,15 +32,11 @@ type TimerCardProps = {
 const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.Element => {
   return (
     <div class={`timer-card ${timer.running ? 'timer-card--running' : ''}`}>
-      <div class='timer-heading'>
-        <p class='timer-label'>{timer.label}</p>
-        <button class='ghost-btn' type='button' onClick={() => onRemove(timer.id)} aria-label='Remove timer'>
-          <X class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
-          <span class='sr-only'>Remove</span>
-        </button>
-      </div>
       <div class='timer-body'>
-        <p class='timer-display'>{formatTime(timer.elapsed)}</p>
+        <div class='timer-info'>
+          <p class='timer-display'>{formatTime(timer.elapsed)}</p>
+          <p class='timer-label'>{timer.label}</p>
+        </div>
         <div class='timer-actions'>
           <button
             type='button'
@@ -58,6 +54,15 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove }: TimerCardProps): JSX.
           <button type='button' class='ghost-btn reset-btn' onClick={() => onReset(timer.id)}>
             <RotateCcw class='icon' size={20} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Reset</span>
+          </button>
+          <button
+            class='ghost-btn remove-btn'
+            type='button'
+            onClick={() => onRemove(timer.id)}
+            aria-label='Remove timer'
+          >
+            <X class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <span class='sr-only'>Remove</span>
           </button>
         </div>
       </div>

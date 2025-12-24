@@ -116,6 +116,13 @@ button:active {
   flex-wrap: nowrap;
 }
 
+.timer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
 .timer-display {
   margin: 0;
   font-variant-numeric: tabular-nums;
@@ -130,6 +137,10 @@ button:active {
 .timer-actions {
   display: flex;
   gap: 8px;
+}
+
+.remove-btn {
+  padding: 6px;
 }
 
 .action-btn {
