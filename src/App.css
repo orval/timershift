@@ -48,10 +48,10 @@ button:active {
 }
 
 .primary {
-  background: linear-gradient(120deg, #2c7cf8, #6a5bff);
-  color: #f9fbff;
-  box-shadow: 0 12px 28px rgba(71, 110, 255, 0.35);
-  border: 1px solid rgba(110, 150, 255, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+  color: #e5e7eb;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   width: 36px;
   height: 36px;
   display: inline-flex;
@@ -61,7 +61,9 @@ button:active {
 }
 
 .primary:hover {
-  box-shadow: 0 16px 34px rgba(71, 110, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f9fbff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
 .ghost-btn {
