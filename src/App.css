@@ -142,6 +142,14 @@ button:active {
 
 .remove-btn {
   padding: 6px;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.remove-btn:hover {
+  background: rgba(248, 113, 113, 0.2);
+  color: #fecaca;
 }
 
 .action-btn {
@@ -156,6 +164,12 @@ button:active {
   border: 1px solid rgba(111, 200, 255, 0.4);
   box-shadow: 0 12px 26px rgba(90, 209, 255, 0.35);
   padding: 0;
+}
+
+.action-btn--play {
+  background: linear-gradient(120deg, #6ee7b7, #34d399);
+  border-color: rgba(52, 211, 153, 0.5);
+  box-shadow: 0 12px 26px rgba(52, 211, 153, 0.35);
 }
 
 .action-btn--pause {
