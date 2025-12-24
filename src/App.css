@@ -1,7 +1,7 @@
 :root {
   font-family: 'Space Grotesk', 'Sora', 'SF Pro Display', 'Segoe UI', sans-serif;
   color: #e9ecf5;
-  background: radial-gradient(circle at 15% 20%, #0c1224 0, #0b1020 34%, #0a0f1e 65%, #050911 100%);
+  background: radial-gradient(circle at 15% 20%, #171a1f 0, #14171c 34%, #0f1216 65%, #0a0c10 100%);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -13,7 +13,8 @@
 
 body {
   margin: 0;
-  background: transparent;
+  background: radial-gradient(circle at 15% 20%, #171a1f 0, #14171c 34%, #0f1216 65%, #0a0c10 100%);
+  min-height: 100vh;
 }
 
 .app-shell {
