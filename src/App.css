@@ -24,7 +24,7 @@ body.no-running {
 .app-shell {
   max-width: 960px;
   margin: 0 auto;
-  padding: 28px 20px 40px;
+  padding: 20px 20px 40px;
   display: flex;
   flex-direction: column;
   gap: 16px;
