@@ -115,24 +115,38 @@ button:active {
   padding: 12px 14px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.02);
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: center;
   min-height: 72px;
-  text-align: left;
+  text-align: center;
+}
+
+.current-timer-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.current-timer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .current-timer-label {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #f2f4ff;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9aa5c6;
   letter-spacing: 0.02em;
+  max-width: 220px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 45%;
 }
 
 .current-timer-display {
@@ -143,7 +157,7 @@ button:active {
   letter-spacing: 0.05em;
   color: #f9fbff;
   text-shadow: 0 0 18px rgba(110, 150, 255, 0.3);
-  text-align: right;
+  text-align: center;
 }
 
 .timer-heading {

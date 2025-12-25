@@ -106,16 +106,34 @@ function App (): JSX.Element {
   const [modalTimerId, setModalTimerId] = useState<number | null>(null)
   const [modalError, setModalError] = useState('')
   const modalInputRef = useRef<HTMLInputElement | null>(null)
+  const lastRunningTimerIdRef = useRef<number | null>(null)
 
-  const hasRunningTimer = useMemo(
-    () => timers.some((timer) => timer.running),
+  const runningTimers = useMemo(
+    () => timers.filter((timer) => timer.running),
     [timers]
   )
 
-  const currentTimer = useMemo(() => {
-    if (timers.length === 0) return null
+  const hasRunningTimer = useMemo(
+    () => runningTimers.length > 0,
+    [runningTimers]
+  )
+
+  const displayTimers = useMemo(() => {
+    if (runningTimers.length > 0) return runningTimers
+    if (timers.length === 0) return []
+    const lastRunningId = lastRunningTimerIdRef.current
+    if (lastRunningId !== null) {
+      const lastRunningTimer = timers.find((timer) => timer.id === lastRunningId)
+      if (lastRunningTimer) return [lastRunningTimer]
+    }
+    return [timers[0]]
+  }, [runningTimers, timers])
+
+  useEffect(() => {
     const runningTimer = timers.find((timer) => timer.running)
-    return runningTimer ?? timers[0]
+    if (runningTimer) {
+      lastRunningTimerIdRef.current = runningTimer.id
+    }
   }, [timers])
 
   useEffect(() => {
@@ -251,10 +269,16 @@ function App (): JSX.Element {
     <>
       <main class='app-shell'>
         <section class='timers'>
-          {currentTimer && (
+          {displayTimers.length > 0 && (
             <div class='current-timer-card'>
-              <p class='current-timer-label'>{currentTimer.label}</p>
-              <p class='current-timer-display'>{formatTime(currentTimer.elapsed)}</p>
+              <div class='current-timer-list'>
+                {displayTimers.map((timer) => (
+                  <div class='current-timer-item' key={timer.id}>
+                    <p class='current-timer-display'>{formatTime(timer.elapsed)}</p>
+                    <p class='current-timer-label'>{timer.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           {timers.length === 0 ? (
