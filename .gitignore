@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .yarn/sdks/
+lhci_reports/
 
 # Editor directories and files
 .vscode/*
