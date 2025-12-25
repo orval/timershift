@@ -8,7 +8,7 @@ import { TimerModal } from './components/TimerModal'
 import { MAX_LABEL_LENGTH } from './constants'
 import { useTimers } from './hooks/useTimers'
 import type { Timer } from './types'
-import { appendHistoryLog, buildLogEntry } from './utils/history'
+import { appendLogEntry, buildLogEntry } from './utils/history'
 import { formatTime } from './utils/time'
 
 function App (): JSX.Element {
@@ -38,7 +38,7 @@ function App (): JSX.Element {
   }, [hasRunningTimer])
 
   useEffect(() => {
-    void appendHistoryLog(buildLogEntry(isHistoryOpen ? 'history_open' : 'history_close'))
+    void appendLogEntry(buildLogEntry(isHistoryOpen ? 'history_open' : 'history_close'))
   }, [isHistoryOpen])
 
   useEffect(() => {

@@ -11,7 +11,7 @@ export type RemovedTimerEntry = {
   removedAt: number
 }
 
-export type HistoryLogEntry = {
+export type LogEntry = {
   action:
     | 'remove'
     | 'restore'

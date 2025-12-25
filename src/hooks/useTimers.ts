@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { MAX_LABEL_LENGTH } from '../constants'
 import type { RemovedTimerEntry, Timer } from '../types'
-import { appendHistoryLog, buildLogEntry } from '../utils/history'
+import { appendLogEntry, buildLogEntry } from '../utils/history'
 
 const STORAGE_KEY = 'timershift:timers'
 const HISTORY_KEY = 'timershift:history'
@@ -106,7 +106,7 @@ export const useTimers = (): {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt: Date.now() }))
     } catch (error) {
-      void appendHistoryLog(buildLogEntry('error', undefined, {
+      void appendLogEntry(buildLogEntry('error', undefined, {
         source: 'localStorage',
         key: STORAGE_KEY,
         message: String(error)
@@ -118,7 +118,7 @@ export const useTimers = (): {
     try {
       window.localStorage.setItem(HISTORY_KEY, JSON.stringify({ removedTimers, savedAt: Date.now() }))
     } catch (error) {
-      void appendHistoryLog(buildLogEntry('error', undefined, {
+      void appendLogEntry(buildLogEntry('error', undefined, {
         source: 'localStorage',
         key: HISTORY_KEY,
         message: String(error)
@@ -127,9 +127,9 @@ export const useTimers = (): {
   }, [removedTimers])
 
   useEffect(() => {
-    void appendHistoryLog(buildLogEntry('app_start'))
+    void appendLogEntry(buildLogEntry('app_start'))
     if (initLoadErrorRef.current) {
-      void appendHistoryLog(buildLogEntry('error', undefined, {
+      void appendLogEntry(buildLogEntry('error', undefined, {
         source: 'storage_parse',
         key: STORAGE_KEY,
         message: initLoadErrorRef.current
@@ -141,7 +141,7 @@ export const useTimers = (): {
   useEffect(() => {
     const handleBeforeUnload = (): void => {
       const snapshot = timersRef.current
-      void appendHistoryLog(buildLogEntry('summary', undefined, {
+      void appendLogEntry(buildLogEntry('summary', undefined, {
         timers: snapshot.map((timer) => ({
           id: timer.id,
           label: timer.label,
@@ -149,7 +149,7 @@ export const useTimers = (): {
           running: timer.running
         }))
       }))
-      void appendHistoryLog(buildLogEntry('app_exit'))
+      void appendLogEntry(buildLogEntry('app_exit'))
     }
 
     window.addEventListener('beforeunload', handleBeforeUnload)
@@ -171,7 +171,7 @@ export const useTimers = (): {
       })
 
       if (target && nextAction) {
-        void appendHistoryLog(buildLogEntry(nextAction, target))
+        void appendLogEntry(buildLogEntry(nextAction, target))
       }
 
       return next
@@ -195,7 +195,7 @@ export const useTimers = (): {
       })
 
       if (updatedTimer && previousElapsed !== null) {
-        void appendHistoryLog(buildLogEntry('reset', updatedTimer, {
+        void appendLogEntry(buildLogEntry('reset', updatedTimer, {
           previousElapsed
         }))
       }
@@ -217,7 +217,7 @@ export const useTimers = (): {
       }
 
       setRemovedTimers((history) => [entry, ...history].slice(0, HISTORY_LIMIT))
-      void appendHistoryLog(buildLogEntry('remove', timerToRemove))
+      void appendLogEntry(buildLogEntry('remove', timerToRemove))
 
       return prev.filter((timer) => timer.id !== id)
     })
@@ -243,8 +243,8 @@ export const useTimers = (): {
       elapsed: 0,
       running: true
     }
-    void appendHistoryLog(buildLogEntry('add', newTimer))
-    void appendHistoryLog(buildLogEntry('start', newTimer))
+    void appendLogEntry(buildLogEntry('add', newTimer))
+    void appendLogEntry(buildLogEntry('start', newTimer))
   }
 
   const renameTimer = (id: number, label: string): void => {
@@ -265,7 +265,7 @@ export const useTimers = (): {
       })
 
       if (updatedTimer && previousLabel !== null && previousLabel !== nextLabel) {
-        void appendHistoryLog(buildLogEntry('rename', updatedTimer, {
+        void appendLogEntry(buildLogEntry('rename', updatedTimer, {
           previousLabel
         }))
       }
@@ -283,7 +283,7 @@ export const useTimers = (): {
 
     setRemovedTimers((prev) => prev.filter((item) => item.entryId !== entry.entryId))
 
-    void appendHistoryLog(buildLogEntry('restore', restoredTimer, {
+    void appendLogEntry(buildLogEntry('restore', restoredTimer, {
       originalId: entry.timer.id
     }))
   }
