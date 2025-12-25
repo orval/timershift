@@ -112,6 +112,12 @@ function App (): JSX.Element {
     [timers]
   )
 
+  const currentTimer = useMemo(() => {
+    if (timers.length === 0) return null
+    const runningTimer = timers.find((timer) => timer.running)
+    return runningTimer ?? timers[0]
+  }, [timers])
+
   useEffect(() => {
     if (!hasRunningTimer) return
 
@@ -245,6 +251,12 @@ function App (): JSX.Element {
     <>
       <main class='app-shell'>
         <section class='timers'>
+          {currentTimer && (
+            <div class='current-timer-card'>
+              <p class='current-timer-label'>{currentTimer.label}</p>
+              <p class='current-timer-display'>{formatTime(currentTimer.elapsed)}</p>
+            </div>
+          )}
           {timers.length === 0 ? (
             <p class='empty'>No timers yet. Create one to get started.</p>
           ) : (
