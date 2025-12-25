@@ -17,11 +17,25 @@ type RemovedTimerEntry = {
 }
 
 type HistoryLogEntry = {
-  action: 'remove' | 'restore'
-  timerId: number
-  label: string
-  elapsed: number
+  action:
+    | 'remove'
+    | 'restore'
+    | 'add'
+    | 'rename'
+    | 'reset'
+    | 'start'
+    | 'pause'
+    | 'app_start'
+    | 'app_exit'
+    | 'summary'
+    | 'history_open'
+    | 'history_close'
+    | 'error'
   at: number
+  timerId?: number
+  label?: string
+  elapsed?: number
+  metadata?: Record<string, unknown>
 }
 
 const STORAGE_KEY = 'timershift:timers'
@@ -48,6 +62,19 @@ const formatTimestamp = (timestamp: number): string =>
     hour: '2-digit',
     minute: '2-digit'
   })
+
+const buildLogEntry = (
+  action: HistoryLogEntry['action'],
+  timer?: Timer,
+  metadata?: Record<string, unknown>
+): HistoryLogEntry => ({
+  action,
+  timerId: timer?.id,
+  label: timer?.label,
+  elapsed: timer?.elapsed,
+  at: Date.now(),
+  metadata
+})
 
 const getHistoryLogPath = async (): Promise<{ appDir: string, logPath: string } | null> => {
   try {
@@ -136,6 +163,7 @@ const TimerCard = ({ timer, onToggle, onReset, onRemove, onRenameRequest }: Time
 }
 
 function App (): JSX.Element {
+  const initLoadErrorRef = useRef<string | null>(null)
   const [timers, setTimers] = useState<Timer[]>(() => {
     if (typeof window === 'undefined') {
       return []
@@ -147,7 +175,8 @@ function App (): JSX.Element {
         const parsed = JSON.parse(savedRaw) as { timers?: Timer[], savedAt?: number }
         const restored = (parsed.timers ?? []).map((timer) => ({ ...timer, running: false }))
         if (restored.length > 0) return restored
-      } catch {
+      } catch (error) {
+        initLoadErrorRef.current = String(error)
         // If parsing fails, fall back to defaults below.
       }
     }
@@ -181,6 +210,7 @@ function App (): JSX.Element {
 
     return []
   })
+  const timersRef = useRef<Timer[]>(timers)
 
   const runningTimers = useMemo(
     () => timers.filter((timer) => timer.running),
@@ -214,7 +244,7 @@ function App (): JSX.Element {
     if (!hasRunningTimer) return
 
     const interval = window.setInterval(() => {
-      setTimers((prev) =>
+      setTimers((prev: Timer[]) =>
         prev.map((timer) =>
           timer.running ? { ...timer, elapsed: timer.elapsed + 1 } : timer
         )
@@ -229,12 +259,65 @@ function App (): JSX.Element {
   }, [hasRunningTimer])
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt: Date.now() }))
+    timersRef.current = timers
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt: Date.now() }))
+    } catch (error) {
+      void appendHistoryLog(buildLogEntry('error', undefined, {
+        source: 'localStorage',
+        key: STORAGE_KEY,
+        message: String(error)
+      }))
+    }
   }, [timers])
 
   useEffect(() => {
-    window.localStorage.setItem(HISTORY_KEY, JSON.stringify({ removedTimers, savedAt: Date.now() }))
+    try {
+      window.localStorage.setItem(HISTORY_KEY, JSON.stringify({ removedTimers, savedAt: Date.now() }))
+    } catch (error) {
+      void appendHistoryLog(buildLogEntry('error', undefined, {
+        source: 'localStorage',
+        key: HISTORY_KEY,
+        message: String(error)
+      }))
+    }
   }, [removedTimers])
+
+  useEffect(() => {
+    void appendHistoryLog(buildLogEntry('app_start'))
+    if (initLoadErrorRef.current) {
+      void appendHistoryLog(buildLogEntry('error', undefined, {
+        source: 'storage_parse',
+        key: STORAGE_KEY,
+        message: initLoadErrorRef.current
+      }))
+      initLoadErrorRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleBeforeUnload = (): void => {
+      const snapshot = timersRef.current
+      void appendHistoryLog(buildLogEntry('summary', undefined, {
+        timers: snapshot.map((timer) => ({
+          id: timer.id,
+          label: timer.label,
+          elapsed: timer.elapsed,
+          running: timer.running
+        }))
+      }))
+      void appendHistoryLog(buildLogEntry('app_exit'))
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])
+
+  useEffect(() => {
+    void appendHistoryLog(buildLogEntry(isHistoryOpen ? 'history_open' : 'history_close'))
+  }, [isHistoryOpen])
 
   useEffect(() => {
     if (!isModalOpen) return
@@ -243,21 +326,53 @@ function App (): JSX.Element {
   }, [isModalOpen])
 
   const toggleTimer = (id: number): void => {
-    setTimers((prev) =>
-      prev.map((timer) =>
-        timer.id === id ? { ...timer, running: !timer.running } : timer
-      )
-    )
+    setTimers((prev: Timer[]) => {
+      let target: Timer | null = null
+      let nextAction: 'start' | 'pause' | null = null
+      const next = prev.map((timer) => {
+        if (timer.id !== id) return timer
+        const nextRunning = !timer.running
+        target = { ...timer, running: nextRunning }
+        nextAction = nextRunning ? 'start' : 'pause'
+        return { ...timer, running: nextRunning }
+      })
+
+      if (target && nextAction) {
+        void appendHistoryLog(buildLogEntry(nextAction, target))
+      }
+
+      return next
+    })
   }
 
   const resetTimer = (id: number): void => {
-    setTimers((prev) =>
-      prev.map((timer) => (timer.id === id ? { ...timer, elapsed: 0, running: false } : timer))
-    )
+    setTimers((prev: Timer[]) => {
+      let updatedTimer: Timer | null = null
+      let previousElapsed: number | null = null
+      const next = prev.map((timer) => {
+        if (timer.id !== id) return timer
+        previousElapsed = timer.elapsed
+        updatedTimer = {
+          id: timer.id,
+          label: timer.label,
+          elapsed: 0,
+          running: false
+        }
+        return updatedTimer
+      })
+
+      if (updatedTimer && previousElapsed !== null) {
+        void appendHistoryLog(buildLogEntry('reset', updatedTimer, {
+          previousElapsed
+        }))
+      }
+
+      return next
+    })
   }
 
   const removeTimer = (id: number): void => {
-    setTimers((prev) => {
+    setTimers((prev: Timer[]) => {
       const timerToRemove = prev.find((timer) => timer.id === id)
       if (!timerToRemove) return prev
 
@@ -269,13 +384,7 @@ function App (): JSX.Element {
       }
 
       setRemovedTimers((history) => [entry, ...history].slice(0, HISTORY_LIMIT))
-      void appendHistoryLog({
-        action: 'remove',
-        timerId: timerToRemove.id,
-        label: timerToRemove.label,
-        elapsed: timerToRemove.elapsed,
-        at: now
-      })
+      void appendHistoryLog(buildLogEntry('remove', timerToRemove))
 
       return prev.filter((timer) => timer.id !== id)
     })
@@ -284,7 +393,7 @@ function App (): JSX.Element {
   const addTimer = (label: string): void => {
     const nextId = Date.now()
     const trimmed = label.trim().slice(0, MAX_LABEL_LENGTH)
-    setTimers((prev) => [
+    setTimers((prev: Timer[]) => [
       ...prev,
       {
         id: nextId,
@@ -295,13 +404,41 @@ function App (): JSX.Element {
     ].map((timer) =>
       timer.id === nextId ? timer : { ...timer, running: false }
     ))
+    const newTimer = {
+      id: nextId,
+      label: trimmed,
+      elapsed: 0,
+      running: true
+    }
+    void appendHistoryLog(buildLogEntry('add', newTimer))
+    void appendHistoryLog(buildLogEntry('start', newTimer))
   }
 
   const renameTimer = (id: number, label: string): void => {
     const nextLabel = label.trim().slice(0, MAX_LABEL_LENGTH)
-    setTimers((prev) =>
-      prev.map((timer) => (timer.id === id ? { ...timer, label: nextLabel } : timer))
-    )
+    setTimers((prev: Timer[]) => {
+      let updatedTimer: Timer | null = null
+      let previousLabel: string | null = null
+      const next = prev.map((timer) => {
+        if (timer.id !== id) return timer
+        previousLabel = timer.label
+        updatedTimer = {
+          id: timer.id,
+          label: nextLabel,
+          elapsed: timer.elapsed,
+          running: timer.running
+        }
+        return updatedTimer
+      })
+
+      if (updatedTimer && previousLabel !== null && previousLabel !== nextLabel) {
+        void appendHistoryLog(buildLogEntry('rename', updatedTimer, {
+          previousLabel
+        }))
+      }
+
+      return next
+    })
   }
 
   const normalizeLabel = (label: string): string => label.trim().toLowerCase()
@@ -365,22 +502,17 @@ function App (): JSX.Element {
   }
 
   const restoreTimer = (entry: RemovedTimerEntry): void => {
-    setTimers((prev) => {
-      const idInUse = prev.some((timer) => timer.id === entry.timer.id)
-      const nextId = idInUse ? Date.now() : entry.timer.id
-      const restoredTimer = { ...entry.timer, id: nextId, running: false }
-      return [...prev, restoredTimer]
-    })
+    const now = Date.now()
+    const idInUse = timers.some((timer) => timer.id === entry.timer.id)
+    const nextId = idInUse ? now : entry.timer.id
+    const restoredTimer = { ...entry.timer, id: nextId, running: false }
+    setTimers((prev: Timer[]) => [...prev, restoredTimer])
 
     setRemovedTimers((prev) => prev.filter((item) => item.entryId !== entry.entryId))
 
-    void appendHistoryLog({
-      action: 'restore',
-      timerId: entry.timer.id,
-      label: entry.timer.label,
-      elapsed: entry.timer.elapsed,
-      at: Date.now()
-    })
+    void appendHistoryLog(buildLogEntry('restore', restoredTimer, {
+      originalId: entry.timer.id
+    }))
   }
 
   return (
