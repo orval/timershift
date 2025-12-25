@@ -167,9 +167,11 @@ function App (): JSX.Element {
         id: nextId,
         label: trimmed,
         elapsed: 0,
-        running: false
+        running: true
       }
-    ])
+    ].map((timer) =>
+      timer.id === nextId ? timer : { ...timer, running: false }
+    ))
   }
 
   const renameTimer = (id: number, label: string): void => {
