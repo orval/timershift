@@ -1,6 +1,6 @@
 import type { JSX } from 'preact'
 import { Pause, Play, CirclePlus, RotateCcw, X } from 'lucide-preact'
-import { useEffect, useMemo, useState } from 'preact/hooks'
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import './App.css'
 
 type Timer = {
@@ -28,23 +28,23 @@ type TimerCardProps = {
   onToggle: (id: number) => void
   onReset: (id: number) => void
   onRemove: (id: number) => void
-  onRename: (id: number, label: string) => void
+  onRenameRequest: (timer: Timer) => void
 }
 
-const TimerCard = ({ timer, onToggle, onReset, onRemove, onRename }: TimerCardProps): JSX.Element => {
+const TimerCard = ({ timer, onToggle, onReset, onRemove, onRenameRequest }: TimerCardProps): JSX.Element => {
   return (
     <div class={`timer-card ${timer.running ? 'timer-card--running' : ''}`}>
       <div class='timer-body'>
         <div class='timer-info'>
           <p class='timer-display'>{formatTime(timer.elapsed)}</p>
-          <input
-            class={`timer-label-input ${timer.label.trim() ? '' : 'timer-label-input--empty'}`}
-            type='text'
-            value={timer.label}
-            onInput={(event) => onRename(timer.id, (event.target as HTMLInputElement).value)}
-            aria-label='Timer name'
-            maxLength={MAX_LABEL_LENGTH}
-          />
+          <button
+            class='timer-label-btn'
+            type='button'
+            onClick={() => onRenameRequest(timer)}
+            aria-label='Edit timer name'
+          >
+            {timer.label}
+          </button>
         </div>
         <div class='timer-actions'>
           <button
@@ -100,6 +100,12 @@ function App (): JSX.Element {
       { id: 1, label: 'Timer 1', elapsed: 0, running: false },
     ]
   })
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalMode, setModalMode] = useState<'add' | 'rename'>('add')
+  const [modalLabel, setModalLabel] = useState('')
+  const [modalTimerId, setModalTimerId] = useState<number | null>(null)
+  const [modalError, setModalError] = useState('')
+  const modalInputRef = useRef<HTMLInputElement | null>(null)
 
   const hasRunningTimer = useMemo(
     () => timers.some((timer) => timer.running),
@@ -128,6 +134,12 @@ function App (): JSX.Element {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt: Date.now() }))
   }, [timers])
 
+  useEffect(() => {
+    if (!isModalOpen) return
+    modalInputRef.current?.focus()
+    modalInputRef.current?.select()
+  }, [isModalOpen])
+
   const toggleTimer = (id: number): void => {
     setTimers((prev) =>
       prev.map((timer) =>
@@ -146,13 +158,14 @@ function App (): JSX.Element {
     setTimers((prev) => prev.filter((timer) => timer.id !== id))
   }
 
-  const addTimer = (): void => {
+  const addTimer = (label: string): void => {
     const nextId = Date.now()
+    const trimmed = label.trim().slice(0, MAX_LABEL_LENGTH)
     setTimers((prev) => [
       ...prev,
       {
         id: nextId,
-        label: '',
+        label: trimmed,
         elapsed: 0,
         running: false
       }
@@ -160,38 +173,146 @@ function App (): JSX.Element {
   }
 
   const renameTimer = (id: number, label: string): void => {
-    const nextLabel = label.slice(0, MAX_LABEL_LENGTH)
+    const nextLabel = label.trim().slice(0, MAX_LABEL_LENGTH)
     setTimers((prev) =>
       prev.map((timer) => (timer.id === id ? { ...timer, label: nextLabel } : timer))
     )
   }
 
-  return (
-    <main class='app-shell'>
-      <section class='timers'>
-        {timers.length === 0 ? (
-          <p class='empty'>No timers yet. Create one to get started.</p>
-        ) : (
-          timers.map((timer) => (
-            <TimerCard
-              key={timer.id}
-              timer={timer}
-              onToggle={toggleTimer}
-              onReset={resetTimer}
-              onRemove={removeTimer}
-              onRename={renameTimer}
-            />
-          ))
-        )}
-      </section>
+  const normalizeLabel = (label: string): string => label.trim().toLowerCase()
 
-      <div class='add-timer'>
-        <button class='primary' type='button' onClick={addTimer}>
-          <CirclePlus class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
-          <span class='sr-only'>Add new timer</span>
-        </button>
-      </div>
-    </main>
+  const isDuplicateLabel = (label: string, excludeId: number | null = null): boolean => {
+    const normalized = normalizeLabel(label)
+    if (!normalized) return false
+    return timers.some((timer) => timer.id !== excludeId && normalizeLabel(timer.label) === normalized)
+  }
+
+  const openAddModal = (): void => {
+    setModalMode('add')
+    setModalLabel('')
+    setModalTimerId(null)
+    setModalError('')
+    setIsModalOpen(true)
+  }
+
+  const openRenameModal = (timer: Timer): void => {
+    setModalMode('rename')
+    setModalLabel(timer.label)
+    setModalTimerId(timer.id)
+    setModalError('')
+    setIsModalOpen(true)
+  }
+
+  const closeModal = (): void => {
+    setIsModalOpen(false)
+    setModalTimerId(null)
+  }
+
+  const handleModalSubmit = (event: Event): void => {
+    event.preventDefault()
+    const trimmed = modalLabel.trim()
+    if (!trimmed) {
+      setModalError('Name is required.')
+      return
+    }
+
+    if (modalMode === 'add') {
+      if (isDuplicateLabel(trimmed)) {
+        setModalError('Name already used.')
+        return
+      }
+      addTimer(trimmed)
+    } else if (modalTimerId !== null) {
+      if (isDuplicateLabel(trimmed, modalTimerId)) {
+        setModalError('Name already used.')
+        return
+      }
+      renameTimer(modalTimerId, trimmed)
+    }
+
+    closeModal()
+  }
+
+  const handleModalInput = (event: Event): void => {
+    const value = (event.target as HTMLInputElement).value
+    setModalLabel(value)
+    if (modalError && value.trim() && !isDuplicateLabel(value, modalTimerId)) {
+      setModalError('')
+    }
+  }
+
+  return (
+    <>
+      <main class='app-shell'>
+        <section class='timers'>
+          {timers.length === 0 ? (
+            <p class='empty'>No timers yet. Create one to get started.</p>
+          ) : (
+            timers.map((timer) => (
+              <TimerCard
+                key={timer.id}
+                timer={timer}
+                onToggle={toggleTimer}
+                onReset={resetTimer}
+                onRemove={removeTimer}
+                onRenameRequest={openRenameModal}
+              />
+            ))
+          )}
+        </section>
+
+        <div class='add-timer'>
+          <button class='primary' type='button' onClick={openAddModal}>
+            <CirclePlus class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <span class='sr-only'>Add new timer</span>
+          </button>
+        </div>
+      </main>
+
+      {isModalOpen && (
+        <div class='modal-backdrop' onClick={closeModal}>
+          <div
+            class='modal'
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='timer-modal-title'
+            onClick={(event) => event.stopPropagation()}
+          >
+            <form class='modal-form' onSubmit={handleModalSubmit}>
+              <h2 class='modal-title' id='timer-modal-title'>
+                {modalMode === 'add' ? 'New timer' : 'Rename timer'}
+              </h2>
+              <label class='modal-label' htmlFor='timer-name'>
+                Timer name
+              </label>
+              <input
+                id='timer-name'
+                ref={modalInputRef}
+                class='modal-input'
+                type='text'
+                value={modalLabel}
+                onInput={handleModalInput}
+                maxLength={MAX_LABEL_LENGTH}
+                aria-invalid={modalError ? 'true' : 'false'}
+              />
+              {modalError && (
+                <p class='modal-error' role='status'>
+                  {modalError}
+                </p>
+              )}
+              <div class='modal-actions'>
+                <button class='modal-btn' type='button' onClick={closeModal}>
+                  Cancel
+                </button>
+                <button class='modal-btn modal-btn--primary' type='submit'>
+                  {modalMode === 'add' ? 'Create' : 'Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
