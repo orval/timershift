@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { Pause, Play, CirclePlus, RotateCcw, X } from 'lucide-preact'
+import { Pause, Play, CirclePlus, RotateCcw, X, History } from 'lucide-preact'
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import './App.css'
 
@@ -10,8 +10,24 @@ type Timer = {
   running: boolean
 }
 
+type RemovedTimerEntry = {
+  entryId: string
+  timer: Timer
+  removedAt: number
+}
+
+type HistoryLogEntry = {
+  action: 'remove' | 'restore'
+  timerId: number
+  label: string
+  elapsed: number
+  at: number
+}
+
 const STORAGE_KEY = 'timershift:timers'
+const HISTORY_KEY = 'timershift:history'
 const MAX_LABEL_LENGTH = 30
+const HISTORY_LIMIT = 40
 
 const formatTime = (totalSeconds: number): string => {
   const hours = Math.floor(totalSeconds / 3600)
@@ -21,6 +37,40 @@ const formatTime = (totalSeconds: number): string => {
   const mm = String(minutes).padStart(2, '0')
   const ss = String(seconds).padStart(2, '0')
   return `${hh}:${mm}:${ss}`
+}
+
+const formatTimestamp = (timestamp: number): string =>
+  new Date(timestamp).toLocaleString([], {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+
+const isTauriApp = (): boolean =>
+  typeof window !== 'undefined' && Boolean((window as { __TAURI_IPC__?: unknown }).__TAURI_IPC__)
+
+const appendHistoryLog = async (entry: HistoryLogEntry): Promise<void> => {
+  if (!isTauriApp()) return
+
+  try {
+    const { appDataDir, join } = await import('@tauri-apps/api/path')
+    const { createDir, readTextFile, writeTextFile } = await import('@tauri-apps/api/fs')
+    const appDir = await appDataDir()
+    await createDir(appDir, { recursive: true })
+    const logPath = await join(appDir, 'timershift-history.jsonl')
+    const line = `${JSON.stringify(entry)}\n`
+    let existing = ''
+    try {
+      existing = await readTextFile(logPath)
+    } catch {
+      // No prior log file.
+    }
+    await writeTextFile(logPath, `${existing}${line}`)
+  } catch {
+    // Logging is best-effort; ignore failures.
+  }
 }
 
 type TimerCardProps = {
@@ -107,6 +157,24 @@ function App (): JSX.Element {
   const [modalError, setModalError] = useState('')
   const modalInputRef = useRef<HTMLInputElement | null>(null)
   const lastRunningTimerIdRef = useRef<number | null>(null)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [removedTimers, setRemovedTimers] = useState<RemovedTimerEntry[]>(() => {
+    if (typeof window === 'undefined') {
+      return []
+    }
+
+    const savedRaw = window.localStorage.getItem(HISTORY_KEY)
+    if (savedRaw) {
+      try {
+        const parsed = JSON.parse(savedRaw) as { removedTimers?: RemovedTimerEntry[] }
+        return parsed.removedTimers ?? []
+      } catch {
+        // Fall back to empty history.
+      }
+    }
+
+    return []
+  })
 
   const runningTimers = useMemo(
     () => timers.filter((timer) => timer.running),
@@ -159,6 +227,10 @@ function App (): JSX.Element {
   }, [timers])
 
   useEffect(() => {
+    window.localStorage.setItem(HISTORY_KEY, JSON.stringify({ removedTimers, savedAt: Date.now() }))
+  }, [removedTimers])
+
+  useEffect(() => {
     if (!isModalOpen) return
     modalInputRef.current?.focus()
     modalInputRef.current?.select()
@@ -179,7 +251,28 @@ function App (): JSX.Element {
   }
 
   const removeTimer = (id: number): void => {
-    setTimers((prev) => prev.filter((timer) => timer.id !== id))
+    setTimers((prev) => {
+      const timerToRemove = prev.find((timer) => timer.id === id)
+      if (!timerToRemove) return prev
+
+      const now = Date.now()
+      const entry: RemovedTimerEntry = {
+        entryId: `${now}-${Math.random().toString(36).slice(2, 8)}`,
+        timer: { ...timerToRemove, running: false },
+        removedAt: now
+      }
+
+      setRemovedTimers((history) => [entry, ...history].slice(0, HISTORY_LIMIT))
+      void appendHistoryLog({
+        action: 'remove',
+        timerId: timerToRemove.id,
+        label: timerToRemove.label,
+        elapsed: timerToRemove.elapsed,
+        at: now
+      })
+
+      return prev.filter((timer) => timer.id !== id)
+    })
   }
 
   const addTimer = (label: string): void => {
@@ -265,6 +358,25 @@ function App (): JSX.Element {
     }
   }
 
+  const restoreTimer = (entry: RemovedTimerEntry): void => {
+    setTimers((prev) => {
+      const idInUse = prev.some((timer) => timer.id === entry.timer.id)
+      const nextId = idInUse ? Date.now() : entry.timer.id
+      const restoredTimer = { ...entry.timer, id: nextId, running: false }
+      return [...prev, restoredTimer]
+    })
+
+    setRemovedTimers((prev) => prev.filter((item) => item.entryId !== entry.entryId))
+
+    void appendHistoryLog({
+      action: 'restore',
+      timerId: entry.timer.id,
+      label: entry.timer.label,
+      elapsed: entry.timer.elapsed,
+      at: Date.now()
+    })
+  }
+
   return (
     <>
       <main class='app-shell'>
@@ -297,11 +409,66 @@ function App (): JSX.Element {
           )}
         </section>
 
-        <div class='add-timer'>
-          <button class='primary' type='button' onClick={openAddModal}>
-            <CirclePlus class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
-            <span class='sr-only'>Add new timer</span>
-          </button>
+        {isHistoryOpen && (
+          <section class='history-panel'>
+            <div class='history-header'>
+              <h2 class='history-title'>History</h2>
+              <div class='history-actions'>
+                <button
+                  class='ghost-btn history-restore-btn'
+                  type='button'
+                  onClick={() => setIsHistoryOpen(false)}
+                >
+                  Hide
+                </button>
+              </div>
+            </div>
+            {removedTimers.length === 0 ? (
+              <p class='history-empty'>No removed timers yet</p>
+            ) : (
+              <ul class='history-list'>
+                {removedTimers.map((entry) => (
+                  <li class='history-item' key={entry.entryId}>
+                    <div class='history-meta'>
+                      <p class='history-name'>{entry.timer.label}</p>
+                      <p class='history-time'>
+                        Removed {formatTimestamp(entry.removedAt)} - {formatTime(entry.timer.elapsed)}
+                      </p>
+                    </div>
+                    <button
+                      class='ghost-btn history-restore-btn'
+                      type='button'
+                      onClick={() => restoreTimer(entry)}
+                    >
+                      Restore
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
+        <div class='footer-actions'>
+          <div class='footer-spacer' aria-hidden='true' />
+          <div class='add-timer'>
+            <button class='primary' type='button' onClick={openAddModal}>
+              <CirclePlus class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+              <span class='sr-only'>Add new timer</span>
+            </button>
+          </div>
+          <div class='history-toggle-right'>
+            {!isHistoryOpen && (
+              <button
+                class='ghost-btn history-toggle-btn'
+                type='button'
+                onClick={() => setIsHistoryOpen(true)}
+                aria-label='History'
+              >
+                <History class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+              </button>
+            )}
+          </div>
         </div>
       </main>
 
