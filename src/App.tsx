@@ -216,17 +216,15 @@ function App (): JSX.Element {
       return
     }
 
+    const excludeId = modalMode === 'rename' ? modalTimerId : null
+    if (isDuplicateLabel(trimmed, excludeId)) {
+      setModalError('Name already in use')
+      return
+    }
+
     if (modalMode === 'add') {
-      if (isDuplicateLabel(trimmed)) {
-        setModalError('Name already used.')
-        return
-      }
       addTimer(trimmed)
     } else if (modalTimerId !== null) {
-      if (isDuplicateLabel(trimmed, modalTimerId)) {
-        setModalError('Name already used.')
-        return
-      }
       renameTimer(modalTimerId, trimmed)
     }
 
