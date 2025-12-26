@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { GripVertical, Pause, Play, RotateCcw, X } from 'lucide-preact'
+import { Pause, Play, RotateCcw, X } from 'lucide-preact'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Timer } from '../types'
@@ -23,7 +23,10 @@ export const TimerCard = ({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: timer.id
   })
-  const dragHandleProps = { ...attributes, ...listeners } as JSX.HTMLAttributes<HTMLButtonElement>
+  const dragHandleProps = { ...attributes, ...listeners } as JSX.HTMLAttributes<HTMLDivElement>
+  const stopDrag: JSX.PointerEventHandler<HTMLButtonElement> = (event) => {
+    event.stopPropagation()
+  }
   const style = {
     transform: CSS.Transform.toString(transform),
     transition
@@ -34,6 +37,7 @@ export const TimerCard = ({
       ref={setNodeRef}
       style={style}
       class={`timer-card ${timer.running ? 'timer-card--running' : ''} ${isDragging ? 'timer-card--dragging' : ''}`}
+      {...dragHandleProps}
     >
       <div class='timer-body'>
         <div class='timer-info'>
@@ -42,6 +46,7 @@ export const TimerCard = ({
             class='timer-label-btn'
             type='button'
             onClick={() => onRenameRequest(timer)}
+            onPointerDown={stopDrag}
             aria-label='Edit timer name'
           >
             {timer.label}
@@ -50,17 +55,10 @@ export const TimerCard = ({
         <div class='timer-actions'>
           <button
             type='button'
-            class='drag-handle'
-            {...dragHandleProps}
-            aria-label={`Reorder ${timer.label}`}
-          >
-            <GripVertical class='icon' size={18} strokeWidth={2} aria-hidden='true' />
-          </button>
-          <button
-            type='button'
             class={`action-btn ${timer.running ? 'action-btn--pause' : 'action-btn--play'}`}
             aria-label={timer.running ? 'Pause timer' : 'Start timer'}
             onClick={() => onToggle(timer.id)}
+            onPointerDown={stopDrag}
           >
             <span class='sr-only'>{timer.running ? 'Pause' : 'Start'}</span>
             {timer.running ? (
@@ -69,7 +67,12 @@ export const TimerCard = ({
               <Play class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             )}
           </button>
-          <button type='button' class='ghost-btn reset-btn' onClick={() => onReset(timer.id)}>
+          <button
+            type='button'
+            class='ghost-btn reset-btn'
+            onClick={() => onReset(timer.id)}
+            onPointerDown={stopDrag}
+          >
             <RotateCcw class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Reset</span>
           </button>
@@ -77,6 +80,7 @@ export const TimerCard = ({
             class='ghost-btn remove-btn'
             type='button'
             onClick={() => onRemove(timer.id)}
+            onPointerDown={stopDrag}
             aria-label='Remove timer'
           >
             <X class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
