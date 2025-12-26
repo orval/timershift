@@ -32,6 +32,7 @@ module.exports = defineConfig([
     {
         ignores: [
             "**/dist/**",
+            "**/coverage/**",
             "src-tauri/target/**",
             "**/.yarn/**",
             "**/node_modules/**",
