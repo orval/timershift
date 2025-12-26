@@ -89,3 +89,14 @@ test('restores a timer from history', async () => {
   expect(screen.getByText('Timer 1', { selector: 'button' })).toBeInTheDocument()
   expect(screen.getByText(/no removed timers yet/i)).toBeInTheDocument()
 })
+
+test('toggles a timer between start and pause', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /start timer/i }))
+  expect(screen.getByRole('button', { name: /pause timer/i })).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name: /pause timer/i }))
+  expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument()
+})
