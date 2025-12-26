@@ -1,7 +1,15 @@
 import { render, screen, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
-import { afterEach, expect, test } from 'vitest'
+import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
+import type { LogEntry } from './types'
+
+const historyMocks = vi.hoisted(() => ({
+  appendLogEntry: vi.fn().mockResolvedValue(undefined),
+  buildLogEntry: (action: string) => ({ action })
+}))
+
+vi.mock('./utils/history', () => historyMocks)
 
 afterEach(() => {
   localStorage.clear()
@@ -99,4 +107,17 @@ test('toggles a timer between start and pause', async () => {
 
   await user.click(screen.getByRole('button', { name: /pause timer/i }))
   expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument()
+})
+
+test('logs summary entries on beforeunload', () => {
+  render(<App />)
+
+  window.dispatchEvent(new Event('beforeunload'))
+
+  const actions = historyMocks.appendLogEntry.mock.calls.map(
+    ([entry]) => (entry as LogEntry).action
+  )
+
+  expect(actions).toContain('summary')
+  expect(actions).toContain('app_exit')
 })
