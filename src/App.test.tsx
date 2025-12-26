@@ -4,6 +4,7 @@ import { render, screen, waitFor, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
 import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
+import { TimerAdjustModal } from './components/TimerAdjustModal'
 import type { LogEntry } from './types'
 
 const historyMocks = vi.hoisted(() => ({
@@ -180,6 +181,40 @@ test('adjusts a timer by minutes', async () => {
   await user.click(screen.getByRole('button', { name: /apply/i }))
 
   expect(screen.getAllByText('00:03:00').length).toBeGreaterThan(0)
+})
+
+test('adjust wheel scroll updates the selected minutes', async () => {
+  const handleChange = vi.fn()
+
+  render(
+    <TimerAdjustModal
+      label='Timer 1'
+      minutes={0}
+      maxMinutes={30}
+      onChange={handleChange}
+      onClose={() => undefined}
+      onSubmit={(event) => event.preventDefault()}
+    />
+  )
+
+  const track = document.querySelector<HTMLDivElement>('.adjust-wheel-track')
+  expect(track).not.toBeNull()
+  if (!track) return
+
+  const scrollState = { value: Number(track.scrollTop) }
+  Object.defineProperty(track, 'scrollTop', {
+    configurable: true,
+    get: () => scrollState.value,
+    set: (value) => {
+      scrollState.value = Number(value)
+    }
+  })
+
+  await waitFor(() => {
+    track.scrollTop = 0
+    track.dispatchEvent(new Event('scroll', { bubbles: true }))
+    expect(handleChange).toHaveBeenCalledWith(30)
+  })
 })
 
 test('removes a timer', async () => {

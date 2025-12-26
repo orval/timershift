@@ -1,5 +1,5 @@
 import type { JSX } from 'preact'
-import { useEffect, useMemo, useRef } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks'
 
 const ITEM_HEIGHT = 36
 
@@ -39,14 +39,23 @@ export const TimerAdjustModal = ({
     listRef.current.scrollTop = targetIndex * ITEM_HEIGHT
   }, [minutes, options])
 
-  const handleScroll = (): void => {
+  const handleScroll = useCallback((): void => {
     const el = listRef.current
     if (!el) return
     const index = Math.round(el.scrollTop / ITEM_HEIGHT)
     const clampedIndex = Math.min(Math.max(index, 0), options.length - 1)
     const nextValue = options[clampedIndex]
     if (nextValue !== minutes) onChange(nextValue)
-  }
+  }, [minutes, onChange, options])
+
+  useEffect(() => {
+    const el = listRef.current
+    if (!el) return
+    el.addEventListener('scroll', handleScroll)
+    return () => {
+      el.removeEventListener('scroll', handleScroll)
+    }
+  }, [handleScroll])
 
   const handleSelect = (value: number): void => {
     if (!listRef.current) {
@@ -79,7 +88,6 @@ export const TimerAdjustModal = ({
             <div
               class='adjust-wheel-track'
               ref={listRef}
-              onScroll={handleScroll}
             >
               {options.map((value) => (
                 <button
