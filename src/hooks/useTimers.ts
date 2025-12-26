@@ -18,6 +18,7 @@ export const useTimers = (): {
   addTimer: (label: string) => void
   renameTimer: (id: number, label: string) => void
   restoreTimer: (entry: RemovedTimerEntry) => void
+  reorderTimers: (sourceId: number, targetId: number) => void
   isDuplicateLabel: (label: string, excludeId?: number | null) => boolean
 } => {
   const initLoadErrorRef = useRef<string | null>(null)
@@ -288,6 +289,19 @@ export const useTimers = (): {
     }))
   }
 
+  const reorderTimers = (sourceId: number, targetId: number): void => {
+    if (sourceId === targetId) return
+    setTimers((prev: Timer[]) => {
+      const sourceIndex = prev.findIndex((timer) => timer.id === sourceId)
+      const targetIndex = prev.findIndex((timer) => timer.id === targetId)
+      if (sourceIndex === -1 || targetIndex === -1) return prev
+      const next = [...prev]
+      const [moved] = next.splice(sourceIndex, 1)
+      next.splice(targetIndex, 0, moved)
+      return next
+    })
+  }
+
   const normalizeLabel = (label: string): string => label.trim().toLowerCase()
 
   const isDuplicateLabel = (label: string, excludeId: number | null = null): boolean => {
@@ -307,6 +321,7 @@ export const useTimers = (): {
     addTimer,
     renameTimer,
     restoreTimer,
+    reorderTimers,
     isDuplicateLabel
   }
 }

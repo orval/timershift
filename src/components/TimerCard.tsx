@@ -1,5 +1,7 @@
 import type { JSX } from 'preact'
-import { Pause, Play, RotateCcw, X } from 'lucide-preact'
+import { GripVertical, Pause, Play, RotateCcw, X } from 'lucide-preact'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import type { Timer } from '../types'
 import { formatTime } from '../utils/time'
 
@@ -11,9 +13,28 @@ type TimerCardProps = {
   onRenameRequest: (timer: Timer) => void
 }
 
-export const TimerCard = ({ timer, onToggle, onReset, onRemove, onRenameRequest }: TimerCardProps): JSX.Element => {
+export const TimerCard = ({
+  timer,
+  onToggle,
+  onReset,
+  onRemove,
+  onRenameRequest
+}: TimerCardProps): JSX.Element => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: timer.id
+  })
+  const dragHandleProps = { ...attributes, ...listeners } as JSX.HTMLAttributes<HTMLButtonElement>
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  }
+
   return (
-    <div class={`timer-card ${timer.running ? 'timer-card--running' : ''}`}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      class={`timer-card ${timer.running ? 'timer-card--running' : ''} ${isDragging ? 'timer-card--dragging' : ''}`}
+    >
       <div class='timer-body'>
         <div class='timer-info'>
           <p class='timer-display'>{formatTime(timer.elapsed)}</p>
@@ -27,6 +48,14 @@ export const TimerCard = ({ timer, onToggle, onReset, onRemove, onRenameRequest 
           </button>
         </div>
         <div class='timer-actions'>
+          <button
+            type='button'
+            class='drag-handle'
+            {...dragHandleProps}
+            aria-label={`Reorder ${timer.label}`}
+          >
+            <GripVertical class='icon' size={18} strokeWidth={2} aria-hidden='true' />
+          </button>
           <button
             type='button'
             class={`action-btn ${timer.running ? 'action-btn--pause' : 'action-btn--play'}`}

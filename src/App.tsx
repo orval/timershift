@@ -1,5 +1,7 @@
 import type { JSX } from 'preact'
 import { CirclePlus, History } from 'lucide-preact'
+import { closestCenter, type DragEndEvent, KeyboardSensor, MouseSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import './App.css'
 import { HistoryPanel } from './components/HistoryPanel'
@@ -8,6 +10,7 @@ import { TimerModal } from './components/TimerModal'
 import { MAX_LABEL_LENGTH } from './constants'
 import { useTimers } from './hooks/useTimers'
 import type { Timer } from './types'
+import { DndContext, SortableContext } from './utils/dndKitPreact'
 import { appendLogEntry, buildLogEntry } from './utils/history'
 import { formatTime } from './utils/time'
 
@@ -23,6 +26,7 @@ function App (): JSX.Element {
     addTimer,
     renameTimer,
     restoreTimer,
+    reorderTimers,
     isDuplicateLabel
   } = useTimers()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -32,6 +36,12 @@ function App (): JSX.Element {
   const [modalError, setModalError] = useState('')
   const modalInputRef = useRef<HTMLInputElement | null>(null)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+
+  const pointerSensor = typeof window !== 'undefined' && 'PointerEvent' in window ? PointerSensor : MouseSensor
+  const sensors = useSensors(
+    useSensor(pointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
 
   useEffect(() => {
     document.body.classList.toggle('no-running', !hasRunningTimer)
@@ -99,6 +109,15 @@ function App (): JSX.Element {
     }
   }
 
+  const handleDragEnd = (event: DragEndEvent): void => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const sourceId = typeof active.id === 'number' ? active.id : Number(active.id)
+    const targetId = typeof over.id === 'number' ? over.id : Number(over.id)
+    if (Number.isNaN(sourceId) || Number.isNaN(targetId)) return
+    reorderTimers(sourceId, targetId)
+  }
+
   return (
     <>
       <main class='app-shell'>
@@ -118,16 +137,20 @@ function App (): JSX.Element {
           {timers.length === 0 ? (
             <p class='empty'>No timers yet. Create one to get started.</p>
           ) : (
-            timers.map((timer) => (
-              <TimerCard
-                key={timer.id}
-                timer={timer}
-                onToggle={toggleTimer}
-                onReset={resetTimer}
-                onRemove={removeTimer}
-                onRenameRequest={openRenameModal}
-              />
-            ))
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={timers.map((timer) => timer.id)} strategy={verticalListSortingStrategy}>
+                {timers.map((timer) => (
+                  <TimerCard
+                    key={timer.id}
+                    timer={timer}
+                    onToggle={toggleTimer}
+                    onReset={resetTimer}
+                    onRemove={removeTimer}
+                    onRenameRequest={openRenameModal}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
         </section>
 

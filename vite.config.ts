@@ -4,9 +4,24 @@ import preact from "@preact/preset-vite";
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
   plugins: [preact()],
+  resolve: {
+    alias: {
+      react: "preact/compat",
+      "react-dom": "preact/compat",
+      "react/jsx-runtime": "preact/jsx-runtime"
+    }
+  },
   test: {
     environment: "happy-dom",
     setupFiles: ["src/test/setup.ts"],
+    deps: {
+      inline: [
+        "@dnd-kit/core",
+        "@dnd-kit/sortable",
+        "@dnd-kit/utilities",
+        "@dnd-kit/accessibility"
+      ]
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],

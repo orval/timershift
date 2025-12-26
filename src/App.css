@@ -222,11 +222,18 @@ button:active {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  transition: border-color 150ms ease, box-shadow 150ms ease, opacity 120ms ease;
 }
 
 .timer-card--running {
   border-color: rgba(74, 222, 128, 0.6);
   box-shadow: 0 6px 20px rgba(74, 222, 128, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.timer-card--dragging {
+  opacity: 0.65;
+  border-color: rgba(148, 163, 184, 0.45);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.45);
 }
 
 .current-timer-card {
@@ -347,6 +354,33 @@ button:active {
 .timer-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.drag-handle {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  color: #9aa5c6;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  cursor: grab;
+  touch-action: none;
+}
+
+.drag-handle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border-style: solid;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+  transform: none;
 }
 
 .remove-btn {
