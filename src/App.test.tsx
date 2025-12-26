@@ -27,6 +27,47 @@ test('opens the add timer modal', async () => {
   expect(screen.getByRole('heading', { name: /new timer/i })).toBeInTheDocument()
 })
 
+test('shows an error when submitting an empty timer name', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+
+  expect(screen.getByText('Name is required.')).toBeInTheDocument()
+})
+
+test('shows an error when submitting a duplicate timer name', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+  const input = within(dialog).getByRole('textbox', { name: /timer name/i })
+
+  await user.type(input, 'Timer 1')
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+
+  expect(screen.getByText('Name already in use')).toBeInTheDocument()
+})
+
+test('clears the modal error when input becomes valid', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+  const input = within(dialog).getByRole('textbox', { name: /timer name/i })
+
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+  expect(screen.getByText('Name is required.')).toBeInTheDocument()
+
+  await user.type(input, 'Focus')
+  expect(screen.queryByText('Name is required.')).toBeNull()
+})
+
 test('creates a timer from the add modal', async () => {
   render(<App />)
   const user = userEvent.setup()
@@ -96,6 +137,19 @@ test('restores a timer from history', async () => {
 
   expect(screen.getByText('Timer 1', { selector: 'button' })).toBeInTheDocument()
   expect(screen.getByText(/no removed timers yet/i)).toBeInTheDocument()
+})
+
+test('closes the history panel', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /history/i }))
+  expect(screen.getByRole('heading', { name: /history/i })).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name: /hide/i }))
+
+  expect(screen.queryByRole('heading', { name: /history/i })).toBeNull()
+  expect(screen.getByRole('button', { name: /history/i })).toBeInTheDocument()
 })
 
 test('toggles a timer between start and pause', async () => {
