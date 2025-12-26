@@ -141,6 +141,29 @@ test('resets a timer', async () => {
   expect(screen.getAllByText('00:00:00').length).toBeGreaterThan(0)
 })
 
+test('undoes a reset from the toast', async () => {
+  localStorage.setItem('timershift:timers', JSON.stringify({
+    timers: [{ id: 1, label: 'Focus', elapsed: 42, running: false }],
+    savedAt: 123
+  }))
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  expect(screen.getAllByText('00:00:42').length).toBeGreaterThan(0)
+
+  await user.click(screen.getByRole('button', { name: /reset/i }))
+
+  expect(screen.getByText('Reset "Focus" at 00:00:42')).toBeInTheDocument()
+  expect(screen.queryByText('00:00:42')).toBeNull()
+  expect(screen.getAllByText('00:00:00').length).toBeGreaterThan(0)
+
+  await user.click(screen.getByRole('button', { name: /undo/i }))
+
+  expect(screen.getAllByText('00:00:42').length).toBeGreaterThan(0)
+  expect(screen.queryByText('Reset "Focus" at 00:00:42')).toBeNull()
+})
+
 test('removes a timer', async () => {
   render(<App />)
   const user = userEvent.setup()
