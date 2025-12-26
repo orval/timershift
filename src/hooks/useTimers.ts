@@ -12,7 +12,7 @@ export const useTimers = (): {
   displayTimers: Timer[]
   removedTimers: RemovedTimerEntry[]
   hasRunningTimer: boolean
-  toggleTimer: (id: number) => void
+  toggleTimer: (id: number, allowMultiple: boolean) => void
   resetTimer: (id: number) => void
   removeTimer: (id: number) => void
   addTimer: (label: string) => void
@@ -159,19 +159,25 @@ export const useTimers = (): {
     }
   }, [])
 
-  const toggleTimer = (id: number): void => {
+  const toggleTimer = (id: number, allowMultiple: boolean): void => {
     setTimers((prev: Timer[]) => {
+      const targetTimer = prev.find((timer) => timer.id === id)
+      if (!targetTimer) return prev
+      const nextRunning = !targetTimer.running
       let target: Timer | null = null
-      let nextAction: 'start' | 'pause' | null = null
+      const nextAction: 'start' | 'pause' = nextRunning ? 'start' : 'pause'
       const next = prev.map((timer) => {
-        if (timer.id !== id) return timer
-        const nextRunning = !timer.running
-        target = { ...timer, running: nextRunning }
-        nextAction = nextRunning ? 'start' : 'pause'
-        return { ...timer, running: nextRunning }
+        if (timer.id === id) {
+          target = { ...timer, running: nextRunning }
+          return { ...timer, running: nextRunning }
+        }
+        if (nextRunning && !allowMultiple && timer.running) {
+          return { ...timer, running: false }
+        }
+        return timer
       })
 
-      if (target && nextAction) {
+      if (target) {
         void appendLogEntry(buildLogEntry(nextAction, target))
       }
 

@@ -7,7 +7,7 @@ import { formatTime } from '../utils/time'
 
 type TimerCardProps = {
   timer: Timer
-  onToggle: (id: number) => void
+  onToggle: (id: number, allowMultiple: boolean) => void
   onReset: (id: number) => void
   onRemove: (id: number) => void
   onRenameRequest: (timer: Timer) => void
@@ -26,6 +26,9 @@ export const TimerCard = ({
   const dragHandleProps = { ...attributes, ...listeners } as JSX.HTMLAttributes<HTMLDivElement>
   const stopDrag: JSX.PointerEventHandler<HTMLButtonElement> = (event) => {
     event.stopPropagation()
+  }
+  const handleToggleClick: JSX.MouseEventHandler<HTMLButtonElement> = (event) => {
+    onToggle(timer.id, event.shiftKey)
   }
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -57,7 +60,7 @@ export const TimerCard = ({
             type='button'
             class={`action-btn ${timer.running ? 'action-btn--pause' : 'action-btn--play'}`}
             aria-label={timer.running ? 'Pause timer' : 'Start timer'}
-            onClick={() => onToggle(timer.id)}
+            onClick={handleToggleClick}
             onPointerDown={stopDrag}
           >
             <span class='sr-only'>{timer.running ? 'Pause' : 'Start'}</span>
