@@ -1,6 +1,6 @@
 import type { JSX } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
-import { ChevronsUpDown, Pause, Play, RotateCcw, X } from 'lucide-preact'
+import { useEffect, useRef, useState } from 'preact/hooks'
+import { Check, ChevronsUpDown, Copy, Pause, Play, RotateCcw, X } from 'lucide-preact'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Timer } from '../types'
@@ -31,9 +31,41 @@ export const TimerCard = ({
     event.stopPropagation()
   }
   const [isAltDown, setIsAltDown] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
+  const copyResetRef = useRef<number | null>(null)
   const handleToggleClick: JSX.MouseEventHandler<HTMLButtonElement> = (event) => {
     const allowMultiple = event.getModifierState('Alt')
     onToggle(timer.id, allowMultiple)
+  }
+  const copyTimerLabel = async (): Promise<void> => {
+    if (typeof navigator === 'undefined') return
+    let didCopy = false
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(timer.label)
+        didCopy = true
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = timer.label
+        textarea.setAttribute('readonly', '')
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+        didCopy = document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
+      if (didCopy) {
+        setIsCopied(true)
+        if (copyResetRef.current !== null) window.clearTimeout(copyResetRef.current)
+        copyResetRef.current = window.setTimeout(() => setIsCopied(false), 1400)
+      }
+    } catch {
+      // Ignore clipboard errors silently.
+    }
+  }
+  const handleCopyClick: JSX.MouseEventHandler<HTMLButtonElement> = () => {
+    void copyTimerLabel()
   }
   useEffect(() => {
     const updateModifierState = (event: KeyboardEvent): void => {
@@ -57,6 +89,13 @@ export const TimerCard = ({
       window.removeEventListener('blur', handleBlur)
     }
   }, [])
+  useEffect(() => {
+    return () => {
+      if (copyResetRef.current !== null) {
+        window.clearTimeout(copyResetRef.current)
+      }
+    }
+  }, [])
   const shouldGlow = !timer.running && isAltDown
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -73,15 +112,31 @@ export const TimerCard = ({
       <div class='timer-body'>
         <div class='timer-info'>
           <p class='timer-display'>{formatTime(timer.elapsed)}</p>
-          <button
-            class='timer-label-btn'
-            type='button'
-            onClick={() => onRenameRequest(timer)}
-            onPointerDown={stopDrag}
-            aria-label='Edit timer name'
-          >
-            {timer.label}
-          </button>
+          <div class='timer-label-row'>
+            <button
+              class='timer-label-btn'
+              type='button'
+              onClick={() => onRenameRequest(timer)}
+              onPointerDown={stopDrag}
+              aria-label='Edit timer name'
+            >
+              {timer.label}
+            </button>
+            <button
+              class={`timer-copy-btn ${isCopied ? 'timer-copy-btn--copied' : ''}`}
+              type='button'
+              onClick={handleCopyClick}
+              onPointerDown={stopDrag}
+              aria-label={isCopied ? 'Copied timer name' : 'Copy timer name'}
+              title={isCopied ? 'Copied' : 'Copy name'}
+            >
+              {isCopied ? (
+                <Check class='icon' size={14} strokeWidth={2.2} aria-hidden='true' />
+              ) : (
+                <Copy class='icon' size={14} strokeWidth={2.2} aria-hidden='true' />
+              )}
+            </button>
+          </div>
         </div>
         <div class='timer-actions'>
           <button

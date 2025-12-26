@@ -311,6 +311,13 @@ button:active {
   min-width: 0;
 }
 
+.timer-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .timer-label-btn {
   border: none;
   background: transparent;
@@ -327,6 +334,8 @@ button:active {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .timer-label-btn:hover {
@@ -340,6 +349,35 @@ button:active {
 .timer-label-btn:focus-visible {
   outline: 1px solid rgba(154, 165, 198, 0.6);
   outline-offset: 2px;
+}
+
+.timer-copy-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5f5;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.timer-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f9fbff;
+}
+
+.timer-copy-btn--copied {
+  background: rgba(52, 211, 153, 0.18);
+  color: #a7f3d0;
+  border-color: rgba(52, 211, 153, 0.45);
+}
+
+.timer-copy-btn--copied:hover {
+  background: rgba(52, 211, 153, 0.24);
+  color: #d1fae5;
 }
 
 .timer-display {
