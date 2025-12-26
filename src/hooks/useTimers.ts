@@ -14,6 +14,7 @@ export const useTimers = (): {
   hasRunningTimer: boolean
   toggleTimer: (id: number, allowMultiple: boolean) => void
   resetTimer: (id: number) => void
+  restoreTimerSnapshot: (snapshot: Timer) => void
   removeTimer: (id: number) => void
   addTimer: (label: string) => void
   renameTimer: (id: number, label: string) => void
@@ -211,6 +212,18 @@ export const useTimers = (): {
     })
   }
 
+  const restoreTimerSnapshot = (snapshot: Timer): void => {
+    setTimers((prev: Timer[]) => {
+      let found = false
+      const next = prev.map((timer) => {
+        if (timer.id !== snapshot.id) return timer
+        found = true
+        return { ...snapshot }
+      })
+      return found ? next : prev
+    })
+  }
+
   const removeTimer = (id: number): void => {
     setTimers((prev: Timer[]) => {
       const timerToRemove = prev.find((timer) => timer.id === id)
@@ -323,6 +336,7 @@ export const useTimers = (): {
     hasRunningTimer,
     toggleTimer,
     resetTimer,
+    restoreTimerSnapshot,
     removeTimer,
     addTimer,
     renameTimer,

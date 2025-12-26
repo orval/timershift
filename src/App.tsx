@@ -22,6 +22,7 @@ function App (): JSX.Element {
     hasRunningTimer,
     toggleTimer,
     resetTimer,
+    restoreTimerSnapshot,
     removeTimer,
     addTimer,
     renameTimer,
@@ -29,6 +30,12 @@ function App (): JSX.Element {
     reorderTimers,
     isDuplicateLabel
   } = useTimers()
+  const [toast, setToast] = useState<{
+    id: number
+    message: string
+    actionLabel: string
+    onAction: () => void
+  } | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'rename'>('add')
   const [modalLabel, setModalLabel] = useState('')
@@ -56,6 +63,14 @@ function App (): JSX.Element {
     modalInputRef.current?.focus()
     modalInputRef.current?.select()
   }, [isModalOpen])
+
+  useEffect(() => {
+    if (!toast) return
+    const timeoutId = window.setTimeout(() => {
+      setToast((current) => (current?.id === toast.id ? null : current))
+    }, 8000)
+    return () => window.clearTimeout(timeoutId)
+  }, [toast])
 
   const openAddModal = (): void => {
     setModalMode('add')
@@ -118,6 +133,22 @@ function App (): JSX.Element {
     reorderTimers(sourceId, targetId)
   }
 
+  const handleReset = (id: number): void => {
+    const snapshot = timers.find((timer) => timer.id === id)
+    if (!snapshot) return
+    resetTimer(id)
+    const toastId = Date.now()
+    setToast({
+      id: toastId,
+      message: `Reset "${snapshot.label}" at ${formatTime(snapshot.elapsed)}`,
+      actionLabel: 'Undo',
+      onAction: () => {
+        restoreTimerSnapshot({ ...snapshot })
+        setToast(null)
+      }
+    })
+  }
+
   return (
     <>
       <main class='app-shell'>
@@ -144,7 +175,7 @@ function App (): JSX.Element {
                     key={timer.id}
                     timer={timer}
                     onToggle={toggleTimer}
-                    onReset={resetTimer}
+                    onReset={handleReset}
                     onRemove={removeTimer}
                     onRenameRequest={openRenameModal}
                   />
@@ -196,6 +227,18 @@ function App (): JSX.Element {
           onSubmit={handleModalSubmit}
           onInput={handleModalInput}
         />
+      )}
+
+      {toast && (
+        <div class='toast' role='status' aria-live='polite'>
+          <p class='toast-message'>{toast.message}</p>
+          <button class='toast-btn' type='button' onClick={toast.onAction}>
+            {toast.actionLabel}
+          </button>
+          <button class='toast-dismiss' type='button' onClick={() => setToast(null)}>
+            Dismiss
+          </button>
+        </div>
       )}
     </>
   )
