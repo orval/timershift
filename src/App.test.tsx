@@ -1,4 +1,6 @@
-import { render, screen, within } from '@testing-library/preact'
+import type { DragEndEvent } from '@dnd-kit/core'
+import type { ComponentChildren } from 'preact'
+import { render, screen, waitFor, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
 import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
@@ -10,6 +12,29 @@ const historyMocks = vi.hoisted(() => ({
 }))
 
 vi.mock('./utils/history', () => historyMocks)
+
+const dndMocks = vi.hoisted(() => {
+  const handlers: { onDragEnd: ((event: DragEndEvent) => void) | null } = { onDragEnd: null }
+  const DndContext = ({
+    children,
+    onDragEnd
+  }: {
+    children?: ComponentChildren
+    onDragEnd?: (event: DragEndEvent) => void
+  }) => {
+    handlers.onDragEnd = onDragEnd ?? null
+    return <div data-testid='dnd-context'>{children}</div>
+  }
+  const SortableContext = ({ children }: { children?: ComponentChildren }) => (
+    <div data-testid='sortable-context'>{children}</div>
+  )
+  return { handlers, DndContext, SortableContext }
+})
+
+vi.mock('./utils/dndKitPreact', () => ({
+  DndContext: dndMocks.DndContext,
+  SortableContext: dndMocks.SortableContext
+}))
 
 afterEach(() => {
   localStorage.clear()
@@ -161,6 +186,36 @@ test('toggles a timer between start and pause', async () => {
 
   await user.click(screen.getByRole('button', { name: /pause timer/i }))
   expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument()
+})
+
+test('reorders timers after a drag end event', async () => {
+  localStorage.setItem('timershift:timers', JSON.stringify({
+    timers: [
+      { id: 1, label: 'Timer A', elapsed: 0, running: false },
+      { id: 2, label: 'Timer B', elapsed: 0, running: false }
+    ],
+    savedAt: 123
+  }))
+
+  render(<App />)
+
+  expect(dndMocks.handlers.onDragEnd).not.toBeNull()
+  expect(screen.getAllByRole('button', { name: /edit timer name/i }).map((button) => button.textContent)).toEqual([
+    'Timer A',
+    'Timer B'
+  ])
+
+  dndMocks.handlers.onDragEnd?.({
+    active: { id: 1 },
+    over: { id: 2 }
+  } as DragEndEvent)
+
+  await waitFor(() => {
+    expect(screen.getAllByRole('button', { name: /edit timer name/i }).map((button) => button.textContent)).toEqual([
+      'Timer B',
+      'Timer A'
+    ])
+  })
 })
 
 test('logs summary entries on beforeunload', () => {
