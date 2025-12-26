@@ -1,6 +1,6 @@
 import type { JSX } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
-import { Clock, Pause, Play, RotateCcw, X } from 'lucide-preact'
+import { ChevronsUpDown, Pause, Play, RotateCcw, X } from 'lucide-preact'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Timer } from '../types'
@@ -114,7 +114,7 @@ export const TimerCard = ({
             onPointerDown={stopDrag}
             aria-label='Adjust time'
           >
-            <Clock class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <ChevronsUpDown class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Adjust</span>
           </button>
           <button
