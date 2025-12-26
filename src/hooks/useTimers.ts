@@ -14,6 +14,7 @@ export const useTimers = (): {
   hasRunningTimer: boolean
   toggleTimer: (id: number, allowMultiple: boolean) => void
   resetTimer: (id: number) => void
+  adjustTimerMinutes: (id: number, minutes: number) => void
   restoreTimerSnapshot: (snapshot: Timer) => void
   removeTimer: (id: number) => void
   addTimer: (label: string) => void
@@ -212,6 +213,35 @@ export const useTimers = (): {
     })
   }
 
+  const adjustTimerMinutes = (id: number, minutes: number): void => {
+    if (!minutes) return
+    const deltaSeconds = minutes * 60
+    setTimers((prev: Timer[]) => {
+      let updatedTimer: Timer | null = null
+      let previousElapsed: number | null = null
+      const next = prev.map((timer) => {
+        if (timer.id !== id) return timer
+        previousElapsed = timer.elapsed
+        const nextElapsed = Math.max(0, timer.elapsed + deltaSeconds)
+        updatedTimer = {
+          id: timer.id,
+          label: timer.label,
+          elapsed: nextElapsed,
+          running: timer.running
+        }
+        return updatedTimer
+      })
+
+      if (updatedTimer && previousElapsed !== null) {
+        void appendLogEntry(buildLogEntry('adjust', updatedTimer, {
+          previousElapsed,
+          deltaMinutes: minutes
+        }))
+      }
+
+      return next
+    })
+  }
   const restoreTimerSnapshot = (snapshot: Timer): void => {
     setTimers((prev: Timer[]) => {
       let found = false
@@ -336,6 +366,7 @@ export const useTimers = (): {
     hasRunningTimer,
     toggleTimer,
     resetTimer,
+    adjustTimerMinutes,
     restoreTimerSnapshot,
     removeTimer,
     addTimer,

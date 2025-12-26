@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import './App.css'
 import { HistoryPanel } from './components/HistoryPanel'
 import { TimerCard } from './components/TimerCard'
+import { TimerAdjustModal } from './components/TimerAdjustModal'
 import { TimerModal } from './components/TimerModal'
 import { MAX_LABEL_LENGTH } from './constants'
 import { useTimers } from './hooks/useTimers'
@@ -24,6 +25,7 @@ function App (): JSX.Element {
     resetTimer,
     restoreTimerSnapshot,
     removeTimer,
+    adjustTimerMinutes,
     addTimer,
     renameTimer,
     restoreTimer,
@@ -43,6 +45,9 @@ function App (): JSX.Element {
   const [modalError, setModalError] = useState('')
   const modalInputRef = useRef<HTMLInputElement | null>(null)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [isAdjustOpen, setIsAdjustOpen] = useState(false)
+  const [adjustTimerId, setAdjustTimerId] = useState<number | null>(null)
+  const [adjustMinutes, setAdjustMinutes] = useState(0)
 
   const pointerSensor = typeof window !== 'undefined' && 'PointerEvent' in window ? PointerSensor : MouseSensor
   const sensors = useSensors(
@@ -91,6 +96,26 @@ function App (): JSX.Element {
   const closeModal = (): void => {
     setIsModalOpen(false)
     setModalTimerId(null)
+  }
+
+  const openAdjustModal = (timer: Timer): void => {
+    setAdjustTimerId(timer.id)
+    setAdjustMinutes(0)
+    setIsAdjustOpen(true)
+  }
+
+  const closeAdjustModal = (): void => {
+    setIsAdjustOpen(false)
+    setAdjustTimerId(null)
+  }
+
+  const handleAdjustSubmit = (event: Event): void => {
+    event.preventDefault()
+    if (adjustTimerId === null) return
+    if (adjustMinutes !== 0) {
+      adjustTimerMinutes(adjustTimerId, adjustMinutes)
+    }
+    closeAdjustModal()
   }
 
   const handleModalSubmit = (event: Event): void => {
@@ -149,6 +174,10 @@ function App (): JSX.Element {
     })
   }
 
+  const adjustTimer = adjustTimerId !== null
+    ? timers.find((timer) => timer.id === adjustTimerId)
+    : null
+
   return (
     <>
       <main class='app-shell'>
@@ -177,6 +206,7 @@ function App (): JSX.Element {
                     onToggle={toggleTimer}
                     onReset={handleReset}
                     onRemove={removeTimer}
+                    onAdjustRequest={openAdjustModal}
                     onRenameRequest={openRenameModal}
                   />
                 ))}
@@ -226,6 +256,17 @@ function App (): JSX.Element {
           onClose={closeModal}
           onSubmit={handleModalSubmit}
           onInput={handleModalInput}
+        />
+      )}
+
+      {isAdjustOpen && adjustTimer && (
+        <TimerAdjustModal
+          label={adjustTimer.label}
+          minutes={adjustMinutes}
+          maxMinutes={60}
+          onChange={setAdjustMinutes}
+          onClose={closeAdjustModal}
+          onSubmit={handleAdjustSubmit}
         />
       )}
 

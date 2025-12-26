@@ -1,6 +1,6 @@
 import type { JSX } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
-import { Pause, Play, RotateCcw, X } from 'lucide-preact'
+import { Clock, Pause, Play, RotateCcw, X } from 'lucide-preact'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Timer } from '../types'
@@ -10,6 +10,7 @@ type TimerCardProps = {
   timer: Timer
   onToggle: (id: number, allowMultiple: boolean) => void
   onReset: (id: number) => void
+  onAdjustRequest: (timer: Timer) => void
   onRemove: (id: number) => void
   onRenameRequest: (timer: Timer) => void
 }
@@ -18,6 +19,7 @@ export const TimerCard = ({
   timer,
   onToggle,
   onReset,
+  onAdjustRequest,
   onRemove,
   onRenameRequest
 }: TimerCardProps): JSX.Element => {
@@ -104,6 +106,16 @@ export const TimerCard = ({
           >
             <RotateCcw class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Reset</span>
+          </button>
+          <button
+            type='button'
+            class='ghost-btn adjust-btn'
+            onClick={() => onAdjustRequest(timer)}
+            onPointerDown={stopDrag}
+            aria-label='Adjust time'
+          >
+            <Clock class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <span class='sr-only'>Adjust</span>
           </button>
           <button
             class='ghost-btn remove-btn'

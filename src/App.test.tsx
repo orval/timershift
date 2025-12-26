@@ -164,6 +164,24 @@ test('undoes a reset from the toast', async () => {
   expect(screen.queryByText('Reset "Focus" at 00:00:42')).toBeNull()
 })
 
+test('adjusts a timer by minutes', async () => {
+  localStorage.setItem('timershift:timers', JSON.stringify({
+    timers: [{ id: 1, label: 'Timer 1', elapsed: 60, running: false }],
+    savedAt: 123
+  }))
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  expect(screen.getAllByText('00:01:00').length).toBeGreaterThan(0)
+
+  await user.click(screen.getByRole('button', { name: /adjust time/i }))
+  await user.click(screen.getByRole('button', { name: '+2' }))
+  await user.click(screen.getByRole('button', { name: /apply/i }))
+
+  expect(screen.getAllByText('00:03:00').length).toBeGreaterThan(0)
+})
+
 test('removes a timer', async () => {
   render(<App />)
   const user = userEvent.setup()

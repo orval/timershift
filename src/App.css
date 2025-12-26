@@ -449,6 +449,23 @@ button:active {
   stroke: currentColor;
 }
 
+.adjust-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #a3bffa;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.adjust-btn:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -538,6 +555,95 @@ button:active {
 
 .modal-btn--primary:hover {
   background: rgba(56, 189, 248, 0.28);
+}
+
+.modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal--adjust {
+  width: min(420px, 100%);
+}
+
+.adjust-subtitle {
+  margin: -6px 0 16px;
+  font-size: 12px;
+  color: #9aa5c6;
+}
+
+.adjust-wheel {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 12px;
+}
+
+.adjust-wheel-track {
+  width: 100px;
+  height: 200px;
+  padding: 82px 0;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+}
+
+.adjust-wheel-track::-webkit-scrollbar {
+  width: 6px;
+}
+
+.adjust-wheel-track::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
+}
+
+.adjust-wheel-item {
+  height: 36px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #9aa5c6;
+  cursor: pointer;
+  scroll-snap-align: center;
+}
+
+.adjust-wheel-item:hover {
+  color: #e2e8f0;
+}
+
+.adjust-wheel-item.is-active {
+  color: #38bdf8;
+  font-size: 16px;
+  text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+}
+
+.adjust-wheel-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 76px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2), 0 0 14px rgba(56, 189, 248, 0.25);
+  pointer-events: none;
+}
+
+.adjust-value {
+  margin: 0;
+  font-size: 12px;
+  color: #cbd5f5;
+  text-align: center;
 }
 
 .sr-only {

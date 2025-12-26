@@ -18,6 +18,7 @@ export type LogEntry = {
     | 'add'
     | 'rename'
     | 'reset'
+    | 'adjust'
     | 'start'
     | 'pause'
     | 'app_start'
