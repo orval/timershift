@@ -6,7 +6,19 @@ export default defineConfig(async () => ({
   plugins: [preact()],
   test: {
     environment: "happy-dom",
-    setupFiles: ["src/test/setup.ts"]
+    setupFiles: ["src/test/setup.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      reportsDirectory: "coverage",
+      exclude: [
+        "**/.pnp.cjs",
+        "**/.pnp.loader.mjs",
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/coverage/**"
+      ]
+    }
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

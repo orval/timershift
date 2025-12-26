@@ -12,6 +12,7 @@
     "lint": "eslint",
     "test": "vitest",
     "testrun": "vitest --run",
+    "test:cov": "vitest run --coverage",
     "lhci": "lhci autorun",
     "sdks:vscode": "yarn dlx @yarnpkg/sdks vscode"
   },
@@ -38,6 +39,7 @@
     "@types/jsdom": "^27",
     "@typescript-eslint/eslint-plugin": "^8.48.1",
     "@typescript-eslint/parser": "^8.48.1",
+    "@vitest/coverage-v8": "^4.0.16",
     "babel-plugin-transform-hook-names": "^1.0.2",
     "eslint": "^9.39.1",
     "eslint-import-resolver-typescript": "^3.6.1",
