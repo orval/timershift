@@ -10,6 +10,8 @@
     "tauri": "tauri",
     "bundle": "tauri build",
     "lint": "eslint",
+    "test": "vitest",
+    "testrun": "vitest --run",
     "lhci": "lhci autorun",
     "sdks:vscode": "yarn dlx @yarnpkg/sdks vscode"
   },
@@ -27,8 +29,13 @@
     "@lhci/cli": "^0.15.1",
     "@preact/preset-vite": "^2.5.0",
     "@tauri-apps/cli": "^1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/preact": "^3.2.4",
+    "@testing-library/user-event": "^14.6.1",
     "@types/babel__code-frame": "^7",
     "@types/babel__core": "^7",
+    "@types/jsdom": "^27",
     "@typescript-eslint/eslint-plugin": "^8.48.1",
     "@typescript-eslint/parser": "^8.48.1",
     "babel-plugin-transform-hook-names": "^1.0.2",
@@ -37,8 +44,11 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-promise": "^6.0.0",
     "globals": "^15.11.0",
+    "happy-dom": "^20.0.11",
+    "jsdom": "^27.3.0",
     "typescript": "^5.0.2",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "vitest": "^4.0.16"
   },
   "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c"
 }
