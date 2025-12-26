@@ -18,7 +18,7 @@ body {
 }
 
 body.no-running {
-  background: radial-gradient(circle at 15% 20%, #3b1414 0, #2d1011 34%, #1f0b0d 65%, #140607 100%);
+  background: radial-gradient(circle at 15% 20%, #310d0e 0, #501517 34%, #310d0e 65%, #501517 100%);
 }
 
 .app-shell {
