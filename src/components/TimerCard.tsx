@@ -1,4 +1,5 @@
 import type { JSX } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
 import { Pause, Play, RotateCcw, X } from 'lucide-preact'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -27,9 +28,34 @@ export const TimerCard = ({
   const stopDrag: JSX.PointerEventHandler<HTMLButtonElement> = (event) => {
     event.stopPropagation()
   }
+  const [isAltDown, setIsAltDown] = useState(false)
   const handleToggleClick: JSX.MouseEventHandler<HTMLButtonElement> = (event) => {
-    onToggle(timer.id, event.shiftKey)
+    const allowMultiple = event.getModifierState('Alt')
+    onToggle(timer.id, allowMultiple)
   }
+  useEffect(() => {
+    const updateModifierState = (event: KeyboardEvent): void => {
+      setIsAltDown(event.getModifierState('Alt'))
+    }
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Alt') updateModifierState(event)
+    }
+    const handleKeyUp = (event: KeyboardEvent): void => {
+      if (event.key === 'Alt') updateModifierState(event)
+    }
+    const handleBlur = (): void => {
+      setIsAltDown(false)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    window.addEventListener('blur', handleBlur)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+      window.removeEventListener('blur', handleBlur)
+    }
+  }, [])
+  const shouldGlow = !timer.running && isAltDown
   const style = {
     transform: CSS.Transform.toString(transform),
     transition
@@ -58,7 +84,7 @@ export const TimerCard = ({
         <div class='timer-actions'>
           <button
             type='button'
-            class={`action-btn ${timer.running ? 'action-btn--pause' : 'action-btn--play'}`}
+            class={`action-btn ${timer.running ? 'action-btn--pause' : 'action-btn--play'} ${shouldGlow ? 'shift-glow' : ''}`}
             aria-label={timer.running ? 'Pause timer' : 'Start timer'}
             onClick={handleToggleClick}
             onPointerDown={stopDrag}
