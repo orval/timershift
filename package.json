@@ -11,7 +11,7 @@
     "bundle": "tauri build",
     "lint": "eslint",
     "test": "vitest",
-    "testrun": "vitest --run",
+    "test:run": "vitest --run",
     "test:cov": "vitest run --coverage",
     "lhci": "lhci autorun",
     "sdks:vscode": "yarn dlx @yarnpkg/sdks vscode"
