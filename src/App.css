@@ -490,23 +490,7 @@ button:active {
   stroke: currentColor;
 }
 
-.adjust-btn {
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  color: #a3bffa;
-  background: rgba(148, 163, 184, 0.12);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-}
-
-.adjust-btn:hover {
-  background: rgba(148, 163, 184, 0.2);
-  color: #e2e8f0;
-}
-
+.adjust-btn,
 .transfer-btn {
   width: 36px;
   height: 36px;
@@ -517,16 +501,12 @@ button:active {
   color: #a3bffa;
   background: rgba(148, 163, 184, 0.12);
   border: 1px solid rgba(148, 163, 184, 0.35);
-  /* color: #2dd4bf;
-  background: rgba(45, 212, 191, 0.12);
-  border: 1px solid rgba(45, 212, 191, 0.35); */
 }
 
+.adjust-btn:hover,
 .transfer-btn:hover {
   background: rgba(148, 163, 184, 0.2);
   color: #e2e8f0;
-  /* background: rgba(45, 212, 191, 0.2);
-  color: #99f6e4; */
 }
 
 .modal-backdrop {
