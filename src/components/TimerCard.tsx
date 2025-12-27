@@ -1,6 +1,6 @@
 import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { Check, ChevronsUpDown, Copy, Pause, Play, RotateCcw, X } from 'lucide-preact'
+import { ArrowLeftRight, Check, ChevronsUpDown, Copy, Pause, Play, RotateCcw, X } from 'lucide-preact'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Timer } from '../types'
@@ -11,6 +11,7 @@ type TimerCardProps = {
   onToggle: (id: number, allowMultiple: boolean) => void
   onReset: (id: number) => void
   onAdjustRequest: (timer: Timer) => void
+  onTransferRequest: (timer: Timer) => void
   onRemove: (id: number) => void
   onRenameRequest: (timer: Timer) => void
 }
@@ -20,6 +21,7 @@ export const TimerCard = ({
   onToggle,
   onReset,
   onAdjustRequest,
+  onTransferRequest,
   onRemove,
   onRenameRequest
 }: TimerCardProps): JSX.Element => {
@@ -161,6 +163,16 @@ export const TimerCard = ({
           >
             <RotateCcw class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Reset</span>
+          </button>
+          <button
+            type='button'
+            class='ghost-btn transfer-btn'
+            onClick={() => onTransferRequest(timer)}
+            onPointerDown={stopDrag}
+            aria-label='Move time'
+          >
+            <ArrowLeftRight class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <span class='sr-only'>Move time</span>
           </button>
           <button
             type='button'

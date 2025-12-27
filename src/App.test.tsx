@@ -217,6 +217,36 @@ test('adjust wheel scroll updates the selected minutes', async () => {
   })
 })
 
+test('moves time between timers', async () => {
+  localStorage.setItem('timershift:timers', JSON.stringify({
+    timers: [
+      { id: 1, label: 'Focus', elapsed: 600, running: false },
+      { id: 2, label: 'Break', elapsed: 0, running: false }
+    ],
+    savedAt: 123
+  }))
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getAllByRole('button', { name: /move time/i })[0])
+  await user.click(screen.getByRole('button', { name: /5 min/i }))
+  await user.click(screen.getByRole('button', { name: /break/i }))
+
+  expect(screen.queryByRole('dialog', { name: /move time/i })).toBeNull()
+
+  const focusCard = screen.getByText('Focus', { selector: 'button' }).closest('.timer-card')
+  const breakCard = screen.getByText('Break', { selector: 'button' }).closest('.timer-card')
+
+  expect(focusCard).not.toBeNull()
+  expect(breakCard).not.toBeNull()
+  if (!focusCard || !breakCard) return
+
+  expect(within(focusCard).getByText('00:05:00')).toBeInTheDocument()
+  expect(within(breakCard).getByText('00:05:00')).toBeInTheDocument()
+  expect(within(breakCard).queryByText('00:00:00')).toBeNull()
+})
+
 test('removes a timer', async () => {
   render(<App />)
   const user = userEvent.setup()

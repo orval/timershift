@@ -507,6 +507,28 @@ button:active {
   color: #e2e8f0;
 }
 
+.transfer-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #a3bffa;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  /* color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.35); */
+}
+
+.transfer-btn:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+  /* background: rgba(45, 212, 191, 0.2);
+  color: #99f6e4; */
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -525,6 +547,9 @@ button:active {
   border-radius: 16px;
   padding: 18px 20px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  max-height: calc(100vh - 48px);
+  max-height: calc(100svh - 48px);
+  overflow-y: auto;
 }
 
 .modal-form {
@@ -607,6 +632,10 @@ button:active {
   width: min(420px, 100%);
 }
 
+.modal--transfer {
+  width: min(520px, 100%);
+}
+
 .adjust-subtitle {
   margin: -6px 0 16px;
   font-size: 12px;
@@ -685,6 +714,192 @@ button:active {
   font-size: 12px;
   color: #cbd5f5;
   text-align: center;
+}
+
+.transfer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transfer-subtitle {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: #9aa5c6;
+}
+
+.transfer-scrub {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.transfer-scrub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.transfer-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #cbd5f5;
+}
+
+.transfer-available {
+  margin: 0;
+  font-size: 11px;
+  color: #9aa5c6;
+}
+
+.transfer-range {
+  width: 100%;
+  accent-color: #38bdf8;
+}
+
+.transfer-range:disabled {
+  opacity: 0.5;
+}
+
+.transfer-amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.transfer-amount-value {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #f9fbff;
+}
+
+.transfer-amount-time {
+  margin: 0;
+  font-size: 12px;
+  color: #9aa5c6;
+  font-variant-numeric: tabular-nums;
+}
+
+.transfer-stepper {
+  display: flex;
+  gap: 8px;
+}
+
+.transfer-step {
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.transfer-step:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.transfer-step:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.transfer-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.transfer-preset {
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.transfer-preset:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.transfer-preset:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.transfer-preset.is-active {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #bae6fd;
+}
+
+.transfer-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transfer-targets-title {
+  margin: 0;
+  font-size: 12px;
+  color: #9aa5c6;
+}
+
+.transfer-targets-grid {
+  display: grid;
+  gap: 8px;
+  max-height: min(240px, 35vh);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.transfer-target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f9fbff;
+  text-align: left;
+}
+
+.transfer-target:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.transfer-target:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.transfer-target-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f9fbff;
+}
+
+.transfer-target-time {
+  font-size: 12px;
+  color: #9aa5c6;
+  font-variant-numeric: tabular-nums;
+}
+
+.transfer-targets-empty {
+  margin: 0;
+  font-size: 12px;
+  color: #9aa5c6;
 }
 
 .sr-only {

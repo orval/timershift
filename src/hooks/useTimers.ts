@@ -15,6 +15,7 @@ export const useTimers = (): {
   toggleTimer: (id: number, allowMultiple: boolean) => void
   resetTimer: (id: number) => void
   adjustTimerMinutes: (id: number, minutes: number) => void
+  transferTimerMinutes: (sourceId: number, targetId: number, minutes: number) => void
   restoreTimerSnapshot: (snapshot: Timer) => void
   removeTimer: (id: number) => void
   addTimer: (label: string) => void
@@ -242,6 +243,43 @@ export const useTimers = (): {
       return next
     })
   }
+
+  const transferTimerMinutes = (sourceId: number, targetId: number, minutes: number): void => {
+    if (!minutes) return
+    if (sourceId === targetId) return
+    const deltaSeconds = minutes * 60
+    setTimers((prev: Timer[]) => {
+      const sourceTimer = prev.find((timer) => timer.id === sourceId)
+      const targetTimer = prev.find((timer) => timer.id === targetId)
+      if (!sourceTimer || !targetTimer) return prev
+      const availableSeconds = Math.min(deltaSeconds, sourceTimer.elapsed)
+      if (availableSeconds <= 0) return prev
+
+      const next = prev.map((timer) => {
+        if (timer.id === sourceId) {
+          return { ...timer, elapsed: Math.max(0, timer.elapsed - availableSeconds) }
+        }
+        if (timer.id === targetId) {
+          return { ...timer, elapsed: timer.elapsed + availableSeconds }
+        }
+        return timer
+      })
+
+      const updatedSource = next.find((timer) => timer.id === sourceId)
+      const updatedTarget = next.find((timer) => timer.id === targetId)
+      if (updatedSource && updatedTarget) {
+        void appendLogEntry(buildLogEntry('transfer', updatedSource, {
+          targetId: updatedTarget.id,
+          targetLabel: updatedTarget.label,
+          sourcePreviousElapsed: sourceTimer.elapsed,
+          targetPreviousElapsed: targetTimer.elapsed,
+          deltaMinutes: availableSeconds / 60
+        }))
+      }
+
+      return next
+    })
+  }
   const restoreTimerSnapshot = (snapshot: Timer): void => {
     setTimers((prev: Timer[]) => {
       let found = false
@@ -367,6 +405,7 @@ export const useTimers = (): {
     toggleTimer,
     resetTimer,
     adjustTimerMinutes,
+    transferTimerMinutes,
     restoreTimerSnapshot,
     removeTimer,
     addTimer,

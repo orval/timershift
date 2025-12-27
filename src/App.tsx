@@ -8,6 +8,7 @@ import { HistoryPanel } from './components/HistoryPanel'
 import { TimerCard } from './components/TimerCard'
 import { TimerAdjustModal } from './components/TimerAdjustModal'
 import { TimerModal } from './components/TimerModal'
+import { TimerTransferModal } from './components/TimerTransferModal'
 import { MAX_LABEL_LENGTH } from './constants'
 import { useTimers } from './hooks/useTimers'
 import type { Timer } from './types'
@@ -26,6 +27,7 @@ function App (): JSX.Element {
     restoreTimerSnapshot,
     removeTimer,
     adjustTimerMinutes,
+    transferTimerMinutes,
     addTimer,
     renameTimer,
     restoreTimer,
@@ -35,8 +37,8 @@ function App (): JSX.Element {
   const [toast, setToast] = useState<{
     id: number
     message: string
-    actionLabel: string
-    onAction: () => void
+    actionLabel?: string
+    onAction?: () => void
   } | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'rename'>('add')
@@ -48,6 +50,9 @@ function App (): JSX.Element {
   const [isAdjustOpen, setIsAdjustOpen] = useState(false)
   const [adjustTimerId, setAdjustTimerId] = useState<number | null>(null)
   const [adjustMinutes, setAdjustMinutes] = useState(0)
+  const [isTransferOpen, setIsTransferOpen] = useState(false)
+  const [transferSourceId, setTransferSourceId] = useState<number | null>(null)
+  const [transferMinutes, setTransferMinutes] = useState(0)
 
   const pointerSensor = typeof window !== 'undefined' && 'PointerEvent' in window ? PointerSensor : MouseSensor
   const sensors = useSensors(
@@ -109,6 +114,19 @@ function App (): JSX.Element {
     setAdjustTimerId(null)
   }
 
+  const openTransferModal = (timer: Timer): void => {
+    const maxMinutes = Math.floor(timer.elapsed / 60)
+    setTransferSourceId(timer.id)
+    setTransferMinutes(Math.min(5, maxMinutes))
+    setIsTransferOpen(true)
+  }
+
+  const closeTransferModal = (): void => {
+    setIsTransferOpen(false)
+    setTransferSourceId(null)
+    setTransferMinutes(0)
+  }
+
   const handleAdjustSubmit = (event: Event): void => {
     event.preventDefault()
     if (adjustTimerId === null) return
@@ -116,6 +134,23 @@ function App (): JSX.Element {
       adjustTimerMinutes(adjustTimerId, adjustMinutes)
     }
     closeAdjustModal()
+  }
+
+  const handleTransfer = (targetId: number): void => {
+    if (transferSourceId === null) return
+    if (transferMinutes <= 0) return
+    const sourceTimer = timers.find((timer) => timer.id === transferSourceId)
+    const targetTimer = timers.find((timer) => timer.id === targetId)
+    if (!sourceTimer || !targetTimer) return
+    const movedSeconds = Math.min(transferMinutes * 60, sourceTimer.elapsed)
+    if (movedSeconds <= 0) return
+    transferTimerMinutes(transferSourceId, targetId, transferMinutes)
+    const toastId = Date.now()
+    setToast({
+      id: toastId,
+      message: `Moved ${formatTime(movedSeconds)} from "${sourceTimer.label}" to "${targetTimer.label}".`
+    })
+    closeTransferModal()
   }
 
   const handleModalSubmit = (event: Event): void => {
@@ -177,6 +212,15 @@ function App (): JSX.Element {
   const adjustTimer = adjustTimerId !== null
     ? timers.find((timer) => timer.id === adjustTimerId)
     : null
+  const transferSource = transferSourceId !== null
+    ? timers.find((timer) => timer.id === transferSourceId)
+    : null
+  const transferTargets = transferSource
+    ? timers.filter((timer) => timer.id !== transferSource.id)
+    : []
+  const transferMaxMinutes = transferSource
+    ? Math.floor(transferSource.elapsed / 60)
+    : 0
 
   return (
     <>
@@ -207,6 +251,7 @@ function App (): JSX.Element {
                     onReset={handleReset}
                     onRemove={removeTimer}
                     onAdjustRequest={openAdjustModal}
+                    onTransferRequest={openTransferModal}
                     onRenameRequest={openRenameModal}
                   />
                 ))}
@@ -270,12 +315,26 @@ function App (): JSX.Element {
         />
       )}
 
+      {isTransferOpen && transferSource && (
+        <TimerTransferModal
+          source={transferSource}
+          targets={transferTargets}
+          minutes={transferMinutes}
+          maxMinutes={transferMaxMinutes}
+          onMinutesChange={setTransferMinutes}
+          onClose={closeTransferModal}
+          onTransfer={handleTransfer}
+        />
+      )}
+
       {toast && (
         <div class='toast' role='status' aria-live='polite'>
           <p class='toast-message'>{toast.message}</p>
-          <button class='toast-btn' type='button' onClick={toast.onAction}>
-            {toast.actionLabel}
-          </button>
+          {toast.onAction && toast.actionLabel && (
+            <button class='toast-btn' type='button' onClick={toast.onAction}>
+              {toast.actionLabel}
+            </button>
+          )}
           <button class='toast-dismiss' type='button' onClick={() => setToast(null)}>
             Dismiss
           </button>
