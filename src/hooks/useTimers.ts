@@ -43,9 +43,7 @@ export const useTimers = (): {
       }
     }
 
-    return [
-      { id: 1, label: 'Timer 1', elapsed: 0, running: false }
-    ]
+    return []
   })
   const [removedTimers, setRemovedTimers] = useState<RemovedTimerEntry[]>(() => {
     if (typeof window === 'undefined') {
