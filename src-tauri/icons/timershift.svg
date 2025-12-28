@@ -3,6 +3,6 @@
   <circle cx="130" cy="130" r="70" stroke="#DCF86C" stroke-width="10"/>
   <path d="M113.26 121.14 L118.74 110.86 L146.46 131.14 L145.54 132.86 Z" fill="#c857bb"/>
   <circle cx="116" cy="116" r="5.8" fill="#c857bb"/>
-  <path d="M137.32 145.37 L142.68 134.63 L168.45 153.11 L167.55 154.89 Z" fill="#DCF86C"/>
-  <circle cx="140" cy="140" r="5.8" fill="#DCF86C"/>
+  <path d="M137.15 145.08 L145.83 140.12 L160.15 172.24 L157.55 173.72 Z" fill="#DCF86C"/>
+  <circle cx="140" cy="140" r="5.5" fill="#DCF86C"/>
 </svg>
