@@ -41,9 +41,16 @@ afterEach(() => {
   localStorage.clear()
 })
 
-test('renders the default timer label', () => {
+const seedTimers = (timers: Array<{ id: number, label: string, elapsed: number, running: boolean }>): void => {
+  localStorage.setItem('timershift:timers', JSON.stringify({
+    timers,
+    savedAt: 123
+  }))
+}
+
+test('renders the empty state when no timers exist', () => {
   render(<App />)
-  expect(screen.getAllByText('Timer 1').length).toBeGreaterThan(0)
+  expect(screen.getByText(/no timers yet/i)).toBeInTheDocument()
 })
 
 test('opens the add timer modal', async () => {
@@ -66,6 +73,7 @@ test('shows an error when submitting an empty timer name', async () => {
 })
 
 test('shows an error when submitting a duplicate timer name', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
   const user = userEvent.setup()
 
@@ -110,6 +118,7 @@ test('creates a timer from the add modal', async () => {
 })
 
 test('renames a timer from the modal', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
   const user = userEvent.setup()
 
@@ -126,6 +135,7 @@ test('renames a timer from the modal', async () => {
 })
 
 test('copies a timer label', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
   const user = userEvent.setup()
 
@@ -135,10 +145,7 @@ test('copies a timer label', async () => {
 })
 
 test('resets a timer', async () => {
-  localStorage.setItem('timershift:timers', JSON.stringify({
-    timers: [{ id: 1, label: 'Timer 1', elapsed: 5, running: false }],
-    savedAt: 123
-  }))
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 5, running: false }])
 
   render(<App />)
   const user = userEvent.setup()
@@ -152,10 +159,7 @@ test('resets a timer', async () => {
 })
 
 test('undoes a reset from the toast', async () => {
-  localStorage.setItem('timershift:timers', JSON.stringify({
-    timers: [{ id: 1, label: 'Focus', elapsed: 42, running: false }],
-    savedAt: 123
-  }))
+  seedTimers([{ id: 1, label: 'Focus', elapsed: 42, running: false }])
 
   render(<App />)
   const user = userEvent.setup()
@@ -175,10 +179,7 @@ test('undoes a reset from the toast', async () => {
 })
 
 test('adjusts a timer by minutes', async () => {
-  localStorage.setItem('timershift:timers', JSON.stringify({
-    timers: [{ id: 1, label: 'Timer 1', elapsed: 60, running: false }],
-    savedAt: 123
-  }))
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 60, running: false }])
 
   render(<App />)
   const user = userEvent.setup()
@@ -227,13 +228,10 @@ test('adjust wheel scroll updates the selected minutes', async () => {
 })
 
 test('moves time between timers', async () => {
-  localStorage.setItem('timershift:timers', JSON.stringify({
-    timers: [
-      { id: 1, label: 'Focus', elapsed: 600, running: false },
-      { id: 2, label: 'Break', elapsed: 0, running: false }
-    ],
-    savedAt: 123
-  }))
+  seedTimers([
+    { id: 1, label: 'Focus', elapsed: 600, running: false },
+    { id: 2, label: 'Break', elapsed: 0, running: false }
+  ])
 
   render(<App />)
   const user = userEvent.setup()
@@ -257,6 +255,7 @@ test('moves time between timers', async () => {
 })
 
 test('removes a timer', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
   const user = userEvent.setup()
 
@@ -266,6 +265,7 @@ test('removes a timer', async () => {
 })
 
 test('restores a timer from history', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
   const user = userEvent.setup()
 
@@ -293,6 +293,7 @@ test('closes the history panel', async () => {
 })
 
 test('toggles a timer between start and pause', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
   const user = userEvent.setup()
 
@@ -304,13 +305,10 @@ test('toggles a timer between start and pause', async () => {
 })
 
 test('reorders timers after a drag end event', async () => {
-  localStorage.setItem('timershift:timers', JSON.stringify({
-    timers: [
-      { id: 1, label: 'Timer A', elapsed: 0, running: false },
-      { id: 2, label: 'Timer B', elapsed: 0, running: false }
-    ],
-    savedAt: 123
-  }))
+  seedTimers([
+    { id: 1, label: 'Timer A', elapsed: 0, running: false },
+    { id: 2, label: 'Timer B', elapsed: 0, running: false }
+  ])
 
   render(<App />)
 
