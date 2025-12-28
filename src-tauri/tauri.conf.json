@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "timershift",
+    "productName": "TimerShift",
     "version": "0.0.0"
   },
   "tauri": {
@@ -32,7 +32,7 @@
     },
     "windows": [
       {
-        "title": "timershift",
+        "title": "TimerShift",
         "width": 500,
         "height": 800
       }
