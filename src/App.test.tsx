@@ -249,7 +249,7 @@ test('moves time between timers', async () => {
 
   expect(focusCard).not.toBeNull()
   expect(breakCard).not.toBeNull()
-  if (!focusCard || !breakCard) return
+  if (!(focusCard instanceof HTMLElement) || !(breakCard instanceof HTMLElement)) return
 
   expect(within(focusCard).getByText('00:05:00')).toBeInTheDocument()
   expect(within(breakCard).getByText('00:05:00')).toBeInTheDocument()
