@@ -125,6 +125,15 @@ test('renames a timer from the modal', async () => {
   expect(screen.getByText('Deep Work', { selector: 'button' })).toBeInTheDocument()
 })
 
+test('copies a timer label', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /copy timer name/i }))
+
+  expect(await screen.findByRole('button', { name: /copied timer name/i })).toBeInTheDocument()
+})
+
 test('resets a timer', async () => {
   localStorage.setItem('timershift:timers', JSON.stringify({
     timers: [{ id: 1, label: 'Timer 1', elapsed: 5, running: false }],
