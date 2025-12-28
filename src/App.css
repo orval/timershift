@@ -24,7 +24,7 @@ body.no-running {
 .app-shell {
   max-width: 960px;
   margin: 0 auto;
-  padding: 20px 20px 40px;
+  padding: 12px 12px 42px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -84,7 +84,7 @@ button:active {
 .timers {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .history-panel {
