@@ -14,6 +14,7 @@ type TimerCardProps = {
   onTransferRequest: (timer: Timer) => void
   onRemove: (id: number) => void
   onRenameRequest: (timer: Timer) => void
+  isPausedHighlight: boolean
 }
 
 export const TimerCard = ({
@@ -23,7 +24,8 @@ export const TimerCard = ({
   onAdjustRequest,
   onTransferRequest,
   onRemove,
-  onRenameRequest
+  onRenameRequest,
+  isPausedHighlight
 }: TimerCardProps): JSX.Element => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: timer.id
@@ -99,6 +101,7 @@ export const TimerCard = ({
     }
   }, [])
   const shouldGlow = !timer.running && isAltDown
+  const isPaused = !timer.running && isPausedHighlight
   const style = {
     transform: CSS.Transform.toString(transform),
     transition
@@ -108,7 +111,7 @@ export const TimerCard = ({
     <div
       ref={setNodeRef}
       style={style}
-      class={`timer-card ${timer.running ? 'timer-card--running' : ''} ${isDragging ? 'timer-card--dragging' : ''}`}
+      class={`timer-card ${timer.running ? 'timer-card--running' : ''} ${isPaused ? 'timer-card--paused' : ''} ${isDragging ? 'timer-card--dragging' : ''}`}
       {...dragHandleProps}
     >
       <div class='timer-body'>

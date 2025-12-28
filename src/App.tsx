@@ -22,6 +22,7 @@ function App (): JSX.Element {
     displayTimers,
     removedTimers,
     hasRunningTimer,
+    pausedDisplayTimerId,
     toggleTimer,
     resetTimer,
     restoreTimerSnapshot,
@@ -253,6 +254,7 @@ function App (): JSX.Element {
                     onAdjustRequest={openAdjustModal}
                     onTransferRequest={openTransferModal}
                     onRenameRequest={openRenameModal}
+                    isPausedHighlight={timer.id === pausedDisplayTimerId}
                   />
                 ))}
               </SortableContext>

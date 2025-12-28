@@ -12,6 +12,7 @@ export const useTimers = (): {
   displayTimers: Timer[]
   removedTimers: RemovedTimerEntry[]
   hasRunningTimer: boolean
+  pausedDisplayTimerId: number | null
   toggleTimer: (id: number, allowMultiple: boolean) => void
   resetTimer: (id: number) => void
   adjustTimerMinutes: (id: number, minutes: number) => void
@@ -83,6 +84,13 @@ export const useTimers = (): {
     }
     return [timers[0]]
   }, [runningTimers, timers])
+
+  const pausedDisplayTimerId = useMemo(() => {
+    if (hasRunningTimer) return null
+    const lastRunningId = lastRunningTimerIdRef.current
+    if (lastRunningId === null) return null
+    return timers.some((timer) => timer.id === lastRunningId) ? lastRunningId : null
+  }, [hasRunningTimer, timers])
 
   useEffect(() => {
     const runningTimer = timers.find((timer) => timer.running)
@@ -402,6 +410,7 @@ export const useTimers = (): {
     displayTimers,
     removedTimers,
     hasRunningTimer,
+    pausedDisplayTimerId,
     toggleTimer,
     resetTimer,
     adjustTimerMinutes,
