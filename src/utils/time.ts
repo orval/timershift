@@ -8,6 +8,13 @@ export const formatTime = (totalSeconds: number): string => {
   return `${hh}:${mm}:${ss}`
 }
 
+export const formatStatusMins = (totalSeconds: number): string => {
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  if (hours === 0) return `${minutes}m`
+  return `${hours}:${minutes}`
+}
+
 export const formatTimestamp = (timestamp: number): string =>
   new Date(timestamp).toLocaleString([], {
     year: 'numeric',

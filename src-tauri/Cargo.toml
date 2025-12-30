@@ -1,8 +1,8 @@
 [package]
-name = "timershift"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "TimerShift"
+version = "0.0.1"
+description = "Run mulitple timers at once and easily move chunks of time between timers"
+authors = ["Dee Rance"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "path-all", "fs-write-file", "fs-read-file", "fs-create-dir", "shell-open"] }
+tauri = { version = "1", features = [ "system-tray", "icon-png", "path-all", "fs-write-file", "fs-read-file", "fs-create-dir", "shell-open"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

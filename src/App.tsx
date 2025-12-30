@@ -2,6 +2,7 @@ import type { JSX } from 'preact'
 import { CirclePlus, History } from 'lucide-preact'
 import { closestCenter, type DragEndEvent, KeyboardSensor, MouseSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { invoke } from '@tauri-apps/api/tauri'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import './App.css'
 import { HistoryPanel } from './components/HistoryPanel'
@@ -14,7 +15,7 @@ import { useTimers } from './hooks/useTimers'
 import type { Timer } from './types'
 import { DndContext, SortableContext } from './utils/dndKitPreact'
 import { appendLogEntry, buildLogEntry } from './utils/history'
-import { formatTime } from './utils/time'
+import { formatStatusMins, formatTime } from './utils/time'
 
 function App (): JSX.Element {
   const {
@@ -60,6 +61,11 @@ function App (): JSX.Element {
     useSensor(pointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
+  const isTauri = typeof window !== 'undefined' && '__TAURI__' in window
+  const trayIconState = hasRunningTimer ? 'play' : 'pause'
+  const trayTitle = displayTimers.length > 0
+    ? `${displayTimers[0].label} ${formatStatusMins(displayTimers[0].elapsed)}`
+    : ''
 
   useEffect(() => {
     document.body.classList.toggle('no-running', !hasRunningTimer)
@@ -82,6 +88,16 @@ function App (): JSX.Element {
     }, 8000)
     return () => window.clearTimeout(timeoutId)
   }, [toast])
+
+  useEffect(() => {
+    if (!isTauri) return
+    void invoke('set_tray_title', { title: trayTitle })
+  }, [isTauri, trayTitle])
+
+  useEffect(() => {
+    if (!isTauri) return
+    void invoke('set_tray_icon_state', { state: trayIconState })
+  }, [isTauri, trayIconState])
 
   const openAddModal = (): void => {
     setModalMode('add')
