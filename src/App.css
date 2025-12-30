@@ -17,9 +17,8 @@
   --white-mid: rgba(255, 255, 255, 0.08);
   --white-high: rgba(255, 255, 255, 0.12);
   --shadow-base: rgba(0, 0, 0, 0.35);
-  --accent-35: rgba(56, 189, 248, 0.35);
-  --accent-50: rgba(56, 189, 248, 0.5);
-  --accent-60: rgba(56, 189, 248, 0.6);
+  --accent-one: rgba(56, 189, 248, 0.35);
+  --accent-two: rgba(56, 189, 248, 0.6);
   --button-size: 36px;
   --icon-sm: 18px;
   --icon-md: 24px;
@@ -37,7 +36,6 @@
   --font-lg: 16px;
   --font-xl: 18px;
   --font-2xl: 20px;
-  --font-3xl: 24px;
   --font-display: 40px;
 }
 
@@ -424,7 +422,7 @@ button:active {
 .timer-display {
   margin: 0;
   font-variant-numeric: tabular-nums;
-  font-size: var(--font-3xl);
+  font-size: var(--font-2xl);
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--text-bright);
@@ -470,8 +468,8 @@ button:active {
 }
 
 .action-btn.shift-glow {
-  box-shadow: 0 0 0 1px var(--accent-35), 0 0 var(--space-md) rgba(56, 189, 248, 0.45), 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
-  border-color: var(--accent-60);
+  box-shadow: 0 0 0 1px var(--accent-one), 0 0 var(--space-md) rgba(56, 189, 248, 0.45), 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
+  border-color: var(--accent-two);
 }
 
 .action-btn--play {
@@ -511,7 +509,7 @@ button:active {
   gap: 4px;
   background: rgba(56, 189, 248, 0.12);
   color: var(--accent);
-  border: 1px solid var(--accent-35);
+  border: 1px solid var(--accent-one);
   box-shadow: 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
   padding: 0;
 }
@@ -600,7 +598,7 @@ button:active {
 }
 
 .modal-input:focus {
-  outline: 1px solid var(--accent-60);
+  outline: 1px solid var(--accent-two);
   outline-offset: 2px;
 }
 
@@ -633,7 +631,7 @@ button:active {
 
 .modal-btn--primary {
   background: rgba(56, 189, 248, 0.18);
-  border-color: var(--accent-50);
+  border-color: var(--accent-two);
   color: var(--accent-soft);
 }
 
@@ -711,7 +709,7 @@ button:active {
 .adjust-wheel-item.is-active {
   color: var(--accent);
   font-size: var(--font-lg);
-  text-shadow: 0 0 var(--space-lg) var(--accent-35);
+  text-shadow: 0 0 var(--space-lg) var(--accent-one);
 }
 
 .adjust-wheel-indicator {
@@ -722,7 +720,7 @@ button:active {
   width: 76px;
   height: var(--button-size);
   border-radius: var(--radius-md);
-  border: 1px solid var(--accent-60);
+  border: 1px solid var(--accent-two);
   box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2), 0 0 var(--space-md) rgba(56, 189, 248, 0.25);
   pointer-events: none;
 }
@@ -856,7 +854,7 @@ button:active {
 
 .transfer-preset.is-active {
   background: rgba(56, 189, 248, 0.18);
-  border-color: var(--accent-50);
+  border-color: var(--accent-two);
   color: var(--accent-soft);
 }
 
@@ -985,7 +983,7 @@ button:active {
   padding: var(--space-xs) 60px;
   font-size: var(--font-md);
   background: rgba(56, 189, 248, 0.22);
-  border-color: var(--accent-50);
+  border-color: var(--accent-two);
   color: var(--accent-soft);
 }
 
