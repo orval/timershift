@@ -16,8 +16,7 @@
   --white-low: rgba(255, 255, 255, 0.04);
   --white-mid: rgba(255, 255, 255, 0.08);
   --white-high: rgba(255, 255, 255, 0.12);
-  --shadow-35: rgba(0, 0, 0, 0.35);
-  --shadow-40: rgba(0, 0, 0, 0.4);
+  --shadow-base: rgba(0, 0, 0, 0.35);
   --accent-35: rgba(56, 189, 248, 0.35);
   --accent-50: rgba(56, 189, 248, 0.5);
   --accent-60: rgba(56, 189, 248, 0.6);
@@ -90,7 +89,7 @@ button:active {
 .primary {
   background: var(--white-low);
   color: var(--text-default);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-35);
+  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
   border: 1px solid var(--white-high);
   width: var(--control-size);
   height: var(--control-size);
@@ -103,7 +102,7 @@ button:active {
 .primary:hover {
   background: var(--white-mid);
   color: var(--text-bright);
-  box-shadow: 0 var(--space-sm) 28px var(--shadow-40);
+  box-shadow: 0 var(--space-sm) 28px var(--shadow-base);
 }
 
 .ghost-btn {
@@ -128,7 +127,7 @@ button:active {
   border: 1px solid var(--white-mid);
   border-radius: var(--radius-md);
   padding: var(--space-sm) var(--space-md);
-  box-shadow: 0 var(--space-sm) 26px var(--shadow-35);
+  box-shadow: 0 var(--space-sm) 26px var(--shadow-base);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
@@ -221,7 +220,7 @@ button:active {
   color: #5c6276;
   background: var(--white-low);
   border-color: var(--white-high);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-35);
+  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
 }
 
 .history-toggle-btn:hover {
@@ -467,12 +466,12 @@ button:active {
   color: var(--text-default);
   background: var(--white-low);
   border: 1px solid var(--white-high);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-35);
+  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
   padding: 0;
 }
 
 .action-btn.shift-glow {
-  box-shadow: 0 0 0 1px var(--accent-35), 0 0 var(--space-md) rgba(56, 189, 248, 0.45), 0 var(--space-sm) var(--space-3xl) var(--shadow-35);
+  box-shadow: 0 0 0 1px var(--accent-35), 0 0 var(--space-md) rgba(56, 189, 248, 0.45), 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
   border-color: var(--accent-60);
 }
 
@@ -514,14 +513,14 @@ button:active {
   background: rgba(56, 189, 248, 0.12);
   color: var(--accent);
   border: 1px solid var(--accent-35);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-35);
+  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
   padding: 0;
 }
 
 .reset-btn:hover {
   background: rgba(56, 189, 248, 0.2);
   color: var(--accent-soft);
-  box-shadow: 0 var(--space-sm) 28px var(--shadow-40);
+  box-shadow: 0 var(--space-sm) 28px var(--shadow-base);
 }
 
 .reset-btn .icon {
@@ -955,7 +954,7 @@ button:active {
   border-radius: var(--radius-md);
   background: rgba(12, 18, 32, 0.96);
   border: 1px solid rgba(148, 163, 184, 0.3);
-  box-shadow: 0 var(--space-md) 30px var(--shadow-40);
+  box-shadow: 0 var(--space-md) 30px var(--shadow-base);
   z-index: 60;
   animation: toast-in 180ms ease;
 }
