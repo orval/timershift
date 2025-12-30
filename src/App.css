@@ -22,11 +22,11 @@
   --button-size: 32px;
   --icon-sm: 16px;
   --icon-md: 20px;
-  --space-xs: 6px;
-  --space-sm: 10px;
-  --space-md: 12px;
-  --space-lg: 14px;
-  --space-xl: 16px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 10px;
+  --space-lg: 12px;
+  --space-xl: 14px;
   --space-2xl: 20px;
   --radius-sm: 7px;
   --radius-md: 10px;
@@ -56,7 +56,7 @@ body.no-running {
 .app-shell {
   max-width: 960px;
   margin: 0 auto;
-  padding: var(--space-sm) var(--space-sm) var(--space-2xl);
+  padding: var(--space-xs) var(--space-xs) var(--space-xl);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
