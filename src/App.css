@@ -34,8 +34,6 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 14px;
-  --radius-xl: 16px;
-  --font-xs: 11px;
   --font-sm: 12px;
   --font-md: 14px;
   --font-lg: 16px;
@@ -202,7 +200,7 @@ button:active {
 
 .history-time {
   margin: 0;
-  font-size: var(--font-xs);
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
@@ -566,7 +564,7 @@ button:active {
   width: min(420px, 100%);
   background: #0f141a;
   border: 1px solid var(--white-mid);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   padding: var(--space-xl) var(--space-2xl);
   box-shadow: 0 var(--space-3xl) 60px rgba(0, 0, 0, 0.55);
   max-height: calc(100vh - 48px);
@@ -675,7 +673,7 @@ button:active {
   width: 100px;
   height: 200px;
   padding: 82px 0;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--white-mid);
   background: var(--white-low);
   overflow-y: auto;
@@ -775,7 +773,7 @@ button:active {
 
 .transfer-available {
   margin: 0;
-  font-size: var(--font-xs);
+  font-size: var(--font-sm);
   color: var(--text-muted);
 }
 
