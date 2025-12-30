@@ -320,7 +320,7 @@ button:active {
   margin: 0;
   font-variant-numeric: tabular-nums;
   font-size: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--text-bright);
   text-shadow: 0 0 var(--space-xl) rgba(110, 150, 255, 0.3);
@@ -344,7 +344,7 @@ button:active {
 .timer-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  /* gap: 4px; */
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -361,7 +361,7 @@ button:active {
   background: transparent;
   padding: 0;
   margin: 0;
-  font-weight: 700;
+  font-weight: 500;
   color: #f2f4ff;
   font-size: var(--font-md);
   text-align: left;
@@ -423,7 +423,7 @@ button:active {
   margin: 0;
   font-variant-numeric: tabular-nums;
   font-size: var(--font-2xl);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.04em;
   color: var(--text-bright);
   text-shadow: 0 0 var(--space-xl) rgba(110, 150, 255, 0.35);
