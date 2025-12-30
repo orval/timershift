@@ -19,24 +19,24 @@
   --shadow-base: rgba(0, 0, 0, 0.35);
   --accent-one: rgba(56, 189, 248, 0.35);
   --accent-two: rgba(56, 189, 248, 0.6);
-  --button-size: 36px;
-  --icon-sm: 18px;
-  --icon-md: 24px;
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 14px;
-  --space-lg: 16px;
-  --space-xl: 20px;
-  --space-2xl: 24px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
-  --font-sm: 12px;
-  --font-md: 14px;
-  --font-lg: 16px;
-  --font-xl: 18px;
-  --font-2xl: 20px;
-  --font-display: 40px;
+  --button-size: 32px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 12px;
+  --space-lg: 14px;
+  --space-xl: 16px;
+  --space-2xl: 20px;
+  --radius-sm: 7px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --font-sm: 11px;
+  --font-md: 13px;
+  --font-lg: 15px;
+  --font-xl: 17px;
+  --font-2xl: 18px;
+  --font-display: 36px;
 }
 
 * {
@@ -284,7 +284,7 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 72px;
+  min-height: 64px;
   text-align: center;
 }
 
