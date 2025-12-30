@@ -20,16 +20,15 @@
   --accent-35: rgba(56, 189, 248, 0.35);
   --accent-50: rgba(56, 189, 248, 0.5);
   --accent-60: rgba(56, 189, 248, 0.6);
-  --control-size: 36px;
+  --button-size: 36px;
   --icon-sm: 18px;
   --icon-md: 24px;
   --space-xs: 8px;
   --space-sm: 12px;
   --space-md: 14px;
   --space-lg: 16px;
-  --space-xl: 18px;
-  --space-2xl: 20px;
-  --space-3xl: 24px;
+  --space-xl: 20px;
+  --space-2xl: 24px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 14px;
@@ -89,10 +88,10 @@ button:active {
 .primary {
   background: var(--white-low);
   color: var(--text-default);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
+  box-shadow: 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
   border: 1px solid var(--white-high);
-  width: var(--control-size);
-  height: var(--control-size);
+  width: var(--button-size);
+  height: var(--button-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -210,8 +209,8 @@ button:active {
 }
 
 .history-toggle-btn {
-  width: var(--control-size);
-  height: var(--control-size);
+  width: var(--button-size);
+  height: var(--button-size);
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -220,7 +219,7 @@ button:active {
   color: #5c6276;
   background: var(--white-low);
   border-color: var(--white-high);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
+  box-shadow: 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
 }
 
 .history-toggle-btn:hover {
@@ -263,18 +262,18 @@ button:active {
 
 .timer-card--running {
   border-color: rgba(74, 222, 128, 0.6);
-  box-shadow: 0 var(--space-xs) var(--space-2xl) rgba(74, 222, 128, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 var(--space-xs) var(--space-xl) rgba(74, 222, 128, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .timer-card--paused {
   border-color: rgba(251, 146, 60, 0.6);
-  box-shadow: 0 var(--space-xs) var(--space-2xl) rgba(251, 146, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 var(--space-xs) var(--space-xl) rgba(251, 146, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .timer-card--dragging {
   opacity: 0.65;
   border-color: rgba(148, 163, 184, 0.45);
-  box-shadow: 0 var(--space-xs) var(--space-3xl) rgba(15, 23, 42, 0.45);
+  box-shadow: 0 var(--space-xs) var(--space-2xl) rgba(15, 23, 42, 0.45);
   cursor: grabbing;
 }
 
@@ -429,7 +428,7 @@ button:active {
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--text-bright);
-  text-shadow: 0 0 var(--space-2xl) rgba(110, 150, 255, 0.35);
+  text-shadow: 0 0 var(--space-xl) rgba(110, 150, 255, 0.35);
   min-width: 0;
 }
 
@@ -440,8 +439,8 @@ button:active {
 }
 
 .remove-btn {
-  width: var(--control-size);
-  height: var(--control-size);
+  width: var(--button-size);
+  height: var(--button-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -457,8 +456,8 @@ button:active {
 }
 
 .action-btn {
-  width: var(--control-size);
-  height: var(--control-size);
+  width: var(--button-size);
+  height: var(--button-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -466,12 +465,12 @@ button:active {
   color: var(--text-default);
   background: var(--white-low);
   border: 1px solid var(--white-high);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
+  box-shadow: 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
   padding: 0;
 }
 
 .action-btn.shift-glow {
-  box-shadow: 0 0 0 1px var(--accent-35), 0 0 var(--space-md) rgba(56, 189, 248, 0.45), 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
+  box-shadow: 0 0 0 1px var(--accent-35), 0 0 var(--space-md) rgba(56, 189, 248, 0.45), 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
   border-color: var(--accent-60);
 }
 
@@ -504,8 +503,8 @@ button:active {
 }
 
 .reset-btn {
-  width: var(--control-size);
-  height: var(--control-size);
+  width: var(--button-size);
+  height: var(--button-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -513,7 +512,7 @@ button:active {
   background: rgba(56, 189, 248, 0.12);
   color: var(--accent);
   border: 1px solid var(--accent-35);
-  box-shadow: 0 var(--space-sm) var(--space-3xl) var(--shadow-base);
+  box-shadow: 0 var(--space-sm) var(--space-2xl) var(--shadow-base);
   padding: 0;
 }
 
@@ -531,8 +530,8 @@ button:active {
 
 .adjust-btn,
 .transfer-btn {
-  width: var(--control-size);
-  height: var(--control-size);
+  width: var(--button-size);
+  height: var(--button-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -555,7 +554,7 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-3xl);
+  padding: var(--space-2xl);
   z-index: 50;
 }
 
@@ -564,8 +563,8 @@ button:active {
   background: #0f141a;
   border: 1px solid var(--white-mid);
   border-radius: var(--radius-lg);
-  padding: var(--space-xl) var(--space-2xl);
-  box-shadow: 0 var(--space-3xl) 60px rgba(0, 0, 0, 0.55);
+  padding: var(--space-xl) var(--space-xl);
+  box-shadow: 0 var(--space-2xl) 60px rgba(0, 0, 0, 0.55);
   max-height: calc(100vh - 48px);
   max-height: calc(100svh - 48px);
   overflow-y: auto;
@@ -691,7 +690,7 @@ button:active {
 }
 
 .adjust-wheel-item {
-  height: var(--control-size);
+  height: var(--button-size);
   width: 100%;
   background: transparent;
   border: none;
@@ -721,7 +720,7 @@ button:active {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 76px;
-  height: var(--control-size);
+  height: var(--button-size);
   border-radius: var(--radius-md);
   border: 1px solid var(--accent-60);
   box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2), 0 0 var(--space-md) rgba(56, 189, 248, 0.25);
@@ -938,15 +937,15 @@ button:active {
   color: var(--text-muted);
   text-align: center;
   border: 1px dashed rgba(154, 165, 198, 0.4);
-  padding: var(--space-2xl);
+  padding: var(--space-xl);
   border-radius: var(--radius-lg);
   background: var(--white-low);
 }
 
 .toast {
   position: fixed;
-  right: var(--space-2xl);
-  bottom: var(--space-2xl);
+  right: var(--space-xl);
+  bottom: var(--space-xl);
   display: inline-flex;
   align-items: center;
   gap: var(--space-lg);
