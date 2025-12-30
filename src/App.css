@@ -13,11 +13,9 @@
   --text-default: #e5e7eb;
   --accent: #38bdf8;
   --accent-soft: #bae6fd;
-  --white-04: rgba(255, 255, 255, 0.04);
-  --white-06: rgba(255, 255, 255, 0.06);
-  --white-08: rgba(255, 255, 255, 0.08);
-  --white-12: rgba(255, 255, 255, 0.12);
-  --white-14: rgba(255, 255, 255, 0.14);
+  --white-low: rgba(255, 255, 255, 0.04);
+  --white-mid: rgba(255, 255, 255, 0.08);
+  --white-high: rgba(255, 255, 255, 0.12);
   --shadow-35: rgba(0, 0, 0, 0.35);
   --shadow-40: rgba(0, 0, 0, 0.4);
   --accent-35: rgba(56, 189, 248, 0.35);
@@ -80,10 +78,10 @@ button:active {
 }
 
 .primary {
-  background: var(--white-04);
+  background: var(--white-low);
   color: var(--text-default);
   box-shadow: 0 var(--size-12) var(--size-24) var(--shadow-35);
-  border: 1px solid var(--white-14);
+  border: 1px solid var(--white-high);
   width: var(--control-size);
   height: var(--control-size);
   display: inline-flex;
@@ -93,20 +91,20 @@ button:active {
 }
 
 .primary:hover {
-  background: var(--white-08);
+  background: var(--white-mid);
   color: var(--text-bright);
   box-shadow: 0 var(--size-12) 28px var(--shadow-40);
 }
 
 .ghost-btn {
-  background: var(--white-04);
+  background: var(--white-low);
   color: #d8def0;
   padding: var(--size-12) var(--size-12);
-  border: 1px solid var(--white-08);
+  border: 1px solid var(--white-mid);
 }
 
 .ghost-btn:hover {
-  background: var(--white-08);
+  background: var(--white-mid);
 }
 
 .timers {
@@ -117,7 +115,7 @@ button:active {
 
 .history-panel {
   background: rgba(10, 14, 20, 0.6);
-  border: 1px solid var(--white-06);
+  border: 1px solid var(--white-mid);
   border-radius: var(--size-12);
   padding: var(--size-12) var(--size-14);
   box-shadow: 0 var(--size-12) 26px var(--shadow-35);
@@ -168,7 +166,7 @@ button:active {
   gap: var(--gap-large);
   padding: var(--gap-small) var(--size-12);
   border-radius: var(--size-12);
-  border: 1px solid var(--white-06);
+  border: 1px solid var(--white-mid);
   background: rgba(255, 255, 255, 0.03);
 }
 
@@ -211,14 +209,14 @@ button:active {
   justify-content: center;
   border-radius: var(--size-12);
   color: #5c6276;
-  background: var(--white-04);
-  border-color: var(--white-14);
+  background: var(--white-low);
+  border-color: var(--white-high);
   box-shadow: 0 var(--size-12) var(--size-24) var(--shadow-35);
 }
 
 .history-toggle-btn:hover {
   color: #dbe3f5;
-  background: var(--white-06);
+  background: var(--white-mid);
 }
 
 .footer-actions {
@@ -243,7 +241,7 @@ button:active {
 
 .timer-card {
   background: linear-gradient(145deg, #0c1220, #090c13 45%, #0c0f13 100%);
-  border: 1px solid var(--white-06);
+  border: 1px solid var(--white-mid);
   border-radius: var(--size-12);
   padding: var(--size-12) var(--size-14);
   box-shadow: 0 var(--size-12) 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.02);
@@ -273,7 +271,7 @@ button:active {
 
 .current-timer-card {
   background: linear-gradient(145deg, #0c1220, #090c13 45%, #0c0f13 100%);
-  border: 1px solid var(--white-06);
+  border: 1px solid var(--white-mid);
   border-radius: var(--size-12);
   padding: var(--size-12) var(--size-14);
   box-shadow: 0 var(--size-12) 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.02);
@@ -395,12 +393,12 @@ button:active {
   justify-content: center;
   flex: 0 0 auto;
   min-width: var(--size-24);
-  background: var(--white-06);
+  background: var(--white-mid);
   color: #5c6276;
 }
 
 .timer-copy-btn:hover {
-  background: var(--white-12);
+  background: var(--white-high);
   color: var(--text-bright);
 }
 
@@ -457,8 +455,8 @@ button:active {
   justify-content: center;
   border-radius: var(--size-12);
   color: var(--text-default);
-  background: var(--white-04);
-  border: 1px solid var(--white-14);
+  background: var(--white-low);
+  border: 1px solid var(--white-high);
   box-shadow: 0 var(--size-12) var(--size-24) var(--shadow-35);
   padding: 0;
 }
@@ -555,7 +553,7 @@ button:active {
 .modal {
   width: min(420px, 100%);
   background: #0f141a;
-  border: 1px solid var(--white-08);
+  border: 1px solid var(--white-mid);
   border-radius: var(--size-16);
   padding: var(--size-18) var(--size-20);
   box-shadow: 0 var(--size-24) 60px rgba(0, 0, 0, 0.55);
@@ -584,8 +582,8 @@ button:active {
 
 .modal-input {
   width: 100%;
-  background: var(--white-06);
-  border: 1px solid var(--white-12);
+  background: var(--white-mid);
+  border: 1px solid var(--white-high);
   border-radius: var(--size-12);
   padding: var(--size-12) var(--size-12);
   color: var(--text-bright);
@@ -616,9 +614,9 @@ button:active {
   padding: var(--size-8) var(--size-12);
   font-size: var(--size-14);
   font-weight: 600;
-  background: var(--white-06);
+  background: var(--white-mid);
   color: var(--text-default);
-  border: 1px solid var(--white-12);
+  border: 1px solid var(--white-high);
 }
 
 .modal-btn:hover {
@@ -666,8 +664,8 @@ button:active {
   height: 200px;
   padding: 82px 0;
   border-radius: var(--size-16);
-  border: 1px solid var(--white-08);
-  background: var(--white-04);
+  border: 1px solid var(--white-mid);
+  background: var(--white-low);
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: thin;
@@ -745,7 +743,7 @@ button:active {
   gap: var(--gap-large);
   padding: var(--size-12);
   border-radius: var(--size-14);
-  border: 1px solid var(--white-08);
+  border: 1px solid var(--white-mid);
   background: rgba(255, 255, 255, 0.03);
 }
 
@@ -809,13 +807,13 @@ button:active {
   padding: var(--size-8) var(--size-12);
   font-size: var(--size-12);
   font-weight: 600;
-  background: var(--white-06);
+  background: var(--white-mid);
   color: var(--text-soft);
-  border: 1px solid var(--white-12);
+  border: 1px solid var(--white-high);
 }
 
 .transfer-step:hover {
-  background: var(--white-12);
+  background: var(--white-high);
 }
 
 .transfer-step:disabled {
@@ -834,13 +832,13 @@ button:active {
   padding: var(--size-8) var(--size-12);
   font-size: var(--size-12);
   font-weight: 600;
-  background: var(--white-04);
+  background: var(--white-low);
   color: var(--text-soft);
-  border: 1px solid var(--white-12);
+  border: 1px solid var(--white-high);
 }
 
 .transfer-preset:hover {
-  background: var(--white-12);
+  background: var(--white-high);
 }
 
 .transfer-preset:disabled {
@@ -881,14 +879,14 @@ button:active {
   gap: var(--gap-large);
   padding: var(--size-12) var(--size-12);
   border-radius: var(--size-12);
-  border: 1px solid var(--white-08);
-  background: var(--white-04);
+  border: 1px solid var(--white-mid);
+  background: var(--white-low);
   color: var(--text-bright);
   text-align: left;
 }
 
 .transfer-target:hover {
-  background: var(--white-08);
+  background: var(--white-mid);
 }
 
 .transfer-target:disabled {
@@ -933,7 +931,7 @@ button:active {
   border: 1px dashed rgba(154, 165, 198, 0.4);
   padding: var(--size-20);
   border-radius: var(--size-14);
-  background: var(--white-04);
+  background: var(--white-low);
 }
 
 .toast {
@@ -965,14 +963,14 @@ button:active {
   padding: var(--size-8) var(--size-12);
   font-size: var(--size-12);
   font-weight: 700;
-  background: var(--white-06);
+  background: var(--white-mid);
   color: var(--text-soft);
-  border: 1px solid var(--white-12);
+  border: 1px solid var(--white-high);
 }
 
 .toast-btn:hover,
 .toast-dismiss:hover {
-  background: var(--white-12);
+  background: var(--white-high);
 }
 
 .toast-btn {
