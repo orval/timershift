@@ -274,7 +274,7 @@ function App (): JSX.Element {
           <div class='footer-spacer' aria-hidden='true' />
           <div class='add-timer'>
             <button class='primary' type='button' onClick={openAddModal}>
-              <CirclePlus class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+              <CirclePlus class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
               <span class='sr-only'>Add new timer</span>
             </button>
           </div>
@@ -286,7 +286,7 @@ function App (): JSX.Element {
                 onClick={() => setIsHistoryOpen(true)}
                 aria-label='History'
               >
-                <History class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+                <History class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
               </button>
             )}
           </div>

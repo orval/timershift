@@ -136,9 +136,9 @@ export const TimerCard = ({
               title={isCopied ? 'Copied' : 'Copy name'}
             >
               {isCopied ? (
-                <Check class='icon' size={14} strokeWidth={2.2} aria-hidden='true' />
+                <Check class='icon' size={12} strokeWidth={2.2} aria-hidden='true' />
               ) : (
-                <Copy class='icon' size={14} strokeWidth={2.2} aria-hidden='true' />
+                <Copy class='icon' size={12} strokeWidth={2.2} aria-hidden='true' />
               )}
             </button>
           </div>
@@ -153,9 +153,9 @@ export const TimerCard = ({
           >
             <span class='sr-only'>{timer.running ? 'Pause' : 'Start'}</span>
             {timer.running ? (
-              <Pause class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+              <Pause class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
             ) : (
-              <Play class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+              <Play class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
             )}
           </button>
           <button
@@ -164,7 +164,7 @@ export const TimerCard = ({
             onClick={() => onReset(timer.id)}
             onPointerDown={stopDrag}
           >
-            <RotateCcw class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <RotateCcw class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Reset</span>
           </button>
           <button
@@ -174,7 +174,7 @@ export const TimerCard = ({
             onPointerDown={stopDrag}
             aria-label='Move time'
           >
-            <ArrowLeftRight class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <ArrowLeftRight class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Move time</span>
           </button>
           <button
@@ -184,7 +184,7 @@ export const TimerCard = ({
             onPointerDown={stopDrag}
             aria-label='Adjust time'
           >
-            <ChevronsUpDown class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <ChevronsUpDown class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Adjust</span>
           </button>
           <button
@@ -194,7 +194,7 @@ export const TimerCard = ({
             onPointerDown={stopDrag}
             aria-label='Remove timer'
           >
-            <X class='icon' size={18} strokeWidth={2.2} aria-hidden='true' />
+            <X class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Remove</span>
           </button>
         </div>
