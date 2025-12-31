@@ -699,7 +699,7 @@ button:active {
 }
 
 .adjust-wheel-item {
-  height: var(--button-size);
+  height: 36px;
   width: 100%;
   background: transparent;
   border: none;
@@ -729,7 +729,7 @@ button:active {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 76px;
-  height: var(--button-size);
+  height: 36px;
   border-radius: var(--radius-md);
   border: 1px solid var(--accent-two);
   box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.2), 0 0 var(--space-md) rgba(56, 189, 248, 0.25);
