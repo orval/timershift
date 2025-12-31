@@ -544,6 +544,11 @@ button:active {
   color: var(--text-soft);
 }
 
+.transfer-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;

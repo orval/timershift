@@ -102,6 +102,7 @@ export const TimerCard = ({
   }, [])
   const shouldGlow = !timer.running && isAltDown
   const isPaused = !timer.running && isPausedHighlight
+  const canTransfer = timer.elapsed >= 60
   const style = {
     transform: CSS.Transform.toString(transform),
     transition
@@ -173,6 +174,7 @@ export const TimerCard = ({
             onClick={() => onTransferRequest(timer)}
             onPointerDown={stopDrag}
             aria-label='Move time'
+            disabled={!canTransfer}
           >
             <ArrowLeftRight class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
             <span class='sr-only'>Move time</span>
