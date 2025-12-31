@@ -30,8 +30,8 @@ export const appendLogEntry = async (entry: LogEntry): Promise<void> => {
   try {
     const paths = await getLogPath()
     if (!paths) return
-    const { createDir, readTextFile, writeTextFile } = await import('@tauri-apps/api/fs')
-    await createDir(paths.appDir, { recursive: true })
+    const { mkdir, readTextFile, writeTextFile } = await import('@tauri-apps/plugin-fs')
+    await mkdir(paths.appDir, { recursive: true })
     const line = `${JSON.stringify(entry)}\n`
     let existing = ''
     try {
