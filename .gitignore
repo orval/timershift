@@ -14,6 +14,7 @@ coverage
 *.local
 .yarn/sdks/
 lhci_reports/
+.lighthouseci/
 
 # Editor directories and files
 .vscode/*
