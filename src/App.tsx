@@ -229,6 +229,9 @@ function App (): JSX.Element {
   const adjustTimer = adjustTimerId !== null
     ? timers.find((timer) => timer.id === adjustTimerId)
     : null
+  const adjustMinMinutes = adjustTimer
+    ? -Math.min(60, Math.floor(adjustTimer.elapsed / 60))
+    : 0
   const transferSource = transferSourceId !== null
     ? timers.find((timer) => timer.id === transferSourceId)
     : null
@@ -327,6 +330,7 @@ function App (): JSX.Element {
           label={adjustTimer.label}
           minutes={adjustMinutes}
           maxMinutes={60}
+          minMinutes={adjustMinMinutes}
           onChange={setAdjustMinutes}
           onClose={closeAdjustModal}
           onSubmit={handleAdjustSubmit}

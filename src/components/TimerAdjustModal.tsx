@@ -13,6 +13,7 @@ type TimerAdjustModalProps = {
   label: string
   minutes: number
   maxMinutes: number
+  minMinutes: number
   onChange: (minutes: number) => void
   onClose: () => void
   onSubmit: (event: Event) => void
@@ -22,14 +23,15 @@ export const TimerAdjustModal = ({
   label,
   minutes,
   maxMinutes,
+  minMinutes,
   onChange,
   onClose,
   onSubmit
 }: TimerAdjustModalProps): JSX.Element => {
   const listRef = useRef<HTMLDivElement | null>(null)
   const options = useMemo(
-    () => Array.from({ length: maxMinutes * 2 + 1 }, (_, index) => maxMinutes - index),
-    [maxMinutes]
+    () => Array.from({ length: maxMinutes - minMinutes + 1 }, (_, index) => maxMinutes - index),
+    [maxMinutes, minMinutes]
   )
 
   useEffect(() => {
