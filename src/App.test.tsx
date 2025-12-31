@@ -201,6 +201,7 @@ test('adjust wheel scroll updates the selected minutes', async () => {
       label='Timer 1'
       minutes={0}
       maxMinutes={30}
+      minMinutes={-30}
       onChange={handleChange}
       onClose={() => undefined}
       onSubmit={(event) => event.preventDefault()}
