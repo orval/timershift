@@ -3,7 +3,7 @@ import { CirclePlus, History } from 'lucide-preact'
 import { closestCenter, type DragEndEvent, KeyboardSensor, MouseSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { invoke } from '@tauri-apps/api/core'
-import { useEffect, useRef, useState } from 'preact/hooks'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import './App.css'
 import { HistoryPanel } from './components/HistoryPanel'
 import { TimerCard } from './components/TimerCard'
@@ -16,6 +16,10 @@ import type { Timer } from './types'
 import { DndContext, SortableContext } from './utils/dndKitPreact'
 import { appendLogEntry, buildLogEntry } from './utils/history'
 import { formatStatusMins, formatTime } from './utils/time'
+import alertSoundUrl from './assets/alert.m4r'
+
+const ALERT_THRESHOLD_SECONDS = 15 * 60
+const ALERT_SOUND_SRC = alertSoundUrl
 
 function App (): JSX.Element {
   const {
@@ -55,6 +59,8 @@ function App (): JSX.Element {
   const [isTransferOpen, setIsTransferOpen] = useState(false)
   const [transferSourceId, setTransferSourceId] = useState<number | null>(null)
   const [transferMinutes, setTransferMinutes] = useState(0)
+  const alertAudioRef = useRef<HTMLAudioElement | null>(null)
+  const lastElapsedByIdRef = useRef<Map<number, number>>(new Map())
 
   const pointerSensor = typeof window !== 'undefined' && 'PointerEvent' in window ? PointerSensor : MouseSensor
   const sensors = useSensors(
@@ -66,6 +72,22 @@ function App (): JSX.Element {
   const trayTitle = displayTimers.length > 0
     ? `${displayTimers[0].label} ${formatStatusMins(displayTimers[0].elapsed)}`
     : ''
+
+  const playAlertSound = useCallback((): void => {
+    if (typeof Audio === 'undefined') return
+    if (!alertAudioRef.current) {
+      const audio = new Audio(ALERT_SOUND_SRC)
+      audio.preload = 'auto'
+      alertAudioRef.current = audio
+    }
+    const audio = alertAudioRef.current
+    if (!audio) return
+    audio.currentTime = 0
+    const playResult = audio.play()
+    if (typeof playResult?.catch === 'function') {
+      playResult.catch(() => {})
+    }
+  }, [])
 
   useEffect(() => {
     document.body.classList.toggle('no-running', !hasRunningTimer)
@@ -98,6 +120,41 @@ function App (): JSX.Element {
     if (!isTauri) return
     void invoke('set_tray_icon_state', { state: trayIconState })
   }, [isTauri, trayIconState])
+
+  useEffect(() => {
+    if (timers.length === 0) {
+      lastElapsedByIdRef.current.clear()
+      return
+    }
+
+    const lastElapsedById = lastElapsedByIdRef.current
+    const activeIds = new Set<number>()
+    let shouldPlay = false
+
+    timers.forEach((timer) => {
+      activeIds.add(timer.id)
+      const previousElapsed = lastElapsedById.get(timer.id)
+      if (
+        timer.running &&
+        previousElapsed !== undefined &&
+        previousElapsed < ALERT_THRESHOLD_SECONDS &&
+        timer.elapsed >= ALERT_THRESHOLD_SECONDS
+      ) {
+        shouldPlay = true
+      }
+      lastElapsedById.set(timer.id, timer.elapsed)
+    })
+
+    for (const id of lastElapsedById.keys()) {
+      if (!activeIds.has(id)) {
+        lastElapsedById.delete(id)
+      }
+    }
+
+    if (shouldPlay) {
+      playAlertSound()
+    }
+  }, [playAlertSound, timers])
 
   const openAddModal = (): void => {
     setModalMode('add')

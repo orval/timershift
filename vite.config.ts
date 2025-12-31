@@ -4,6 +4,7 @@ import preact from "@preact/preset-vite";
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
   plugins: [preact()],
+  assetsInclude: ["**/*.m4r"],
   resolve: {
     alias: {
       react: "preact/compat",
