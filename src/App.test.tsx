@@ -290,6 +290,32 @@ test('toggles a timer between start and pause', async () => {
   expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument()
 })
 
+test('starting a timer pauses other running timers', async () => {
+  seedTimers([
+    { id: 1, label: 'Timer A', elapsed: 0, running: false },
+    { id: 2, label: 'Timer B', elapsed: 0, running: false }
+  ])
+  render(<App />)
+  const user = userEvent.setup()
+
+  const timerACard = screen.getByText('Timer A', { selector: 'button' }).closest('.timer-card')
+  const timerBCard = screen.getByText('Timer B', { selector: 'button' }).closest('.timer-card')
+
+  expect(timerACard).not.toBeNull()
+  expect(timerBCard).not.toBeNull()
+  if (!(timerACard instanceof HTMLElement) || !(timerBCard instanceof HTMLElement)) return
+
+  expect(within(timerBCard).getByRole('button', { name: /start timer/i })).toBeInTheDocument()
+
+  await user.click(within(timerACard).getByRole('button', { name: /start timer/i }))
+  expect(within(timerACard).getByRole('button', { name: /pause timer/i })).toBeInTheDocument()
+
+  await user.click(within(timerBCard).getByRole('button', { name: /start timer/i }))
+
+  expect(within(timerBCard).getByRole('button', { name: /pause timer/i })).toBeInTheDocument()
+  expect(within(timerACard).getByRole('button', { name: /start timer/i })).toBeInTheDocument()
+})
+
 test('reorders timers after a drag end event', async () => {
   seedTimers([
     { id: 1, label: 'Timer A', elapsed: 0, running: false },
