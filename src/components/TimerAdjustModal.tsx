@@ -1,7 +1,8 @@
 import type { JSX } from 'preact'
-import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks'
+import { useMemo } from 'preact/hooks'
+import { formatTime } from '../utils/time'
 
-const ITEM_HEIGHT = 36
+const PRESET_MINUTES = [1, 5, 10, 15, 25, 30, 45, 60]
 
 const formatMinutes = (minutes: number): string => {
   if (minutes > 0) return `+${minutes}`
@@ -28,48 +29,29 @@ export const TimerAdjustModal = ({
   onClose,
   onSubmit
 }: TimerAdjustModalProps): JSX.Element => {
-  const listRef = useRef<HTMLDivElement | null>(null)
-  const options = useMemo(
-    () => Array.from({ length: maxMinutes - minMinutes + 1 }, (_, index) => maxMinutes - index),
-    [maxMinutes, minMinutes]
-  )
+  const presets = useMemo(() => {
+    const negative = PRESET_MINUTES
+      .filter((value) => -value >= minMinutes)
+      .map((value) => -value)
+      .reverse()
+    const positive = PRESET_MINUTES.filter((value) => value <= maxMinutes)
+    return [...negative, ...positive]
+  }, [maxMinutes, minMinutes])
 
-  useEffect(() => {
-    const targetIndex = options.indexOf(minutes)
-    if (targetIndex === -1) return
-    if (!listRef.current) return
-    listRef.current.scrollTop = targetIndex * ITEM_HEIGHT
-  }, [minutes, options])
+  const clampMinutes = (value: number): number =>
+    Math.min(Math.max(value, minMinutes), maxMinutes)
 
-  const handleScroll = useCallback((): void => {
-    const el = listRef.current
-    if (!el) return
-    const index = Math.round(el.scrollTop / ITEM_HEIGHT)
-    const clampedIndex = Math.min(Math.max(index, 0), options.length - 1)
-    const nextValue = options[clampedIndex]
-    if (nextValue !== minutes) onChange(nextValue)
-  }, [minutes, onChange, options])
+  const handleRangeInput = (event: Event): void => {
+    const value = Number((event.target as HTMLInputElement).value)
+    onChange(clampMinutes(value))
+  }
 
-  useEffect(() => {
-    const el = listRef.current
-    if (!el) return
-    el.addEventListener('scroll', handleScroll)
-    return () => {
-      el.removeEventListener('scroll', handleScroll)
-    }
-  }, [handleScroll])
+  const handlePreset = (value: number): void => {
+    onChange(clampMinutes(value))
+  }
 
-  const handleSelect = (value: number): void => {
-    if (!listRef.current) {
-      onChange(value)
-      return
-    }
-    const nextIndex = options.indexOf(value)
-    listRef.current.scrollTo({
-      top: nextIndex * ITEM_HEIGHT,
-      behavior: 'smooth'
-    })
-    onChange(value)
+  const handleStep = (delta: number): void => {
+    onChange(clampMinutes(minutes + delta))
   }
 
   return (
@@ -81,28 +63,64 @@ export const TimerAdjustModal = ({
         aria-labelledby='timer-adjust-title'
         onClick={(event) => event.stopPropagation()}
       >
-        <form class='modal-form' onSubmit={onSubmit}>
+        <form class='modal-form adjust-form' onSubmit={onSubmit}>
           <h2 class='modal-title' id='timer-adjust-title'>
             Adjust time
           </h2>
           <p class='adjust-subtitle'>Shift minutes for {label}</p>
-          <div class='adjust-wheel'>
-            <div
-              class='adjust-wheel-track'
-              ref={listRef}
-            >
-              {options.map((value) => (
-                <button
-                  key={value}
-                  type='button'
-                  class={`adjust-wheel-item ${value === minutes ? 'is-active' : ''}`}
-                  onClick={() => handleSelect(value)}
-                >
-                  {formatMinutes(value)}
-                </button>
-              ))}
+          <div class='transfer-scrub'>
+            <div class='transfer-scrub-header'>
+              <p class='transfer-label'>Minutes to shift</p>
+              <p class='transfer-available'>
+                Range {formatMinutes(minMinutes)} to {formatMinutes(maxMinutes)} min
+              </p>
             </div>
-            <div class='adjust-wheel-indicator' aria-hidden='true' />
+            <input
+              class='transfer-range'
+              type='range'
+              min={minMinutes}
+              max={maxMinutes}
+              step={1}
+              value={minutes}
+              onInput={handleRangeInput}
+              aria-label='Minutes to shift'
+            />
+            <div class='transfer-amount'>
+              <p class='transfer-amount-value'>{formatMinutes(minutes)} min</p>
+              <p class='transfer-amount-time'>{formatTime(Math.abs(minutes) * 60)}</p>
+            </div>
+            <div class='transfer-stepper'>
+              <button
+                class='transfer-step'
+                type='button'
+                onClick={() => handleStep(-1)}
+                disabled={minutes <= minMinutes}
+                aria-label='Decrease by 1 minute'
+              >
+                -1m
+              </button>
+              <button
+                class='transfer-step'
+                type='button'
+                onClick={() => handleStep(1)}
+                disabled={minutes >= maxMinutes}
+                aria-label='Increase by 1 minute'
+              >
+                +1m
+              </button>
+            </div>
+          </div>
+          <div class='transfer-presets'>
+            {presets.map((value) => (
+              <button
+                key={value}
+                class={`transfer-preset ${value === minutes ? 'is-active' : ''}`}
+                type='button'
+                onClick={() => handlePreset(value)}
+              >
+                {formatMinutes(value)} min
+              </button>
+            ))}
           </div>
           <div class='modal-actions'>
             <button class='modal-btn' type='button' onClick={onClose}>

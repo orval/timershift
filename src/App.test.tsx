@@ -1,6 +1,6 @@
 import type { DragEndEvent } from '@dnd-kit/core'
 import type { ComponentChildren } from 'preact'
-import { render, screen, waitFor, within } from '@testing-library/preact'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
 import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
@@ -187,13 +187,13 @@ test('adjusts a timer by minutes', async () => {
   expect(screen.getAllByText('00:01:00').length).toBeGreaterThan(0)
 
   await user.click(screen.getByRole('button', { name: /adjust time/i }))
-  await user.click(screen.getByRole('button', { name: '+2' }))
+  await user.click(screen.getByRole('button', { name: '+1 min' }))
   await user.click(screen.getByRole('button', { name: /apply/i }))
 
-  expect(screen.getAllByText('00:03:00').length).toBeGreaterThan(0)
+  expect(screen.getAllByText('00:02:00').length).toBeGreaterThan(0)
 })
 
-test('adjust wheel scroll updates the selected minutes', async () => {
+test('adjust range input updates the selected minutes', () => {
   const handleChange = vi.fn()
 
   render(
@@ -208,24 +208,9 @@ test('adjust wheel scroll updates the selected minutes', async () => {
     />
   )
 
-  const track = document.querySelector<HTMLDivElement>('.adjust-wheel-track')
-  expect(track).not.toBeNull()
-  if (!track) return
-
-  const scrollState = { value: Number(track.scrollTop) }
-  Object.defineProperty(track, 'scrollTop', {
-    configurable: true,
-    get: () => scrollState.value,
-    set: (value) => {
-      scrollState.value = Number(value)
-    }
-  })
-
-  await waitFor(() => {
-    track.scrollTop = 0
-    track.dispatchEvent(new Event('scroll', { bubbles: true }))
-    expect(handleChange).toHaveBeenCalledWith(30)
-  })
+  const slider = screen.getByRole('slider', { name: /minutes to shift/i })
+  fireEvent.input(slider, { target: { value: '10' } })
+  expect(handleChange).toHaveBeenCalledWith(10)
 })
 
 test('moves time between timers', async () => {
