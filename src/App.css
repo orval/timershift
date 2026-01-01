@@ -61,13 +61,6 @@ body.no-running {
   gap: var(--space-lg);
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-lg);
-}
-
 button {
   border: none;
   border-radius: var(--radius-md);
@@ -331,12 +324,6 @@ button:active {
   color: var(--text-bright);
   text-shadow: 0 0 var(--space-xl) rgba(110, 150, 255, 0.3);
   text-align: center;
-}
-
-.timer-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .timer-body {
