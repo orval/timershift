@@ -64,6 +64,8 @@ export const useTimers = (): {
   })
   const lastRunningTimerIdRef = useRef<number | null>(null)
   const timersRef = useRef<Timer[]>(timers)
+  const lastTickRef = useRef<number | null>(null)
+  const tickRemainderRef = useRef<number>(0)
 
   const runningTimers = useMemo(
     () => timers.filter((timer) => timer.running),
@@ -98,12 +100,26 @@ export const useTimers = (): {
   }, [timers])
 
   useEffect(() => {
-    if (!hasRunningTimer) return
+    if (!hasRunningTimer) {
+      lastTickRef.current = null
+      tickRemainderRef.current = 0
+      return
+    }
 
+    lastTickRef.current = Date.now()
+    tickRemainderRef.current = 0
     const interval = window.setInterval(() => {
+      const now = Date.now()
+      const lastTick = lastTickRef.current ?? now
+      const deltaMs = Math.max(0, now - lastTick)
+      lastTickRef.current = now
+      const totalMs = tickRemainderRef.current + deltaMs
+      const deltaSeconds = Math.floor(totalMs / 1000)
+      tickRemainderRef.current = totalMs - deltaSeconds * 1000
+      if (deltaSeconds <= 0) return
       setTimers((prev: Timer[]) =>
         prev.map((timer) =>
-          timer.running ? { ...timer, elapsed: timer.elapsed + 1 } : timer
+          timer.running ? { ...timer, elapsed: timer.elapsed + deltaSeconds } : timer
         )
       )
     }, 1000)
