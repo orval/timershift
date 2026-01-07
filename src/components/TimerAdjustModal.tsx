@@ -89,7 +89,7 @@ export const TimerAdjustModal = ({
               {presets.map((value) => (
                 <button
                   key={value}
-                  class={`transfer-preset ${value === minutes ? 'is-active' : ''}`}
+                  class={`transfer-preset${value === minutes ? ' is-active' : ''}`}
                   type='button'
                   onClick={() => handlePreset(value)}
                 >
