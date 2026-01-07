@@ -770,9 +770,10 @@ button:active {
 }
 
 .transfer-preset.is-active {
-  background: hsla(var(--preset-hue), 85%, 60%, 0.3);
-  border-color: hsla(var(--preset-hue), 85%, 62%, 0.75);
-  color: hsl(var(--preset-hue), 90%, 80%);
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
+  border-color: rgba(255, 255, 255, 0.78);
+  color: var(--text-bright);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.28), 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
 .transfer-targets {
