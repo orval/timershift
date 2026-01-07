@@ -63,10 +63,10 @@ export const TimerAdjustModal = ({
           <h2 class='modal-title' id='timer-adjust-title'>
             Adjust time
           </h2>
-          <p class='adjust-subtitle'>Shift minutes for {label}</p>
+          <p class='adjust-subtitle'>Adjust minutes for {label}</p>
           <div class='transfer-scrub'>
             <div class='transfer-scrub-header'>
-              <p class='transfer-label'>Minutes to shift</p>
+              <p class='transfer-label'>Minutes to adjust</p>
               <p class='transfer-available'>
                 Range {formatMinutes(minMinutes)} to {formatMinutes(maxMinutes)} min
               </p>
@@ -79,7 +79,7 @@ export const TimerAdjustModal = ({
               step={1}
               value={minutes}
               onInput={handleRangeInput}
-              aria-label='Minutes to shift'
+              aria-label='Minutes to adjust'
             />
             <div class='transfer-amount'>
               <p class='transfer-amount-value'>{formatMinutes(minutes)} min</p>

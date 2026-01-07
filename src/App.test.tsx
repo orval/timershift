@@ -208,7 +208,7 @@ test('adjust range input updates the selected minutes', () => {
     />
   )
 
-  const slider = screen.getByRole('slider', { name: /minutes to shift/i })
+  const slider = screen.getByRole('slider', { name: /minutes to adjust/i })
   fireEvent.input(slider, { target: { value: '10' } })
   expect(handleChange).toHaveBeenCalledWith(10)
 })
