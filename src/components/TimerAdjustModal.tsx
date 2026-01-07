@@ -63,7 +63,7 @@ export const TimerAdjustModal = ({
           <h2 class='modal-title' id='timer-adjust-title'>
             Adjust time
           </h2>
-          <p class='adjust-subtitle'>Adjust minutes for {label}</p>
+            <p class='adjust-subtitle'>Adjust minutes for <strong>{label}</strong></p>
           <div class='transfer-scrub'>
             <div class='transfer-scrub-header'>
               <p class='transfer-label'>Minutes to adjust</p>
