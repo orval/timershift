@@ -769,6 +769,40 @@ button:active {
   color: var(--accent-soft);
 }
 
+.transfer-preset.is-negative {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.transfer-preset.is-negative:hover {
+  background: rgba(248, 113, 113, 0.18);
+  color: #fecaca;
+}
+
+.transfer-preset.is-negative.is-active {
+  background: rgba(248, 113, 113, 0.22);
+  border-color: rgba(248, 113, 113, 0.6);
+  color: #fecaca;
+}
+
+.transfer-preset.is-positive {
+  color: var(--accent);
+  border-color: var(--accent-one);
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.transfer-preset.is-positive:hover {
+  background: rgba(56, 189, 248, 0.18);
+  color: var(--accent-soft);
+}
+
+.transfer-preset.is-positive.is-active {
+  background: rgba(56, 189, 248, 0.24);
+  border-color: var(--accent-two);
+  color: var(--accent-soft);
+}
+
 .transfer-targets {
   display: flex;
   flex-direction: column;

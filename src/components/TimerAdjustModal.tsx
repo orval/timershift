@@ -63,7 +63,9 @@ export const TimerAdjustModal = ({
           <h2 class='modal-title' id='timer-adjust-title'>
             Adjust time
           </h2>
-            <p class='adjust-subtitle'>Adjust minutes for <strong>{label}</strong></p>
+          <p class='adjust-subtitle'>
+            Adjust minutes for <strong>{label}</strong>
+          </p>
           <div class='transfer-scrub'>
             <div class='transfer-scrub-header'>
               <p class='transfer-label'>Minutes to adjust</p>
@@ -89,7 +91,7 @@ export const TimerAdjustModal = ({
               {presets.map((value) => (
                 <button
                   key={value}
-                  class={`transfer-preset${value === minutes ? ' is-active' : ''}`}
+                  class={`transfer-preset ${value < 0 ? 'is-negative' : 'is-positive'}${value === minutes ? ' is-active' : ''}`}
                   type='button'
                   onClick={() => handlePreset(value)}
                 >
