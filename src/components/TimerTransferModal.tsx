@@ -42,6 +42,21 @@ export const TimerTransferModal = ({
     onMinutesChange(clampMinutes(value))
   }
 
+  const getPresetStyle = (value: number): JSX.CSSProperties => {
+    if (safeMax <= 0) return {}
+    const ratio = Math.min(Math.max(value / safeMax, 0), 1)
+    const hue = 190 + ratio * 25
+    const alpha = 0.08 + ratio * 0.22
+    const borderAlpha = 0.22 + ratio * 0.46
+    const textLight = 70 + ratio * 10
+    return {
+      '--preset-hue': hue.toFixed(1),
+      '--preset-alpha': alpha.toFixed(3),
+      '--preset-border-alpha': borderAlpha.toFixed(3),
+      '--preset-text-light': `${textLight.toFixed(1)}%`
+    } as JSX.CSSProperties
+  }
+
   const isTransferReady = minutes > 0 && safeMax > 0
   const targetEmptyMessage = safeMax === 0
     ? 'No full minutes to move yet.'
@@ -92,6 +107,7 @@ export const TimerTransferModal = ({
                   type='button'
                   onClick={() => handlePreset(value)}
                   disabled={safeMax === 0}
+                  style={getPresetStyle(value)}
                 >
                   {value} min
                 </button>
@@ -101,6 +117,7 @@ export const TimerTransferModal = ({
                   class={`transfer-preset ${safeMax === minutes ? 'is-active' : ''}`}
                   type='button'
                   onClick={() => handlePreset(safeMax)}
+                  style={getPresetStyle(safeMax)}
                 >
                   All
                 </button>

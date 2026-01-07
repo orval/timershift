@@ -50,6 +50,26 @@ export const TimerAdjustModal = ({
     onChange(clampMinutes(value))
   }
 
+  const negativeBound = Math.max(0, Math.abs(minMinutes))
+  const positiveBound = Math.max(0, maxMinutes)
+  const getPresetStyle = (value: number): JSX.CSSProperties => {
+    if (value === 0) return {}
+    const isNegative = value < 0
+    const bound = isNegative ? negativeBound : positiveBound
+    if (bound === 0) return {}
+    const ratio = Math.min(Math.abs(value) / bound, 1)
+    const hue = isNegative ? 8 + ratio * 18 : 185 + ratio * 28
+    const alpha = 0.08 + ratio * 0.22
+    const borderAlpha = 0.22 + ratio * 0.46
+    const textLight = 70 + ratio * 12
+    return {
+      '--preset-hue': hue.toFixed(1),
+      '--preset-alpha': alpha.toFixed(3),
+      '--preset-border-alpha': borderAlpha.toFixed(3),
+      '--preset-text-light': `${textLight.toFixed(1)}%`
+    } as JSX.CSSProperties
+  }
+
   return (
     <div class='modal-backdrop' onClick={onClose}>
       <div
@@ -91,9 +111,10 @@ export const TimerAdjustModal = ({
               {presets.map((value) => (
                 <button
                   key={value}
-                  class={`transfer-preset ${value < 0 ? 'is-negative' : 'is-positive'}${value === minutes ? ' is-active' : ''}`}
+                  class={`transfer-preset${value === minutes ? ' is-active' : ''}`}
                   type='button'
                   onClick={() => handlePreset(value)}
+                  style={getPresetStyle(value)}
                 >
                   {formatMinutes(value)} min
                 </button>

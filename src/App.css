@@ -745,17 +745,23 @@ button:active {
 }
 
 .transfer-preset {
+  --preset-hue: 200;
+  --preset-alpha: 0.1;
+  --preset-border-alpha: 0.3;
+  --preset-text-light: 72%;
   border-radius: var(--radius-md);
   padding: var(--space-xs) var(--space-sm);
   font-size: var(--font-sm);
   font-weight: 600;
-  background: var(--white-low);
-  color: var(--text-soft);
-  border: 1px solid var(--white-high);
+  background: hsla(var(--preset-hue), 80%, 55%, var(--preset-alpha));
+  color: hsl(var(--preset-hue), 85%, var(--preset-text-light));
+  border: 1px solid hsla(var(--preset-hue), 80%, 60%, var(--preset-border-alpha));
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .transfer-preset:hover {
-  background: var(--white-high);
+  background: hsla(var(--preset-hue), 80%, 60%, 0.22);
+  color: hsl(var(--preset-hue), 90%, 78%);
 }
 
 .transfer-preset:disabled {
@@ -764,43 +770,9 @@ button:active {
 }
 
 .transfer-preset.is-active {
-  background: rgba(56, 189, 248, 0.18);
-  border-color: var(--accent-two);
-  color: var(--accent-soft);
-}
-
-.transfer-preset.is-negative {
-  color: #f87171;
-  border-color: rgba(248, 113, 113, 0.35);
-  background: rgba(248, 113, 113, 0.08);
-}
-
-.transfer-preset.is-negative:hover {
-  background: rgba(248, 113, 113, 0.18);
-  color: #fecaca;
-}
-
-.transfer-preset.is-negative.is-active {
-  background: rgba(248, 113, 113, 0.22);
-  border-color: rgba(248, 113, 113, 0.6);
-  color: #fecaca;
-}
-
-.transfer-preset.is-positive {
-  color: var(--accent);
-  border-color: var(--accent-one);
-  background: rgba(56, 189, 248, 0.08);
-}
-
-.transfer-preset.is-positive:hover {
-  background: rgba(56, 189, 248, 0.18);
-  color: var(--accent-soft);
-}
-
-.transfer-preset.is-positive.is-active {
-  background: rgba(56, 189, 248, 0.24);
-  border-color: var(--accent-two);
-  color: var(--accent-soft);
+  background: hsla(var(--preset-hue), 85%, 60%, 0.3);
+  border-color: hsla(var(--preset-hue), 85%, 62%, 0.75);
+  color: hsl(var(--preset-hue), 90%, 80%);
 }
 
 .transfer-targets {

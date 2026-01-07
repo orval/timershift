@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
 import { TimerAdjustModal } from './components/TimerAdjustModal'
+import { TimerTransferModal } from './components/TimerTransferModal'
 import type { LogEntry } from './types'
 
 const historyMocks = vi.hoisted(() => ({
@@ -211,6 +212,47 @@ test('adjust range input updates the selected minutes', () => {
   const slider = screen.getByRole('slider', { name: /minutes to adjust/i })
   fireEvent.input(slider, { target: { value: '10' } })
   expect(handleChange).toHaveBeenCalledWith(10)
+})
+
+test('transfer range input updates the selected minutes', () => {
+  const handleChange = vi.fn()
+
+  render(
+    <TimerTransferModal
+      source={{ id: 1, label: 'Source', elapsed: 420, running: false }}
+      targets={[]}
+      minutes={0}
+      maxMinutes={7}
+      onMinutesChange={handleChange}
+      onClose={() => undefined}
+      onTransfer={() => undefined}
+    />
+  )
+
+  const slider = screen.getByRole('slider', { name: /minutes to move/i })
+  fireEvent.input(slider, { target: { value: '9' } })
+  expect(handleChange).toHaveBeenCalledWith(7)
+})
+
+test('selects the all preset in transfer modal', async () => {
+  const handleChange = vi.fn()
+  const user = userEvent.setup()
+
+  render(
+    <TimerTransferModal
+      source={{ id: 1, label: 'Source', elapsed: 420, running: false }}
+      targets={[]}
+      minutes={0}
+      maxMinutes={7}
+      onMinutesChange={handleChange}
+      onClose={() => undefined}
+      onTransfer={() => undefined}
+    />
+  )
+
+  await user.click(screen.getByRole('button', { name: 'All' }))
+
+  expect(handleChange).toHaveBeenCalledWith(7)
 })
 
 test('moves time between timers', async () => {
