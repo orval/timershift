@@ -733,30 +733,6 @@ button:active {
   font-variant-numeric: tabular-nums;
 }
 
-.transfer-stepper {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-.transfer-step {
-  border-radius: var(--radius-md);
-  padding: var(--space-xs) var(--space-sm);
-  font-size: var(--font-sm);
-  font-weight: 600;
-  background: var(--white-mid);
-  color: var(--text-soft);
-  border: 1px solid var(--white-high);
-}
-
-.transfer-step:hover {
-  background: var(--white-high);
-}
-
-.transfer-step:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .transfer-presets {
   display: flex;
   flex-wrap: wrap;

@@ -50,10 +50,6 @@ export const TimerAdjustModal = ({
     onChange(clampMinutes(value))
   }
 
-  const handleStep = (delta: number): void => {
-    onChange(clampMinutes(minutes + delta))
-  }
-
   return (
     <div class='modal-backdrop' onClick={onClose}>
       <div
@@ -89,38 +85,18 @@ export const TimerAdjustModal = ({
               <p class='transfer-amount-value'>{formatMinutes(minutes)} min</p>
               <p class='transfer-amount-time'>{formatTime(Math.abs(minutes) * 60)}</p>
             </div>
-            <div class='transfer-stepper'>
-              <button
-                class='transfer-step'
-                type='button'
-                onClick={() => handleStep(-1)}
-                disabled={minutes <= minMinutes}
-                aria-label='Decrease by 1 minute'
-              >
-                -1m
-              </button>
-              <button
-                class='transfer-step'
-                type='button'
-                onClick={() => handleStep(1)}
-                disabled={minutes >= maxMinutes}
-                aria-label='Increase by 1 minute'
-              >
-                +1m
-              </button>
+            <div class='transfer-presets'>
+              {presets.map((value) => (
+                <button
+                  key={value}
+                  class={`transfer-preset ${value === minutes ? 'is-active' : ''}`}
+                  type='button'
+                  onClick={() => handlePreset(value)}
+                >
+                  {formatMinutes(value)} min
+                </button>
+              ))}
             </div>
-          </div>
-          <div class='transfer-presets'>
-            {presets.map((value) => (
-              <button
-                key={value}
-                class={`transfer-preset ${value === minutes ? 'is-active' : ''}`}
-                type='button'
-                onClick={() => handlePreset(value)}
-              >
-                {formatMinutes(value)} min
-              </button>
-            ))}
           </div>
           <div class='modal-actions'>
             <button class='modal-btn' type='button' onClick={onClose}>

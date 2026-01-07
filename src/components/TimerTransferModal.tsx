@@ -42,10 +42,6 @@ export const TimerTransferModal = ({
     onMinutesChange(clampMinutes(value))
   }
 
-  const handleStep = (delta: number): void => {
-    onMinutesChange(clampMinutes(minutes + delta))
-  }
-
   const isTransferReady = minutes > 0 && safeMax > 0
   const targetEmptyMessage = safeMax === 0
     ? 'No full minutes to move yet.'
@@ -88,49 +84,28 @@ export const TimerTransferModal = ({
               <p class='transfer-amount-value'>{minutes} min</p>
               <p class='transfer-amount-time'>{formatTime(minutes * 60)}</p>
             </div>
-            <div class='transfer-stepper'>
-              <button
-                class='transfer-step'
-                type='button'
-                onClick={() => handleStep(-1)}
-                disabled={minutes <= 0}
-                aria-label='Decrease by 1 minute'
-              >
-                -1m
-              </button>
-              <button
-                class='transfer-step'
-                type='button'
-                onClick={() => handleStep(1)}
-                disabled={minutes >= safeMax}
-                aria-label='Increase by 1 minute'
-              >
-                +1m
-              </button>
+            <div class='transfer-presets'>
+              {presets.map((value) => (
+                <button
+                  key={value}
+                  class={`transfer-preset ${value === minutes ? 'is-active' : ''}`}
+                  type='button'
+                  onClick={() => handlePreset(value)}
+                  disabled={safeMax === 0}
+                >
+                  {value} min
+                </button>
+              ))}
+              {showAllPreset && (
+                <button
+                  class={`transfer-preset ${safeMax === minutes ? 'is-active' : ''}`}
+                  type='button'
+                  onClick={() => handlePreset(safeMax)}
+                >
+                  All
+                </button>
+              )}
             </div>
-          </div>
-
-          <div class='transfer-presets'>
-            {presets.map((value) => (
-              <button
-                key={value}
-                class={`transfer-preset ${value === minutes ? 'is-active' : ''}`}
-                type='button'
-                onClick={() => handlePreset(value)}
-                disabled={safeMax === 0}
-              >
-                {value} min
-              </button>
-            ))}
-            {showAllPreset && (
-              <button
-                class={`transfer-preset ${safeMax === minutes ? 'is-active' : ''}`}
-                type='button'
-                onClick={() => handlePreset(safeMax)}
-              >
-                All
-              </button>
-            )}
           </div>
 
           <div class='transfer-targets'>
