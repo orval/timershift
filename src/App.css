@@ -8,9 +8,9 @@
   --app-bg: radial-gradient(circle at 15% 20%, #171a1f 0, #14171c 34%, #0f1216 65%, #0a0c10 100%);
   --app-bg-no-running: radial-gradient(circle at 15% 20%, #310d0e 0, #501517 34%, #310d0e 65%, #501517 100%);
   --text-bright: #f9fbff;
-  --text-soft: #e2e8f0;
-  --text-muted: #9aa5c6;
-  --text-default: #e5e7eb;
+  --text-default: #d7deef;
+  --text-soft: #b5bfd6;
+  --text-muted: #7f8bad;
   --accent: #38bdf8;
   --accent-soft: #bae6fd;
   --white-low: rgba(255, 255, 255, 0.04);
@@ -654,6 +654,11 @@ button:active {
   margin: 0;
   font-size: var(--font-sm);
   color: var(--text-muted);
+}
+
+.adjust-subtitle strong {
+  color: var(--text-soft);
+  font-weight: 700;
 }
 
 .adjust-form {
