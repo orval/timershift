@@ -32,7 +32,9 @@ export default defineConfig(async () => ({
         "**/.pnp.loader.mjs",
         "**/node_modules/**",
         "**/dist/**",
-        "**/coverage/**"
+        "**/coverage/**",
+        "**/*.css",
+        "**/*.m4r"
       ]
     }
   },
