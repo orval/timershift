@@ -179,6 +179,50 @@ test('undoes a reset from the toast', async () => {
   expect(screen.queryByText('Reset "Focus" at 00:00:42')).toBeNull()
 })
 
+test('dismisses a toast without undoing the reset', async () => {
+  seedTimers([{ id: 1, label: 'Focus', elapsed: 42, running: false }])
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /reset/i }))
+
+  expect(screen.getByText('Reset "Focus" at 00:00:42')).toBeInTheDocument()
+
+  await user.click(screen.getByRole('button', { name: /dismiss/i }))
+
+  expect(screen.queryByText('Reset "Focus" at 00:00:42')).toBeNull()
+  expect(screen.queryByText('00:00:42')).toBeNull()
+  expect(screen.getAllByText('00:00:00').length).toBeGreaterThan(0)
+})
+
+test('plays the alert sound when a running timer crosses 15 minutes', async () => {
+  seedTimers([{ id: 1, label: 'Focus', elapsed: 899, running: false }])
+
+  const play = vi.fn().mockResolvedValue(undefined)
+  class MockAudio {
+    preload = ''
+    currentTime = 0
+    play = play
+    constructor (public src: string) {}
+  }
+
+  vi.stubGlobal('Audio', MockAudio as unknown as typeof Audio)
+
+  try {
+    render(<App />)
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('button', { name: /start timer/i }))
+
+    await waitFor(() => {
+      expect(play).toHaveBeenCalled()
+    }, { timeout: 2000 })
+  } finally {
+    vi.unstubAllGlobals()
+  }
+})
+
 test('adjusts a timer by minutes', async () => {
   seedTimers([{ id: 1, label: 'Timer 1', elapsed: 60, running: false }])
 
