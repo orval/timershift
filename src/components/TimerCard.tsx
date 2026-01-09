@@ -41,6 +41,14 @@ export const TimerCard = ({
     const allowMultiple = event.getModifierState('Alt')
     onToggle(timer.id, allowMultiple)
   }
+  const handleCardClick: JSX.MouseEventHandler<HTMLDivElement> = (event) => {
+    const target = event.target as HTMLElement
+    if (target.tagName === 'BUTTON' || target.closest('button')) {
+      return
+    }
+    const allowMultiple = event.getModifierState('Alt')
+    onToggle(timer.id, allowMultiple)
+  }
   const copyTimerLabel = async (): Promise<void> => {
     if (typeof navigator === 'undefined') return
     let didCopy = false
@@ -116,7 +124,7 @@ export const TimerCard = ({
       {...dragHandleProps}
     >
       <div class='timer-body'>
-        <div class='timer-info'>
+        <div class='timer-info' onClick={handleCardClick}>
           <p class='timer-display'>{formatTime(timer.elapsed)}</p>
           <div class='timer-label-row'>
             <button
