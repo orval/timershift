@@ -36,6 +36,7 @@
   --font-xl: 17px;
   --font-2xl: 18px;
   --font-display: 36px;
+  --titlebar-offset: env(titlebar-area-height, 0px);
 }
 
 * {
@@ -46,10 +47,22 @@ body {
   margin: 0;
   background: var(--app-bg);
   min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 body.no-running {
   background: var(--app-bg-no-running);
+}
+
+.app-viewport {
+  position: fixed;
+  top: var(--titlebar-offset);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .app-shell {

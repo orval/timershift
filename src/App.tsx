@@ -301,73 +301,75 @@ function App (): JSX.Element {
 
   return (
     <>
-      <main class='app-shell'>
-        <section class='timers'>
-          {displayTimers.length > 0 && (
-            <div class='current-timer-card'>
-              <div class='current-timer-list'>
-                {displayTimers.map((timer) => (
-                  <div class='current-timer-item' key={timer.id}>
-                    <p class='current-timer-display'>{formatTime(timer.elapsed)}</p>
-                    <p class='current-timer-label'>{timer.label}</p>
-                  </div>
-                ))}
+      <div class='app-viewport'>
+        <main class='app-shell'>
+          <section class='timers'>
+            {displayTimers.length > 0 && (
+              <div class='current-timer-card'>
+                <div class='current-timer-list'>
+                  {displayTimers.map((timer) => (
+                    <div class='current-timer-item' key={timer.id}>
+                      <p class='current-timer-display'>{formatTime(timer.elapsed)}</p>
+                      <p class='current-timer-label'>{timer.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          {timers.length === 0 ? (
-            <p class='empty'>No timers yet. Create one to get started.</p>
-          ) : (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={timers.map((timer) => timer.id)} strategy={verticalListSortingStrategy}>
-                {timers.map((timer) => (
-                  <TimerCard
-                    key={timer.id}
-                    timer={timer}
-                    onToggle={toggleTimer}
-                    onReset={handleReset}
-                    onRemove={removeTimer}
-                    onAdjustRequest={openAdjustModal}
-                    onTransferRequest={openTransferModal}
-                    onRenameRequest={openRenameModal}
-                    isPausedHighlight={timer.id === pausedDisplayTimerId}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-          )}
-        </section>
-
-        {isHistoryOpen && (
-          <HistoryPanel
-            removedTimers={removedTimers}
-            onClose={() => setIsHistoryOpen(false)}
-            onRestore={restoreTimer}
-          />
-        )}
-
-        <div class='footer-actions'>
-          <div class='footer-spacer' aria-hidden='true' />
-          <div class='add-timer'>
-            <button class='primary' type='button' onClick={openAddModal}>
-              <CirclePlus class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
-              <span class='sr-only'>Add new timer</span>
-            </button>
-          </div>
-          <div class='history-toggle-right'>
-            {!isHistoryOpen && (
-              <button
-                class='ghost-btn history-toggle-btn'
-                type='button'
-                onClick={() => setIsHistoryOpen(true)}
-                aria-label='History'
-              >
-                <History class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
-              </button>
             )}
+            {timers.length === 0 ? (
+              <p class='empty'>No timers yet. Create one to get started.</p>
+            ) : (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={timers.map((timer) => timer.id)} strategy={verticalListSortingStrategy}>
+                  {timers.map((timer) => (
+                    <TimerCard
+                      key={timer.id}
+                      timer={timer}
+                      onToggle={toggleTimer}
+                      onReset={handleReset}
+                      onRemove={removeTimer}
+                      onAdjustRequest={openAdjustModal}
+                      onTransferRequest={openTransferModal}
+                      onRenameRequest={openRenameModal}
+                      isPausedHighlight={timer.id === pausedDisplayTimerId}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
+            )}
+          </section>
+
+          {isHistoryOpen && (
+            <HistoryPanel
+              removedTimers={removedTimers}
+              onClose={() => setIsHistoryOpen(false)}
+              onRestore={restoreTimer}
+            />
+          )}
+
+          <div class='footer-actions'>
+            <div class='footer-spacer' aria-hidden='true' />
+            <div class='add-timer'>
+              <button class='primary' type='button' onClick={openAddModal}>
+                <CirclePlus class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
+                <span class='sr-only'>Add new timer</span>
+              </button>
+            </div>
+            <div class='history-toggle-right'>
+              {!isHistoryOpen && (
+                <button
+                  class='ghost-btn history-toggle-btn'
+                  type='button'
+                  onClick={() => setIsHistoryOpen(true)}
+                  aria-label='History'
+                >
+                  <History class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
       {isModalOpen && (
         <TimerModal
