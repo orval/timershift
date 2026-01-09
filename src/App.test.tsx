@@ -332,6 +332,30 @@ test('toggles a timer between start and pause', async () => {
   expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument()
 })
 
+test('toggles play/pause when clicking on the middle of the timer card', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 60, running: false }])
+  render(<App />)
+  const user = userEvent.setup()
+
+  // Find the timer card and its display area
+  const timerCard = screen.getByText('Timer 1', { selector: 'button' }).closest('.timer-card')
+  expect(timerCard).not.toBeNull()
+  if (!(timerCard instanceof HTMLElement)) return
+
+  const timerDisplay = within(timerCard).getByText('00:01:00')
+  
+  // Initially should be stopped
+  expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument()
+
+  // Click on the timer display to start
+  await user.click(timerDisplay)
+  expect(screen.getByRole('button', { name: /pause timer/i })).toBeInTheDocument()
+
+  // Click on the timer display again to pause
+  await user.click(timerDisplay)
+  expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument()
+})
+
 test('starting a timer pauses other running timers', async () => {
   seedTimers([
     { id: 1, label: 'Timer A', elapsed: 0, running: false },
