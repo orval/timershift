@@ -302,20 +302,20 @@ function App (): JSX.Element {
   return (
     <>
       <div class='app-viewport'>
+        {displayTimers.length > 0 && (
+          <section class='current-timer-dock'>
+            <div class='current-timer-list'>
+              {displayTimers.map((timer) => (
+                <div class='current-timer-item' key={timer.id}>
+                  <p class='current-timer-display'>{formatTime(timer.elapsed)}</p>
+                  <p class='current-timer-label'>{timer.label}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         <main class='app-shell'>
           <section class='timers'>
-            {displayTimers.length > 0 && (
-              <div class='current-timer-card'>
-                <div class='current-timer-list'>
-                  {displayTimers.map((timer) => (
-                    <div class='current-timer-item' key={timer.id}>
-                      <p class='current-timer-display'>{formatTime(timer.elapsed)}</p>
-                      <p class='current-timer-label'>{timer.label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
             {timers.length === 0 ? (
               <p class='empty'>No timers yet. Create one to get started.</p>
             ) : (
