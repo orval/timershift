@@ -5,8 +5,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --app-bg: radial-gradient(circle at 15% 20%, #171a1f 0, #14171c 34%, #0f1216 65%, #0a0c10 100%);
-  --app-bg-no-running: radial-gradient(circle at 15% 20%, #310d0e 0, #501517 34%, #310d0e 65%, #501517 100%);
+  --app-bg: #14171c;
+  --app-bg-no-running: #310d0e;
   --text-bright: #f9fbff;
   --text-default: #d7deef;
   --text-soft: #b5bfd6;
