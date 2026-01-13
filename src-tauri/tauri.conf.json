@@ -15,7 +15,8 @@
       {
         "title": "TimerShift",
         "width": 350,
-        "height": 450
+        "height": 450,
+        "acceptFirstMouse": true
       }
     ],
     "security": {
