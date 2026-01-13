@@ -12,7 +12,7 @@ export const formatStatusMins = (totalSeconds: number): string => {
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   if (hours === 0) return `${minutes}m`
-  return `${hours}:${minutes}`
+  return `${hours}:${String(minutes).padStart(2, '0')}`
 }
 
 export const formatTimestamp = (timestamp: number): string =>
