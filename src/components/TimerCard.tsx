@@ -49,6 +49,10 @@ export const TimerCard = ({
     const allowMultiple = event.getModifierState('Alt')
     onToggle(timer.id, allowMultiple)
   }
+  const handleRenameClick: JSX.MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.stopPropagation()
+    onRenameRequest(timer)
+  }
   const copyTimerLabel = async (): Promise<void> => {
     if (typeof navigator === 'undefined') return
     let didCopy = false
@@ -76,7 +80,8 @@ export const TimerCard = ({
       // Ignore clipboard errors silently.
     }
   }
-  const handleCopyClick: JSX.MouseEventHandler<HTMLButtonElement> = () => {
+  const handleCopyClick: JSX.MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.stopPropagation()
     void copyTimerLabel()
   }
   useEffect(() => {
@@ -130,7 +135,7 @@ export const TimerCard = ({
             <button
               class='timer-label-btn'
               type='button'
-              onClick={() => onRenameRequest(timer)}
+              onClick={handleRenameClick}
               onPointerDown={stopDrag}
               aria-label='Edit timer name'
             >
