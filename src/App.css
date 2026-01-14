@@ -19,6 +19,8 @@
   --shadow-base: rgba(0, 0, 0, 0.35);
   --accent-one: rgba(56, 189, 248, 0.35);
   --accent-two: rgba(56, 189, 248, 0.6);
+  --bg-gradient: linear-gradient(145deg, #0c1220, #090c13 45%, #0c0f13 100%);
+  --bg-gradient-transfer-active: linear-gradient(150deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
   --button-size: 28px;
   --icon-sm: 14px;
   --icon-md: 20px;
@@ -258,7 +260,7 @@ button:active {
 }
 
 .timer-card {
-  background: linear-gradient(145deg, #0c1220, #090c13 45%, #0c0f13 100%);
+  background: var(--bg-gradient);
   border: 1px solid var(--white-mid);
   border-radius: var(--radius-md);
   padding: 6px var(--space-md);
@@ -291,14 +293,14 @@ button:active {
   position: sticky;
   top: 0;
   z-index: 6;
-  background: linear-gradient(145deg, #0c1220, #090c13 45%, #0c0f13 100%);
+  background: var(--bg-gradient);
   border-bottom: 1px solid var(--white-mid);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   padding: var(--space-sm) var(--space-xs);
 }
 
 body.no-running .current-timer-dock {
-  background: linear-gradient(145deg, #310d0e, #501517 45%, #310d0e 100%);
+  background: var(--app-bg-no-running);
 }
 
 .current-timer-list {
@@ -786,7 +788,7 @@ body.no-running .current-timer-dock {
 }
 
 .transfer-preset.is-active {
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
+  background: var(--bg-gradient-transfer-active);
   border-color: rgba(255, 255, 255, 0.78);
   color: var(--text-bright);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.28), 0 8px 18px rgba(0, 0, 0, 0.35);
