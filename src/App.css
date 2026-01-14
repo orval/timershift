@@ -19,7 +19,7 @@
   --shadow-base: rgba(0, 0, 0, 0.35);
   --accent-one: rgba(56, 189, 248, 0.35);
   --accent-two: rgba(56, 189, 248, 0.6);
-  --bg-gradient: linear-gradient(145deg, #0c1220, #090c13 45%, #0c0f13 100%);
+  --bg-gradient: linear-gradient(145deg, hsl(225 15% 7%), hsl(225 20% 10%) 45%, hsl(225 25% 13%) 100%);
   --bg-gradient-transfer-active: linear-gradient(150deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
   --button-size: 28px;
   --icon-sm: 14px;
