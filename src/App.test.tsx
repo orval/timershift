@@ -6,7 +6,7 @@ import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
 import { TimerAdjustModal } from './components/TimerAdjustModal'
 import { TimerTransferModal } from './components/TimerTransferModal'
-import type { LogEntry } from './types'
+import { DEFAULT_TIMER_TYPE, type CaseCategory, type LogEntry, type TimerType } from './types'
 
 const historyMocks = vi.hoisted(() => ({
   appendLogEntry: vi.fn().mockResolvedValue(undefined),
@@ -42,9 +42,19 @@ afterEach(() => {
   localStorage.clear()
 })
 
-const seedTimers = (timers: Array<{ id: number, label: string, elapsed: number, running: boolean }>): void => {
+const seedTimers = (
+  timers: Array<{
+    id: number
+    label: string
+    elapsed: number
+    running: boolean
+    type?: TimerType
+    caseCategory?: CaseCategory
+    caseNote?: string
+  }>
+): void => {
   localStorage.setItem('timershift:timers', JSON.stringify({
-    timers,
+    timers: timers.map((timer) => ({ ...timer, type: timer.type ?? DEFAULT_TIMER_TYPE })),
     savedAt: 123
   }))
 }
@@ -118,12 +128,29 @@ test('creates a timer from the add modal', async () => {
   expect(screen.getByText('Pomodoro', { selector: 'button' })).toBeInTheDocument()
 })
 
-test('renames a timer from the modal', async () => {
-  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
+test('auto-selects case type for 8-digit names', async () => {
   render(<App />)
   const user = userEvent.setup()
 
-  await user.click(screen.getByRole('button', { name: /edit timer name/i }))
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+  const input = within(dialog).getByRole('textbox', { name: /timer name/i })
+
+  await user.type(input, '12345678')
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+
+  const labelButton = screen.getByText('12345678', { selector: 'button' })
+  const card = labelButton.closest('.timer-card')
+  expect(card).not.toBeNull()
+  expect(card?.className).toContain('timer-card--type-case')
+})
+
+test('renames a timer from the modal', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false, type: 'Admin' }])
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /edit timer details/i }))
   const dialog = screen.getByRole('dialog')
   const input = within(dialog).getByRole('textbox', { name: /timer name/i })
 
@@ -133,6 +160,67 @@ test('renames a timer from the modal', async () => {
 
   expect(screen.queryByRole('dialog')).toBeNull()
   expect(screen.getByText('Deep Work', { selector: 'button' })).toBeInTheDocument()
+})
+
+test('updates modal state when changing type, category, and note', async () => {
+  seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false, type: 'Admin' }])
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /edit timer details/i }))
+  const dialog = screen.getByRole('dialog')
+
+  await user.click(within(dialog).getByRole('radio', { name: /case timer type/i }))
+  expect(within(dialog).getByLabelText(/case id/i)).toBeInTheDocument()
+
+  await user.click(within(dialog).getByRole('radio', { name: /community/i }))
+  expect(within(dialog).getByRole('radio', { name: /community/i })).toHaveAttribute(
+    'aria-checked',
+    'true'
+  )
+
+  const noteInput = within(dialog).getByRole('textbox', { name: /note/i })
+  await user.type(noteInput, 'Follow up needed')
+  expect(noteInput).toHaveValue('Follow up needed')
+})
+
+test('updates case category from the edit modal', async () => {
+  seedTimers([
+    { id: 1, label: '12345678', elapsed: 0, running: false, type: 'Case', caseCategory: 'Prep' }
+  ])
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /edit timer details/i }))
+  const dialog = screen.getByRole('dialog')
+
+  await user.click(within(dialog).getByRole('radio', { name: /community/i }))
+  await user.click(within(dialog).getByRole('button', { name: /save/i }))
+
+  const timerCard = screen.getByText('12345678', { selector: 'button' }).closest('.timer-card')
+  expect(timerCard).not.toBeNull()
+  if (!(timerCard instanceof HTMLElement)) return
+
+  expect(within(timerCard).getByRole('button', { name: 'Community' })).toBeInTheDocument()
+})
+
+test('updates case category from the card popover', async () => {
+  seedTimers([
+    { id: 1, label: 'Timer 1', elapsed: 0, running: false, type: 'Case', caseCategory: 'Prep' }
+  ])
+  render(<App />)
+  const user = userEvent.setup()
+
+  const timerCard = screen.getByText('Timer 1', { selector: 'button' }).closest('.timer-card')
+  expect(timerCard).not.toBeNull()
+  if (!(timerCard instanceof HTMLElement)) return
+
+  await user.click(within(timerCard).getByRole('button', { name: 'Prep' }))
+  const mprOption = await within(timerCard).findByRole('option', { name: 'MPR' })
+  await user.click(mprOption)
+
+  expect(within(timerCard).getByRole('button', { name: 'MPR' })).toBeInTheDocument()
+  expect(within(timerCard).queryByRole('button', { name: 'Prep' })).toBeNull()
 })
 
 test('copies a timer label', async () => {
@@ -263,7 +351,7 @@ test('transfer range input updates the selected minutes', () => {
 
   render(
     <TimerTransferModal
-      source={{ id: 1, label: 'Source', elapsed: 420, running: false }}
+      source={{ id: 1, label: 'Source', type: DEFAULT_TIMER_TYPE, elapsed: 420, running: false }}
       targets={[]}
       minutes={0}
       maxMinutes={7}
@@ -284,7 +372,7 @@ test('selects the all preset in transfer modal', async () => {
 
   render(
     <TimerTransferModal
-      source={{ id: 1, label: 'Source', elapsed: 420, running: false }}
+      source={{ id: 1, label: 'Source', type: DEFAULT_TIMER_TYPE, elapsed: 420, running: false }}
       targets={[]}
       minutes={0}
       maxMinutes={7}
@@ -435,7 +523,7 @@ test('reorders timers after a drag end event', async () => {
   render(<App />)
 
   expect(dndMocks.handlers.onDragEnd).not.toBeNull()
-  expect(screen.getAllByRole('button', { name: /edit timer name/i }).map((button) => button.textContent)).toEqual([
+  expect(screen.getAllByRole('button', { name: /edit timer details/i }).map((button) => button.textContent)).toEqual([
     'Timer A',
     'Timer B'
   ])
@@ -446,7 +534,7 @@ test('reorders timers after a drag end event', async () => {
   } as DragEndEvent)
 
   await waitFor(() => {
-    expect(screen.getAllByRole('button', { name: /edit timer name/i }).map((button) => button.textContent)).toEqual([
+    expect(screen.getAllByRole('button', { name: /edit timer details/i }).map((button) => button.textContent)).toEqual([
       'Timer B',
       'Timer A'
     ])

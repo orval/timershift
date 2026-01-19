@@ -12,7 +12,7 @@ import { TimerModal } from './components/TimerModal'
 import { TimerTransferModal } from './components/TimerTransferModal'
 import { MAX_LABEL_LENGTH } from './constants'
 import { useTimers } from './hooks/useTimers'
-import type { Timer } from './types'
+import { DEFAULT_CASE_CATEGORY, type CaseCategory, type Timer, type TimerType } from './types'
 import { DndContext, SortableContext } from './utils/dndKitPreact'
 import { appendLogEntry, buildLogEntry } from './utils/history'
 import { formatStatusMins, formatTime } from './utils/time'
@@ -20,6 +20,7 @@ import alertSoundUrl from './assets/alert.m4r'
 
 const ALERT_THRESHOLD_SECONDS = 15 * 60
 const ALERT_SOUND_SRC = alertSoundUrl
+const DEFAULT_NEW_TIMER_TYPE: TimerType = 'Other'
 
 function App (): JSX.Element {
   const {
@@ -36,6 +37,9 @@ function App (): JSX.Element {
     transferTimerMinutes,
     addTimer,
     renameTimer,
+    setTimerType,
+    setCaseCategory,
+    setCaseNote,
     restoreTimer,
     reorderTimers,
     isDuplicateLabel
@@ -49,6 +53,9 @@ function App (): JSX.Element {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'rename'>('add')
   const [modalLabel, setModalLabel] = useState('')
+  const [modalType, setModalType] = useState<TimerType>(DEFAULT_NEW_TIMER_TYPE)
+  const [modalCaseCategory, setModalCaseCategory] = useState<CaseCategory>(DEFAULT_CASE_CATEGORY)
+  const [modalCaseNote, setModalCaseNote] = useState('')
   const [modalTimerId, setModalTimerId] = useState<number | null>(null)
   const [modalError, setModalError] = useState('')
   const modalInputRef = useRef<HTMLInputElement | null>(null)
@@ -72,6 +79,18 @@ function App (): JSX.Element {
   const trayTitle = displayTimers.length > 0
     ? `${displayTimers[0].label} ${formatStatusMins(displayTimers[0].elapsed)}`
     : ''
+  const isValidCaseLabel = (label: string): boolean => /^\d{8}$/.test(label)
+  const getAutoTimerType = (label: string): TimerType => (
+    isValidCaseLabel(label) ? 'Case' : 'Other'
+  )
+  const getLabelError = (label: string, type: TimerType, excludeId: number | null): string => {
+    if (!label) return type === 'Case' ? 'Case ID is required.' : 'Name is required.'
+    if (type === 'Case' && !isValidCaseLabel(label)) return 'Case ID must be 8 digits.'
+    if (isDuplicateLabel(label, excludeId)) {
+      return type === 'Case' ? 'Case ID already in use.' : 'Name already in use'
+    }
+    return ''
+  }
 
   const playAlertSound = useCallback((): void => {
     if (typeof Audio === 'undefined') return
@@ -159,6 +178,9 @@ function App (): JSX.Element {
   const openAddModal = (): void => {
     setModalMode('add')
     setModalLabel('')
+    setModalType(DEFAULT_NEW_TIMER_TYPE)
+    setModalCaseCategory(DEFAULT_CASE_CATEGORY)
+    setModalCaseNote('')
     setModalTimerId(null)
     setModalError('')
     setIsModalOpen(true)
@@ -167,6 +189,9 @@ function App (): JSX.Element {
   const openRenameModal = (timer: Timer): void => {
     setModalMode('rename')
     setModalLabel(timer.label)
+    setModalType(timer.type)
+    setModalCaseCategory(timer.caseCategory ?? DEFAULT_CASE_CATEGORY)
+    setModalCaseNote(timer.caseNote ?? '')
     setModalTimerId(timer.id)
     setModalError('')
     setIsModalOpen(true)
@@ -230,20 +255,22 @@ function App (): JSX.Element {
   const handleModalSubmit = (event: Event): void => {
     event.preventDefault()
     const trimmed = modalLabel.trim()
-    if (!trimmed) {
-      setModalError('Name is required.')
-      return
-    }
-
+    const resolvedType = modalMode === 'add' ? getAutoTimerType(trimmed) : modalType
     const excludeId = modalMode === 'rename' ? modalTimerId : null
-    if (isDuplicateLabel(trimmed, excludeId)) {
-      setModalError('Name already in use')
+    const error = getLabelError(trimmed, resolvedType, excludeId)
+    if (error) {
+      setModalError(error)
       return
     }
 
     if (modalMode === 'add') {
-      addTimer(trimmed)
+      addTimer(trimmed, resolvedType)
     } else if (modalTimerId !== null) {
+      setTimerType(modalTimerId, modalType)
+      if (modalType === 'Case') {
+        setCaseCategory(modalTimerId, modalCaseCategory)
+      }
+      setCaseNote(modalTimerId, modalCaseNote)
       renameTimer(modalTimerId, trimmed)
     }
 
@@ -253,9 +280,31 @@ function App (): JSX.Element {
   const handleModalInput = (event: Event): void => {
     const value = (event.target as HTMLInputElement).value
     setModalLabel(value)
-    if (modalError && value.trim() && !isDuplicateLabel(value, modalTimerId)) {
-      setModalError('')
+    const trimmedValue = value.trim()
+    const nextType = modalMode === 'add' ? getAutoTimerType(trimmedValue) : modalType
+    if (modalMode === 'add' && nextType !== modalType) {
+      setModalType(nextType)
     }
+    if (!modalError) return
+    const excludeId = modalMode === 'rename' ? modalTimerId : null
+    const error = getLabelError(trimmedValue, nextType, excludeId)
+    setModalError(error)
+  }
+
+  const handleModalTypeChange = (nextType: TimerType): void => {
+    setModalType(nextType)
+    if (!modalError) return
+    const excludeId = modalMode === 'rename' ? modalTimerId : null
+    const error = getLabelError(modalLabel.trim(), nextType, excludeId)
+    setModalError(error)
+  }
+
+  const handleModalCaseCategoryChange = (category: CaseCategory): void => {
+    setModalCaseCategory(category)
+  }
+
+  const handleModalCaseNoteChange = (note: string): void => {
+    setModalCaseNote(note)
   }
 
   const handleDragEnd = (event: DragEndEvent): void => {
@@ -331,6 +380,7 @@ function App (): JSX.Element {
                       onAdjustRequest={openAdjustModal}
                       onTransferRequest={openTransferModal}
                       onRenameRequest={openRenameModal}
+                      onCaseCategoryChange={setCaseCategory}
                       isPausedHighlight={timer.id === pausedDisplayTimerId}
                     />
                   ))}
@@ -377,6 +427,12 @@ function App (): JSX.Element {
           label={modalLabel}
           error={modalError}
           maxLabelLength={MAX_LABEL_LENGTH}
+          timerType={modalType}
+          onTypeChange={modalMode === 'rename' ? handleModalTypeChange : undefined}
+          caseCategory={modalMode === 'rename' ? modalCaseCategory : undefined}
+          caseNote={modalMode === 'rename' ? modalCaseNote : undefined}
+          onCaseCategoryChange={modalMode === 'rename' ? handleModalCaseCategoryChange : undefined}
+          onCaseNoteChange={modalMode === 'rename' ? handleModalCaseNoteChange : undefined}
           inputRef={modalInputRef}
           onClose={closeModal}
           onSubmit={handleModalSubmit}

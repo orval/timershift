@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
-import { MAX_LABEL_LENGTH } from '../constants'
-import type { RemovedTimerEntry, Timer } from '../types'
+import { MAX_LABEL_LENGTH, MAX_NOTE_LENGTH } from '../constants'
+import {
+  CASE_CATEGORIES,
+  DEFAULT_CASE_CATEGORY,
+  DEFAULT_TIMER_TYPE,
+  TIMER_TYPES,
+  type CaseCategory,
+  type RemovedTimerEntry,
+  type Timer,
+  type TimerType
+} from '../types'
 import { appendLogEntry, buildLogEntry } from '../utils/history'
 
 const STORAGE_KEY = 'timershift:timers'
@@ -19,13 +28,31 @@ export const useTimers = (): {
   transferTimerMinutes: (sourceId: number, targetId: number, minutes: number) => void
   restoreTimerSnapshot: (snapshot: Timer) => void
   removeTimer: (id: number) => void
-  addTimer: (label: string) => void
+  addTimer: (label: string, type: TimerType) => void
   renameTimer: (id: number, label: string) => void
+  setTimerType: (id: number, type: TimerType) => void
+  setCaseCategory: (id: number, category: CaseCategory) => void
+  setCaseNote: (id: number, note: string) => void
   restoreTimer: (entry: RemovedTimerEntry) => void
   reorderTimers: (sourceId: number, targetId: number) => void
   isDuplicateLabel: (label: string, excludeId?: number | null) => boolean
 } => {
   const initLoadErrorRef = useRef<string | null>(null)
+  const resolveTimerType = (value: unknown): TimerType =>
+    TIMER_TYPES.includes(value as TimerType) ? (value as TimerType) : DEFAULT_TIMER_TYPE
+  const resolveCaseCategory = (value: unknown): CaseCategory | undefined =>
+    CASE_CATEGORIES.includes(value as CaseCategory) ? (value as CaseCategory) : undefined
+  const normalizeTimer = (timer: Timer): Timer => {
+    const type = resolveTimerType(timer.type)
+    const resolvedCategory = resolveCaseCategory(timer.caseCategory)
+    return {
+      ...timer,
+      type,
+      running: false,
+      caseCategory: resolvedCategory ?? (type === 'Case' ? DEFAULT_CASE_CATEGORY : undefined),
+      caseNote: typeof timer.caseNote === 'string' ? timer.caseNote.slice(0, MAX_NOTE_LENGTH) : ''
+    }
+  }
   const [timers, setTimers] = useState<Timer[]>(() => {
     if (typeof window === 'undefined') {
       return []
@@ -35,7 +62,7 @@ export const useTimers = (): {
     if (savedRaw) {
       try {
         const parsed = JSON.parse(savedRaw) as { timers?: Timer[], savedAt?: number }
-        const restored = (parsed.timers ?? []).map((timer) => ({ ...timer, running: false }))
+        const restored = (parsed.timers ?? []).map((timer) => normalizeTimer(timer))
         if (restored.length > 0) return restored
       } catch (error) {
         initLoadErrorRef.current = String(error)
@@ -166,15 +193,16 @@ export const useTimers = (): {
 
   useEffect(() => {
     const handleBeforeUnload = (): void => {
-      const snapshot = timersRef.current
-      void appendLogEntry(buildLogEntry('summary', undefined, {
-        timers: snapshot.map((timer) => ({
-          id: timer.id,
-          label: timer.label,
-          elapsed: timer.elapsed,
-          running: timer.running
-        }))
+    const snapshot = timersRef.current
+    void appendLogEntry(buildLogEntry('summary', undefined, {
+      timers: snapshot.map((timer) => ({
+        id: timer.id,
+        label: timer.label,
+        type: timer.type,
+        elapsed: timer.elapsed,
+        running: timer.running
       }))
+    }))
       void appendLogEntry(buildLogEntry('app_exit'))
     }
 
@@ -217,12 +245,7 @@ export const useTimers = (): {
       const next = prev.map((timer) => {
         if (timer.id !== id) return timer
         previousElapsed = timer.elapsed
-        updatedTimer = {
-          id: timer.id,
-          label: timer.label,
-          elapsed: 0,
-          running: false
-        }
+        updatedTimer = { ...timer, elapsed: 0, running: false }
         return updatedTimer
       })
 
@@ -246,12 +269,7 @@ export const useTimers = (): {
         if (timer.id !== id) return timer
         previousElapsed = timer.elapsed
         const nextElapsed = Math.max(0, timer.elapsed + deltaSeconds)
-        updatedTimer = {
-          id: timer.id,
-          label: timer.label,
-          elapsed: nextElapsed,
-          running: timer.running
-        }
+        updatedTimer = { ...timer, elapsed: nextElapsed }
         return updatedTimer
       })
 
@@ -333,14 +351,19 @@ export const useTimers = (): {
     })
   }
 
-  const addTimer = (label: string): void => {
+  const addTimer = (label: string, type: TimerType): void => {
     const nextId = Date.now()
     const trimmed = label.trim().slice(0, MAX_LABEL_LENGTH)
+    const caseCategory = type === 'Case' ? DEFAULT_CASE_CATEGORY : undefined
+    const caseNote = ''
     setTimers((prev: Timer[]) => [
       ...prev,
       {
         id: nextId,
         label: trimmed,
+        type,
+        caseCategory,
+        caseNote,
         elapsed: 0,
         running: true
       }
@@ -350,6 +373,9 @@ export const useTimers = (): {
     const newTimer = {
       id: nextId,
       label: trimmed,
+      type,
+      caseCategory,
+      caseNote,
       elapsed: 0,
       running: true
     }
@@ -365,12 +391,7 @@ export const useTimers = (): {
       const next = prev.map((timer) => {
         if (timer.id !== id) return timer
         previousLabel = timer.label
-        updatedTimer = {
-          id: timer.id,
-          label: nextLabel,
-          elapsed: timer.elapsed,
-          running: timer.running
-        }
+        updatedTimer = { ...timer, label: nextLabel }
         return updatedTimer
       })
 
@@ -388,7 +409,7 @@ export const useTimers = (): {
     const now = Date.now()
     const idInUse = timers.some((timer) => timer.id === entry.timer.id)
     const nextId = idInUse ? now : entry.timer.id
-    const restoredTimer = { ...entry.timer, id: nextId, running: false }
+    const restoredTimer = normalizeTimer({ ...entry.timer, id: nextId })
     setTimers((prev: Timer[]) => [...prev, restoredTimer])
 
     setRemovedTimers((prev) => prev.filter((item) => item.entryId !== entry.entryId))
@@ -409,6 +430,35 @@ export const useTimers = (): {
       next.splice(targetIndex, 0, moved)
       return next
     })
+  }
+
+  const setTimerType = (id: number, type: TimerType): void => {
+    setTimers((prev: Timer[]) => {
+      let updated = false
+      const next = prev.map((timer) => {
+        if (timer.id !== id) return timer
+        if (timer.type === type) return timer
+        updated = true
+        const caseCategory = type === 'Case'
+          ? resolveCaseCategory(timer.caseCategory) ?? DEFAULT_CASE_CATEGORY
+          : timer.caseCategory
+        return { ...timer, type, caseCategory }
+      })
+      return updated ? next : prev
+    })
+  }
+
+  const setCaseCategory = (id: number, category: CaseCategory): void => {
+    setTimers((prev: Timer[]) =>
+      prev.map((timer) => (timer.id === id ? { ...timer, caseCategory: category } : timer))
+    )
+  }
+
+  const setCaseNote = (id: number, note: string): void => {
+    const nextNote = note.slice(0, MAX_NOTE_LENGTH)
+    setTimers((prev: Timer[]) =>
+      prev.map((timer) => (timer.id === id ? { ...timer, caseNote: nextNote } : timer))
+    )
   }
 
   const normalizeLabel = (label: string): string => label.trim().toLowerCase()
@@ -433,6 +483,9 @@ export const useTimers = (): {
     removeTimer,
     addTimer,
     renameTimer,
+    setTimerType,
+    setCaseCategory,
+    setCaseNote,
     restoreTimer,
     reorderTimers,
     isDuplicateLabel

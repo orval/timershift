@@ -1,6 +1,6 @@
 # TimerShift
 
-Run mulitple timers at once and easily move chunks of time between timers.
+Run multiple timers at once and easily move chunks of time between timers.
 
 ## Recommended IDE Setup
 

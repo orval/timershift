@@ -15,6 +15,7 @@ export default defineConfig(async () => ({
   test: {
     environment: "happy-dom",
     setupFiles: ["src/test/setup.ts"],
+    exclude: ["tests/e2e/**"],
     deps: {
       inline: [
         "@dnd-kit/core",

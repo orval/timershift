@@ -37,6 +37,7 @@ const RAW_RUNTIME_STATE =
           ["@dnd-kit/utilities", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:3.2.2"],\
           ["@eslint/js", "npm:9.39.1"],\
           ["@lhci/cli", "npm:0.15.1"],\
+          ["@playwright/test", "npm:1.57.0"],\
           ["@preact/preset-vite", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:2.8.2"],\
           ["@tauri-apps/api", "npm:2.9.1"],\
           ["@tauri-apps/cli", "npm:2.9.6"],\
@@ -1811,6 +1812,16 @@ const RAW_RUNTIME_STATE =
           ["@paulirish/trace_engine", "npm:0.0.53"],\
           ["legacy-javascript", "npm:0.0.1"],\
           ["third-party-web", "npm:0.29.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@playwright/test", [\
+      ["npm:1.57.0", {\
+        "packageLocation": "../../../.yarn/berry/cache/@playwright-test-npm-1.57.0-d5b9717312-10c0.zip/node_modules/@playwright/test/",\
+        "packageDependencies": [\
+          ["@playwright/test", "npm:1.57.0"],\
+          ["playwright", "npm:1.57.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -5787,6 +5798,14 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["fsevents", [\
+      ["patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>::version=2.3.2&hash=df0bf1", {\
+        "packageLocation": "./.yarn/unplugged/fsevents-patch-19706e7e35/node_modules/fsevents/",\
+        "packageDependencies": [\
+          ["fsevents", "patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"],\
+          ["node-gyp", "npm:12.1.0"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["patch:fsevents@npm%3A2.3.3#optional!builtin<compat/fsevents>::version=2.3.3&hash=df0bf1", {\
         "packageLocation": "./.yarn/unplugged/fsevents-patch-6b67494872/node_modules/fsevents/",\
         "packageDependencies": [\
@@ -8114,6 +8133,26 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["playwright", [\
+      ["npm:1.57.0", {\
+        "packageLocation": "../../../.yarn/berry/cache/playwright-npm-1.57.0-1712c32e43-10c0.zip/node_modules/playwright/",\
+        "packageDependencies": [\
+          ["fsevents", "patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"],\
+          ["playwright", "npm:1.57.0"],\
+          ["playwright-core", "npm:1.57.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["playwright-core", [\
+      ["npm:1.57.0", {\
+        "packageLocation": "../../../.yarn/berry/cache/playwright-core-npm-1.57.0-1ccd5476ca-10c0.zip/node_modules/playwright-core/",\
+        "packageDependencies": [\
+          ["playwright-core", "npm:1.57.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["possible-typed-array-names", [\
       ["npm:1.1.0", {\
         "packageLocation": "../../../.yarn/berry/cache/possible-typed-array-names-npm-1.1.0-ce60ca4401-10c0.zip/node_modules/possible-typed-array-names/",\
@@ -9265,6 +9304,7 @@ const RAW_RUNTIME_STATE =
           ["@dnd-kit/utilities", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:3.2.2"],\
           ["@eslint/js", "npm:9.39.1"],\
           ["@lhci/cli", "npm:0.15.1"],\
+          ["@playwright/test", "npm:1.57.0"],\
           ["@preact/preset-vite", "virtual:dfea247a80e12b9fd80fbe0777adaf586d168e4a05a2e27fc58f58701213b4f6f953f12d866a6c2ad646ad00588494db3a856de0e836371308b791c6534abff9#npm:2.8.2"],\
           ["@tauri-apps/api", "npm:2.9.1"],\
           ["@tauri-apps/cli", "npm:2.9.6"],\
