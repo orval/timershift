@@ -16,7 +16,10 @@
         "title": "TimerShift",
         "width": 450,
         "height": 600,
-        "acceptFirstMouse": true
+        "acceptFirstMouse": true,
+        "theme": "Dark",
+        "titleBarStyle": "Visible",
+        "backgroundColor": "#14171c"
       }
     ],
     "security": {
