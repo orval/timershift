@@ -11,27 +11,33 @@ test('toggles play/pause when clicking the timer display', async ({ page }) => {
   await page.getByLabel(/timer name/i).fill('12345678')
   await page.getByRole('button', { name: /create/i }).click()
 
-  const timerDisplay = page.locator('.timer-card .timer-display').first()
+  // Wait for the timer card to appear
+  const timerCard = page.locator('.timer-card').first()
+  await expect(timerCard).toBeVisible()
+  
+  // The timer display is the time text element (p tag with tabular-nums class)
+  const timerDisplay = timerCard.locator('p.tabular-nums').first()
   await expect(timerDisplay).toBeVisible()
 
-  const toggleButton = page.locator('.timer-actions').getByRole('button', { name: /pause timer/i })
+  // Find the toggle button within the timer card to avoid selecting the card itself
+  const toggleButton = timerCard.locator('button[aria-label*="Pause timer"]')
   await expect(toggleButton).toBeVisible()
   await timerDisplay.click()
-  await expect(page.locator('.timer-actions').getByRole('button', { name: /start timer/i })).toBeVisible()
+  await expect(timerCard.locator('button[aria-label*="Start timer"]')).toBeVisible()
   await timerDisplay.click()
-  await expect(page.locator('.timer-actions').getByRole('button', { name: /pause timer/i })).toBeVisible()
+  await expect(timerCard.locator('button[aria-label*="Pause timer"]')).toBeVisible()
 })
 
-test('shows copied state when clicking the timer copy button', async ({ page }) => {
+test('shows copied state when clicking the timer copy button', async ({ page, context }) => {
+  // Grant clipboard permissions
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+  
   await page.addInitScript(() => {
     window.localStorage.clear()
   })
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, 'clipboard', {
-      value: { writeText: async () => {} },
-      configurable: true
-    })
-  })
+
+  // Listen for console messages to debug clipboard issues
+  page.on('console', msg => console.log('PAGE LOG:', msg.text()))
 
   await page.goto('/')
 
@@ -39,8 +45,15 @@ test('shows copied state when clicking the timer copy button', async ({ page }) 
   await page.getByLabel(/timer name/i).fill('Focus')
   await page.getByRole('button', { name: /create/i }).click()
 
-  const copyButton = page.locator('.timer-copy-btn').first()
+  // Wait for the timer card to appear
+  const timerCard = page.locator('.timer-card').first()
+  await expect(timerCard).toBeVisible()
+
+  // Find the copy button within the timer card using a stable role locator
+  const copyButton = timerCard.getByRole('button', { name: /copy timer name|copied timer name/i })
   await expect(copyButton).toHaveAttribute('aria-label', /copy timer name/i)
   await copyButton.click()
-  await expect(copyButton).toHaveAttribute('aria-label', /copied timer name/i)
+  
+  // Wait for the aria-label to change after the async clipboard operation
+  await expect(copyButton).toHaveAttribute('aria-label', /copied timer name/i, { timeout: 2000 })
 })

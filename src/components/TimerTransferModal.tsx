@@ -2,6 +2,7 @@ import type { JSX } from 'preact'
 import { useMemo } from 'preact/hooks'
 import type { Timer } from '../types'
 import { formatTime } from '../utils/time'
+import { buttonSecondaryClass, modalOverlayClass, modalShellBaseClass } from './uiClasses'
 
 const PRESET_MINUTES = [1, 5, 10, 15, 25, 30, 45, 60]
 
@@ -32,6 +33,10 @@ export const TimerTransferModal = ({
   const clampMinutes = (value: number): number =>
     Math.min(Math.max(value, 0), safeMax)
   const showAllPreset = safeMax > 0 && !presets.includes(safeMax)
+  const isAllPresetActive = safeMax === minutes
+  const allPresetToneClass = isAllPresetActive
+    ? 'bg-transfer-active text-text-bright border-white/80 shadow-preset-active'
+    : 'bg-[hsla(var(--preset-hue),_80%,_55%,_var(--preset-alpha))] text-[hsl(var(--preset-hue),_85%,_var(--preset-text-light))] border-[hsla(var(--preset-hue),_80%,_60%,_var(--preset-border-alpha))] hover:bg-[hsla(var(--preset-hue),_80%,_60%,_0.22)] hover:text-[hsl(var(--preset-hue),_90%,_78%)]'
 
   const handleRangeInput = (event: Event): void => {
     const value = Number((event.target as HTMLInputElement).value)
@@ -63,29 +68,29 @@ export const TimerTransferModal = ({
     : 'Add another timer to move time.'
 
   return (
-    <div class='modal-backdrop' onClick={onClose}>
+    <div className={modalOverlayClass} onClick={onClose}>
       <div
-        class='modal modal--transfer'
+        className={`${modalShellBaseClass} max-w-[520px]`}
         role='dialog'
         aria-modal='true'
         aria-labelledby='timer-transfer-title'
         onClick={(event) => event.stopPropagation()}
       >
-        <div class='modal-form transfer-form'>
-          <h2 class='modal-title' id='timer-transfer-title'>
+        <div className='flex flex-col gap-lg'>
+          <h2 className='mb-xs text-xl font-bold text-text-bright' id='timer-transfer-title'>
             Move time
           </h2>
-          <p class='transfer-subtitle'>
+          <p className='m-0 text-sm text-text-muted'>
             From {source.label} - {formatTime(source.elapsed)}
           </p>
 
-          <div class='transfer-scrub'>
-            <div class='transfer-scrub-header'>
-              <p class='transfer-label'>Minutes to move</p>
-              <p class='transfer-available'>Available {safeMax} min</p>
+          <div className='grid gap-lg rounded-lg border border-white-mid bg-white-low p-sm'>
+            <div className='flex items-center justify-between gap-lg'>
+              <p className='m-0 text-sm font-semibold text-text-strong'>Minutes to move</p>
+              <p className='m-0 text-sm text-text-muted'>Available {safeMax} min</p>
             </div>
             <input
-              class='transfer-range'
+              className='w-full accent-accent disabled:opacity-50'
               type='range'
               min={0}
               max={safeMax}
@@ -95,26 +100,32 @@ export const TimerTransferModal = ({
               disabled={safeMax === 0}
               aria-label='Minutes to move'
             />
-            <div class='transfer-amount'>
-              <p class='transfer-amount-value'>{minutes} min</p>
-              <p class='transfer-amount-time'>{formatTime(minutes * 60)}</p>
+            <div className='flex items-baseline justify-between gap-lg'>
+              <p className='m-0 text-2xl font-bold text-text-bright'>{minutes} min</p>
+              <p className='m-0 text-sm tabular-nums text-text-muted'>{formatTime(minutes * 60)}</p>
             </div>
-            <div class='transfer-presets'>
-              {presets.map((value) => (
-                <button
-                  key={value}
-                  class={`transfer-preset ${value === minutes ? 'is-active' : ''}`}
-                  type='button'
-                  onClick={() => handlePreset(value)}
-                  disabled={safeMax === 0}
-                  style={getPresetStyle(value)}
-                >
-                  {value} min
-                </button>
-              ))}
+            <div className='flex flex-wrap gap-xs'>
+              {presets.map((value) => {
+                const isActive = value === minutes
+                const presetToneClass = isActive
+                  ? 'bg-transfer-active text-text-bright border-white/80 shadow-preset-active'
+                  : 'bg-[hsla(var(--preset-hue),_80%,_55%,_var(--preset-alpha))] text-[hsl(var(--preset-hue),_85%,_var(--preset-text-light))] border-[hsla(var(--preset-hue),_80%,_60%,_var(--preset-border-alpha))] hover:bg-[hsla(var(--preset-hue),_80%,_60%,_0.22)] hover:text-[hsl(var(--preset-hue),_90%,_78%)]'
+                return (
+                  <button
+                    key={value}
+                    className={`rounded-md border px-sm py-xs text-sm font-semibold transition-[background,color,border-color] duration-150 disabled:cursor-not-allowed disabled:opacity-60 ${presetToneClass}`}
+                    type='button'
+                    onClick={() => handlePreset(value)}
+                    disabled={safeMax === 0}
+                    style={getPresetStyle(value)}
+                  >
+                    {value} min
+                  </button>
+                )
+              })}
               {showAllPreset && (
                 <button
-                  class={`transfer-preset ${safeMax === minutes ? 'is-active' : ''}`}
+                  className={`rounded-md border px-sm py-xs text-sm font-semibold transition-[background,color,border-color] duration-150 ${allPresetToneClass}`}
                   type='button'
                   onClick={() => handlePreset(safeMax)}
                   style={getPresetStyle(safeMax)}
@@ -125,26 +136,26 @@ export const TimerTransferModal = ({
             </div>
           </div>
 
-          <div class='transfer-targets'>
-            <p class='transfer-targets-title'>Tap a timer to receive</p>
+          <div className='flex flex-col gap-xs'>
+            <p className='m-0 text-sm text-text-muted'>Tap a timer to receive</p>
             {targets.length === 0 ? (
-              <p class='transfer-targets-empty'>{targetEmptyMessage}</p>
+              <p className='m-0 text-sm text-text-muted'>{targetEmptyMessage}</p>
             ) : (
               <>
                 {safeMax === 0 && (
-                  <p class='transfer-targets-empty'>No full minutes to move yet.</p>
+                  <p className='m-0 text-sm text-text-muted'>No full minutes to move yet.</p>
                 )}
-                <div class='transfer-targets-grid'>
+                <div className='grid max-h-[min(240px,35vh)] gap-xs overflow-y-auto pr-0.5'>
                   {targets.map((target) => (
                     <button
                       key={target.id}
-                      class='transfer-target'
+                      className='flex items-center justify-between gap-lg rounded-md border border-white-mid bg-white-low p-sm text-left text-text-bright transition-[background,transform] duration-150 hover:bg-white-mid active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60'
                       type='button'
                       onClick={() => onTransfer(target.id)}
                       disabled={!isTransferReady}
                     >
-                      <span class='transfer-target-label'>{target.label}</span>
-                      <span class='transfer-target-time'>{formatTime(target.elapsed)}</span>
+                      <span className='text-md font-semibold text-text-bright'>{target.label}</span>
+                      <span className='text-sm tabular-nums text-text-muted'>{formatTime(target.elapsed)}</span>
                     </button>
                   ))}
                 </div>
@@ -152,8 +163,12 @@ export const TimerTransferModal = ({
             )}
           </div>
 
-          <div class='modal-actions'>
-            <button class='modal-btn' type='button' onClick={onClose}>
+          <div className='flex justify-end gap-xs'>
+            <button
+              className={buttonSecondaryClass}
+              type='button'
+              onClick={onClose}
+            >
               Cancel
             </button>
           </div>

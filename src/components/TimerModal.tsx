@@ -2,17 +2,24 @@ import type { JSX } from 'preact'
 import { Briefcase, Shield, SquareAsterisk } from 'lucide-preact'
 import { MAX_NOTE_LENGTH } from '../constants'
 import { CASE_CATEGORIES, TIMER_TYPES, type CaseCategory, type TimerType } from '../types'
+import {
+  buttonPrimaryClass,
+  buttonSecondaryClass,
+  modalOverlayClass,
+  modalShellBaseClass
+} from './uiClasses'
 
 export const TimerTypeIcon = ({ type }: { type: TimerType }): JSX.Element => {
+  const iconProps = { size: 14, strokeWidth: 2.2, class: 'shrink-0' }
   switch (type) {
     case 'Admin':
-      return <Shield class='icon' aria-hidden='true' />
+      return <Shield {...iconProps} aria-hidden='true' />
     case 'Case':
-      return <Briefcase class='icon' aria-hidden='true' />
+      return <Briefcase {...iconProps} aria-hidden='true' />
     case 'Other':
-      return <SquareAsterisk class='icon' aria-hidden='true' />
+      return <SquareAsterisk {...iconProps} aria-hidden='true' />
     default:
-      return <SquareAsterisk class='icon' aria-hidden='true' />
+      return <SquareAsterisk {...iconProps} aria-hidden='true' />
   }
 }
 
@@ -62,25 +69,25 @@ export const TimerModal = ({
         maxLength: maxLabelLength
       }
   return (
-    <div class='modal-backdrop' onClick={onClose}>
+    <div className={modalOverlayClass} onClick={onClose}>
       <div
-        class='modal'
+        className={`${modalShellBaseClass} max-w-[420px]`}
         role='dialog'
         aria-modal='true'
         aria-labelledby='timer-modal-title'
         onClick={(event) => event.stopPropagation()}
       >
-        <form class='modal-form' onSubmit={onSubmit} noValidate>
-          <h2 class='modal-title' id='timer-modal-title'>
+        <form className='m-0' onSubmit={onSubmit} noValidate>
+          <h2 className='mb-xs text-xl font-bold text-text-bright' id='timer-modal-title'>
             {mode === 'add' ? 'New timer' : 'Edit timer'}
           </h2>
-          <label class='modal-label' htmlFor='timer-name'>
+          <label className='mb-xs block text-sm text-text-muted' htmlFor='timer-name'>
             {labelText}
           </label>
           <input
             id='timer-name'
             ref={inputRef}
-            class='modal-input'
+            className='w-full rounded-md border border-white-high bg-white-mid p-sm text-md font-semibold text-text-bright focus:outline focus:outline-1 focus:outline-offset-2 focus:outline-accent/60'
             type='text'
             value={label}
             onInput={onInput}
@@ -88,17 +95,17 @@ export const TimerModal = ({
             aria-invalid={error ? 'true' : 'false'}
           />
           {error && (
-            <p class='modal-error' role='status'>
+            <p className='mt-xs text-sm text-text-red-light' role='status'>
               {error}
             </p>
           )}
           {onTypeChange && (
             <>
-              <label class='modal-label' id='timer-type-label'>
+              <label className='mb-xs mt-sm block text-sm text-text-muted' id='timer-type-label'>
                 Timer type
               </label>
               <div
-                class='timer-type-control timer-type-control--modal'
+                className='inline-flex items-center gap-px rounded-sm border border-white-mid bg-panel-bg p-px shadow-inset-border'
                 role='radiogroup'
                 aria-labelledby='timer-type-label'
               >
@@ -111,11 +118,11 @@ export const TimerModal = ({
                       role='radio'
                       aria-checked={isActive}
                       aria-label={`${typeOption} timer type`}
-                      class={`timer-type-btn ${isActive ? 'timer-type-btn--active' : ''}`}
+                      className={`inline-flex h-[18px] w-5 items-center justify-center rounded-sm p-0 transition-[background,color] duration-150 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent/75 ${isActive ? 'bg-accent/20 text-text-bright shadow-inset-accent' : 'text-text-muted hover:bg-white-low hover:text-text-bright'}`}
                       onClick={() => onTypeChange(typeOption)}
                     >
                       <TimerTypeIcon type={typeOption} />
-                      <span class='sr-only'>{typeOption}</span>
+                      <span className='sr-only'>{typeOption}</span>
                     </button>
                   )
                 })}
@@ -124,11 +131,11 @@ export const TimerModal = ({
           )}
           {timerType === 'Case' && onCaseCategoryChange && (
             <>
-              <label class='modal-label' id='case-category-label'>
+              <label className='mb-xs mt-sm block text-sm text-text-muted' id='case-category-label'>
                 Case category
               </label>
               <div
-                class='timer-type-control timer-type-control--modal timer-type-control--text'
+                className='inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-sm border border-white-mid bg-panel-bg p-px shadow-inset-border'
                 role='radiogroup'
                 aria-labelledby='case-category-label'
               >
@@ -140,7 +147,7 @@ export const TimerModal = ({
                       type='button'
                       role='radio'
                       aria-checked={isActive}
-                      class={`timer-type-btn timer-type-btn--text ${isActive ? 'timer-type-btn--active' : ''}`}
+                      className={`whitespace-nowrap rounded-sm px-sm py-xs text-sm font-semibold leading-[1.1] transition-[background,color] duration-150 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent/75 ${isActive ? 'bg-accent/20 text-text-bright shadow-inset-accent' : 'text-text-muted hover:bg-white-low hover:text-text-bright'}`}
                       onClick={() => onCaseCategoryChange(category)}
                     >
                       {category}
@@ -152,25 +159,32 @@ export const TimerModal = ({
           )}
           {onCaseNoteChange && (
             <>
-              <label class='modal-label' htmlFor='timer-note'>
+              <label className='mb-xs mt-sm block text-sm text-text-muted' htmlFor='timer-note'>
                 Note
               </label>
-              <textarea
-                id='timer-note'
-                class='modal-input modal-textarea'
-                value={caseNote ?? ''}
-                onInput={(event) => onCaseNoteChange(event.currentTarget.value)}
-                rows={3}
+            <textarea
+              id='timer-note'
+              className='min-h-[96px] w-full resize-y rounded-md border border-white-high bg-white-mid p-sm text-md font-medium text-text-bright focus:outline focus:outline-1 focus:outline-offset-2 focus:outline-accent/60'
+              value={caseNote ?? ''}
+              onInput={(event) => onCaseNoteChange(event.currentTarget.value)}
+              rows={3}
                 maxLength={MAX_NOTE_LENGTH}
                 placeholder='Add a note...'
               />
             </>
           )}
-          <div class='modal-actions'>
-            <button class='modal-btn' type='button' onClick={onClose}>
+          <div className='mt-lg flex justify-end gap-xs'>
+            <button
+              className={buttonSecondaryClass}
+              type='button'
+              onClick={onClose}
+            >
               Cancel
             </button>
-            <button class='modal-btn modal-btn--primary' type='submit'>
+            <button
+              className={buttonPrimaryClass}
+              type='submit'
+            >
               {mode === 'add' ? 'Create' : 'Save'}
             </button>
           </div>

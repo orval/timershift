@@ -1,10 +1,9 @@
 import type { JSX } from 'preact'
-import { CirclePlus, History } from 'lucide-preact'
+import { CirclePlus, History, Moon, Sun } from 'lucide-preact'
 import { closestCenter, type DragEndEvent, KeyboardSensor, MouseSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
-import './App.css'
 import { HistoryPanel } from './components/HistoryPanel'
 import { TimerCard } from './components/TimerCard'
 import { TimerAdjustModal } from './components/TimerAdjustModal'
@@ -16,6 +15,7 @@ import { DEFAULT_CASE_CATEGORY, type CaseCategory, type Timer, type TimerType } 
 import { DndContext, SortableContext } from './utils/dndKitPreact'
 import { appendLogEntry, buildLogEntry } from './utils/history'
 import { formatStatusMins, formatTime } from './utils/time'
+import { applyTheme, getInitialTheme, THEME_STORAGE_KEY, type ThemeName } from './utils/theme'
 import alertSoundUrl from './assets/alert.m4r'
 
 const ALERT_THRESHOLD_SECONDS = 15 * 60
@@ -50,6 +50,7 @@ function App (): JSX.Element {
     actionLabel?: string
     onAction?: () => void
   } | null>(null)
+  const [theme, setTheme] = useState<ThemeName>(getInitialTheme)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<'add' | 'rename'>('add')
   const [modalLabel, setModalLabel] = useState('')
@@ -109,10 +110,6 @@ function App (): JSX.Element {
   }, [])
 
   useEffect(() => {
-    document.body.classList.toggle('no-running', !hasRunningTimer)
-  }, [hasRunningTimer])
-
-  useEffect(() => {
     void appendLogEntry(buildLogEntry(isHistoryOpen ? 'history_open' : 'history_close'))
   }, [isHistoryOpen])
 
@@ -129,6 +126,16 @@ function App (): JSX.Element {
     }, 8000)
     return () => window.clearTimeout(timeoutId)
   }, [toast])
+
+  useEffect(() => {
+    applyTheme(theme)
+    if (typeof window === 'undefined') return
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+    } catch {
+      // Ignore storage failures (private mode or disabled storage).
+    }
+  }, [theme])
 
   useEffect(() => {
     if (!isTauri) return
@@ -347,26 +354,41 @@ function App (): JSX.Element {
   const transferMaxMinutes = transferSource
     ? Math.floor(transferSource.elapsed / 60)
     : 0
+  const isLightTheme = theme === 'light'
+  const nextTheme = isLightTheme ? 'dark' : 'light'
+  const themeLabel = nextTheme === 'light' ? 'Switch to light mode' : 'Switch to dark mode'
+  const viewportBgClass = hasRunningTimer ? 'bg-app-bg' : 'bg-app-bg-no-running'
+  const dockBgClass = hasRunningTimer ? 'bg-app-gradient' : 'bg-app-bg-no-running'
 
   return (
     <>
-      <div class='app-viewport'>
+      <div
+        className={`fixed inset-x-0 bottom-0 top-[var(--titlebar-offset)] overflow-y-auto overscroll-contain ${viewportBgClass}`}
+      >
         {displayTimers.length > 0 && (
-          <section class='current-timer-dock'>
-            <div class='current-timer-list'>
+          <section
+            className={`sticky top-0 z-[6] border-b border-white-mid px-xs py-sm shadow-dock ${dockBgClass}`}
+          >
+            <div className='mx-auto flex w-full max-w-[960px] flex-wrap items-center justify-center gap-lg'>
               {displayTimers.map((timer) => (
-                <div class='current-timer-item' key={timer.id}>
-                  <p class='current-timer-display'>{formatTime(timer.elapsed)}</p>
-                  <p class='current-timer-label'>{timer.label}</p>
+                <div className='flex flex-col items-center gap-xs' key={timer.id}>
+                  <p className='m-0 text-display font-semibold tabular-nums tracking-wider text-text-bright [text-shadow:0_0_var(--space-xl)_var(--text-glow-30)]'>
+                    {formatTime(timer.elapsed)}
+                  </p>
+                  <p className='m-0 max-w-[220px] truncate text-md font-semibold tracking-[0.02em] text-text-muted'>
+                    {timer.label}
+                  </p>
                 </div>
               ))}
             </div>
           </section>
         )}
-        <main class='app-shell'>
-          <section class='timers'>
+        <main className='mx-auto flex max-w-[960px] flex-col gap-lg px-xs pb-xl pt-xs'>
+          <section className='flex flex-col gap-xs'>
             {timers.length === 0 ? (
-              <p class='empty'>No timers yet. Create one to get started.</p>
+              <p className='my-lg rounded-lg border border-dashed border-border-default bg-white-low p-xl text-center text-text-muted'>
+                No timers yet. Create one to get started.
+              </p>
             ) : (
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={timers.map((timer) => timer.id)} strategy={verticalListSortingStrategy}>
@@ -397,23 +419,41 @@ function App (): JSX.Element {
             />
           )}
 
-          <div class='footer-actions'>
-            <div class='footer-spacer' aria-hidden='true' />
-            <div class='add-timer'>
-              <button class='primary' type='button' onClick={openAddModal}>
-                <CirclePlus class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
-                <span class='sr-only'>Add new timer</span>
+          <div className='grid grid-cols-[1fr_auto_1fr] items-center'>
+            <div className='flex justify-start'>
+              <button
+                className='inline-flex size-btn items-center justify-center rounded-md border border-white-high bg-white-low p-0 text-text-icon-muted shadow-base transition-[transform,box-shadow,background,color] duration-150 hover:bg-white-mid hover:text-text-default active:translate-y-px'
+                type='button'
+                onClick={() => setTheme(nextTheme)}
+                aria-pressed={isLightTheme}
+              >
+                {nextTheme === 'light' ? (
+                  <Sun size={16} strokeWidth={2.2} aria-hidden='true' />
+                ) : (
+                  <Moon size={16} strokeWidth={2.2} aria-hidden='true' />
+                )}
+                <span className='sr-only'>{themeLabel}</span>
               </button>
             </div>
-            <div class='history-toggle-right'>
+            <div className='flex justify-center'>
+              <button
+                className='inline-flex size-btn items-center justify-center rounded-md border border-white-high bg-white-low p-0 text-text-default shadow-base transition-[transform,box-shadow,background,color] duration-150 hover:bg-white-mid hover:text-text-bright hover:shadow-button-hover active:translate-y-px'
+                type='button'
+                onClick={openAddModal}
+              >
+                <CirclePlus size={16} strokeWidth={2.2} aria-hidden='true' />
+                <span className='sr-only'>Add new timer</span>
+              </button>
+            </div>
+            <div className='flex justify-end'>
               {!isHistoryOpen && (
                 <button
-                  class='ghost-btn history-toggle-btn'
+                  className='inline-flex size-btn items-center justify-center rounded-md border border-white-high bg-white-low p-0 text-text-icon-muted shadow-base transition-[transform,box-shadow,background,color] duration-150 hover:bg-white-mid hover:text-text-default active:translate-y-px'
                   type='button'
                   onClick={() => setIsHistoryOpen(true)}
                   aria-label='History'
                 >
-                  <History class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
+                  <History size={16} strokeWidth={2.2} aria-hidden='true' />
                 </button>
               )}
             </div>
@@ -465,14 +505,26 @@ function App (): JSX.Element {
       )}
 
       {toast && (
-        <div class='toast' role='status' aria-live='polite'>
-          <p class='toast-message'>{toast.message}</p>
+        <div
+          className='fixed bottom-xl right-xl z-[60] inline-flex animate-toast-in items-center gap-lg rounded-md border border-border-subtle bg-toast-bg p-sm shadow-toast'
+          role='status'
+          aria-live='polite'
+        >
+          <p className='m-0 text-sm font-semibold text-text-soft'>{toast.message}</p>
           {toast.onAction && toast.actionLabel && (
-            <button class='toast-btn' type='button' onClick={toast.onAction}>
+            <button
+              className='rounded-md border border-accent/60 bg-accent/[0.22] px-[60px] py-xs text-md font-bold text-text-soft transition-[background,color] duration-150 hover:bg-accent/30 active:translate-y-px'
+              type='button'
+              onClick={toast.onAction}
+            >
               {toast.actionLabel}
             </button>
           )}
-          <button class='toast-dismiss' type='button' onClick={() => setToast(null)}>
+          <button
+            className='rounded-md border border-white-high bg-white-mid px-sm py-xs text-sm font-bold text-text-soft transition-[background,color] duration-150 hover:bg-white-high active:translate-y-px'
+            type='button'
+            onClick={() => setToast(null)}
+          >
             Dismiss
           </button>
         </div>

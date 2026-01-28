@@ -10,12 +10,12 @@ type HistoryPanelProps = {
 
 export const HistoryPanel = ({ removedTimers, onClose, onRestore }: HistoryPanelProps): JSX.Element => {
   return (
-    <section class='history-panel'>
-      <div class='history-header'>
-        <h2 class='history-title'>History</h2>
-        <div class='history-actions'>
+    <section className='flex flex-col gap-lg rounded-md border border-white-mid bg-panel-bg px-md py-sm shadow-panel'>
+      <div className='flex items-baseline justify-between gap-xs'>
+        <h2 className='m-0 text-md font-bold text-text-bright'>History</h2>
+        <div className='inline-flex items-center gap-xs'>
           <button
-            class='ghost-btn history-restore-btn'
+            className='whitespace-nowrap rounded-md border border-white-mid bg-white-low px-sm py-xs text-sm font-semibold text-text-button transition-[background,color,transform] duration-150 hover:bg-white-mid hover:text-text-bright active:translate-y-px'
             type='button'
             onClick={onClose}
           >
@@ -24,19 +24,24 @@ export const HistoryPanel = ({ removedTimers, onClose, onRestore }: HistoryPanel
         </div>
       </div>
       {removedTimers.length === 0 ? (
-        <p class='history-empty'>No removed timers yet</p>
+        <p className='m-0 text-sm text-text-muted'>No removed timers yet</p>
       ) : (
-        <ul class='history-list'>
+        <ul className='m-0 flex list-none flex-col gap-xs p-0'>
           {removedTimers.map((entry) => (
-            <li class='history-item' key={entry.entryId}>
-              <div class='history-meta'>
-                <p class='history-name'>{entry.timer.label}</p>
-                <p class='history-time'>
+            <li
+              className='flex items-center justify-between gap-lg rounded-md border border-white-mid bg-white-low px-sm py-xs'
+              key={entry.entryId}
+            >
+              <div className='flex min-w-0 flex-col gap-0.5'>
+                <p className='m-0 max-w-full truncate text-md font-semibold text-text-label'>
+                  {entry.timer.label}
+                </p>
+                <p className='m-0 text-sm text-text-muted'>
                   Removed {formatTimestamp(entry.removedAt)} - {formatTime(entry.timer.elapsed)}
                 </p>
               </div>
               <button
-                class='ghost-btn history-restore-btn'
+                className='whitespace-nowrap rounded-md border border-white-mid bg-white-low px-sm py-xs text-sm font-semibold text-text-button transition-[background,color,transform] duration-150 hover:bg-white-mid hover:text-text-bright active:translate-y-px'
                 type='button'
                 onClick={() => onRestore(entry)}
               >

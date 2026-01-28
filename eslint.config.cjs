@@ -5,6 +5,10 @@ const tseslint = require("@typescript-eslint/eslint-plugin");
 const tsParser = require("@typescript-eslint/parser");
 const importPlugin = require("eslint-plugin-import");
 const promisePlugin = require("eslint-plugin-promise");
+const tailwindcss = require("eslint-plugin-tailwindcss");
+
+const tailwindcssFlatConfigs = tailwindcss.configs?.["flat/recommended"];
+const tailwindcssConfigs = Array.isArray(tailwindcssFlatConfigs) ? tailwindcssFlatConfigs : [];
 
 // Apply the TypeScript flat configs and layer project-specific settings on top
 const tsConfigs = tseslint.configs["flat/recommended-type-checked"].map(
@@ -29,6 +33,7 @@ const tsConfigs = tseslint.configs["flat/recommended-type-checked"].map(
 );
 
 module.exports = defineConfig([
+    ...tailwindcssConfigs,
     {
         ignores: [
             "**/dist/**",
@@ -71,6 +76,7 @@ module.exports = defineConfig([
             "@typescript-eslint": tseslint,
             import: importPlugin,
             promise: promisePlugin,
+            tailwindcss,
         },
         settings: {
             "import/resolver": {
@@ -79,11 +85,18 @@ module.exports = defineConfig([
                     extensions: [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs"],
                 },
             },
+            tailwindcss: {
+                config: "tailwind.config.cjs",
+                callees: ["clsx", "classnames", "cn"],
+            },
         },
         rules: {
             ...importPlugin.configs.recommended.rules,
             ...(importPlugin.configs.typescript?.rules ?? {}),
             ...promisePlugin.configs.recommended.rules,
+            "tailwindcss/classnames-order": "warn",
+            "tailwindcss/no-contradicting-classname": "error",
+            "tailwindcss/no-custom-classname": "off",
             semi: ["error", "never"],
         },
     },

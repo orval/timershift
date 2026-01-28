@@ -1,6 +1,12 @@
 import type { JSX } from 'preact'
 import { useMemo } from 'preact/hooks'
 import { formatTime } from '../utils/time'
+import {
+  buttonPrimaryDisabledClass,
+  buttonSecondaryClass,
+  modalOverlayClass,
+  modalShellBaseClass
+} from './uiClasses'
 
 const PRESET_MINUTES = [1, 5, 10, 15, 25, 30, 45, 60]
 
@@ -71,30 +77,30 @@ export const TimerAdjustModal = ({
   }
 
   return (
-    <div class='modal-backdrop' onClick={onClose}>
+    <div className={modalOverlayClass} onClick={onClose}>
       <div
-        class='modal modal--adjust'
+        className={`${modalShellBaseClass} max-w-[420px]`}
         role='dialog'
         aria-modal='true'
         aria-labelledby='timer-adjust-title'
         onClick={(event) => event.stopPropagation()}
       >
-        <form class='modal-form adjust-form' onSubmit={onSubmit}>
-          <h2 class='modal-title' id='timer-adjust-title'>
+        <form className='flex flex-col gap-lg' onSubmit={onSubmit}>
+          <h2 className='mb-xs text-xl font-bold text-text-bright' id='timer-adjust-title'>
             Adjust time
           </h2>
-          <p class='adjust-subtitle'>
-            Adjust minutes for <strong>{label}</strong>
+          <p className='m-0 text-sm text-text-muted'>
+            Adjust minutes for <strong className='font-bold text-text-soft'>{label}</strong>
           </p>
-          <div class='transfer-scrub'>
-            <div class='transfer-scrub-header'>
-              <p class='transfer-label'>Minutes to adjust</p>
-              <p class='transfer-available'>
+          <div className='grid gap-lg rounded-lg border border-white-mid bg-white-low p-sm'>
+            <div className='flex items-center justify-between gap-lg'>
+              <p className='m-0 text-sm font-semibold text-text-strong'>Minutes to adjust</p>
+              <p className='m-0 text-sm text-text-muted'>
                 Range {formatMinutes(minMinutes)} to {formatMinutes(maxMinutes)} min
               </p>
             </div>
             <input
-              class='transfer-range'
+              className='w-full accent-accent disabled:opacity-50'
               type='range'
               min={minMinutes}
               max={maxMinutes}
@@ -103,30 +109,40 @@ export const TimerAdjustModal = ({
               onInput={handleRangeInput}
               aria-label='Minutes to adjust'
             />
-            <div class='transfer-amount'>
-              <p class='transfer-amount-value'>{formatMinutes(minutes)} min</p>
-              <p class='transfer-amount-time'>{formatTime(Math.abs(minutes) * 60)}</p>
+            <div className='flex items-baseline justify-between gap-lg'>
+              <p className='m-0 text-2xl font-bold text-text-bright'>{formatMinutes(minutes)} min</p>
+              <p className='m-0 text-sm tabular-nums text-text-muted'>{formatTime(Math.abs(minutes) * 60)}</p>
             </div>
-            <div class='transfer-presets'>
-              {presets.map((value) => (
-                <button
-                  key={value}
-                  class={`transfer-preset${value === minutes ? ' is-active' : ''}`}
-                  type='button'
-                  onClick={() => handlePreset(value)}
-                  style={getPresetStyle(value)}
-                >
-                  {formatMinutes(value)} min
-                </button>
-              ))}
+            <div className='flex flex-wrap gap-xs'>
+              {presets.map((value) => {
+                const isActive = value === minutes
+                const presetToneClass = isActive
+                  ? 'bg-transfer-active text-text-bright border-white/80 shadow-preset-active'
+                  : 'bg-[hsla(var(--preset-hue),_80%,_55%,_var(--preset-alpha))] text-[hsl(var(--preset-hue),_85%,_var(--preset-text-light))] border-[hsla(var(--preset-hue),_80%,_60%,_var(--preset-border-alpha))] hover:bg-[hsla(var(--preset-hue),_80%,_60%,_0.22)] hover:text-[hsl(var(--preset-hue),_90%,_78%)]'
+                return (
+                  <button
+                    key={value}
+                    className={`rounded-md border px-sm py-xs text-sm font-semibold transition-[background,color,border-color] duration-150 ${presetToneClass}`}
+                    type='button'
+                    onClick={() => handlePreset(value)}
+                    style={getPresetStyle(value)}
+                  >
+                    {formatMinutes(value)} min
+                  </button>
+                )
+              })}
             </div>
           </div>
-          <div class='modal-actions'>
-            <button class='modal-btn' type='button' onClick={onClose}>
+          <div className='flex justify-end gap-xs'>
+            <button
+              className={buttonSecondaryClass}
+              type='button'
+              onClick={onClose}
+            >
               Cancel
             </button>
             <button
-              class='modal-btn modal-btn--primary'
+              className={buttonPrimaryDisabledClass}
               type='submit'
               disabled={minutes === 0}
             >

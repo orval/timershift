@@ -171,27 +171,58 @@ export const TimerCard = ({
   const normalizedNote = trimmedNote ? trimmedNote.replace(/\s+/g, ' ') : ''
   const notePreview = normalizedNote ? normalizedNote.slice(0, 40) : ''
   const typeClass = `timer-card--type-${timer.type.toLowerCase()}`
+  const typeTint = timer.type === 'Admin'
+    ? 'var(--timer-tint-admin)'
+    : timer.type === 'Case'
+        ? 'var(--timer-tint-case)'
+        : 'var(--timer-tint-break)'
+  const cardVisualClass = isDragging
+    ? 'opacity-65 border-border-default shadow-timer-dragging'
+    : timer.running
+      ? 'border-text-green/60 shadow-timer-running'
+      : isPaused
+        ? 'border-text-orange/60 shadow-timer-paused'
+        : 'border-white-mid shadow-timer-default'
+  const cardCursorClass = isDragging ? 'cursor-grabbing' : 'cursor-grab'
+  const actionBorderClass = shouldGlow
+    ? 'border-accent/50'
+    : timer.running
+        ? 'border-text-orange/50'
+        : 'border-text-green/[0.45]'
+  const actionToneClass = timer.running
+    ? 'bg-text-orange/10 text-text-orange hover:bg-text-orange/20 hover:text-text-orange-light'
+    : 'bg-text-green/[0.08] text-text-green hover:bg-text-green/[0.18] hover:text-text-green-light'
+  const actionShadowClass = shouldGlow
+    ? 'shadow-action-glow'
+    : 'shadow-base'
+  const copyToneClass = isCopied
+    ? 'bg-text-green/[0.18] text-text-green-light border-text-green/[0.45] hover:bg-text-green/[0.24] hover:text-text-green-lighter'
+    : 'bg-white-mid text-text-icon-muted hover:bg-white-high hover:text-text-bright'
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition
-  }
+    transition,
+    '--timer-card-tint': typeTint,
+    '--timer-card-bg': 'linear-gradient(155deg, var(--timer-card-tint), transparent 60%), var(--bg-gradient)'
+  } as JSX.CSSProperties
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      class={`timer-card ${typeClass} ${timer.running ? 'timer-card--running' : ''} ${isPaused ? 'timer-card--paused' : ''} ${isDragging ? 'timer-card--dragging' : ''}`}
+      className={`timer-card ${typeClass} flex touch-none flex-col gap-xs rounded-md border px-md py-1.5 shadow-lg transition-[border-color,box-shadow,opacity] duration-150 [background:var(--timer-card-bg)] ${cardCursorClass} ${cardVisualClass}`}
       onClick={handleCardClick}
       {...dragHandleProps}
     >
-      <div class='timer-body'>
-        <div class='timer-info'>
-          <div class='timer-display-row'>
-            <p class='timer-display'>{formatTime(timer.elapsed)}</p>
+      <div className='flex items-center justify-between gap-lg'>
+        <div className='flex min-w-0 flex-1 flex-col'>
+          <div className='flex flex-wrap items-center gap-lg'>
+            <p className='m-0 min-w-0 text-2xl font-medium tabular-nums tracking-[0.04em] text-text-bright [text-shadow:0_0_var(--space-xl)_var(--text-glow-35)]'>
+              {formatTime(timer.elapsed)}
+            </p>
           </div>
-          <div class='timer-label-row'>
+          <div className='mt-0.5 flex min-w-0 items-center gap-xs'>
             <button
-              class='timer-label-btn'
+              className='max-w-full shrink-0 truncate rounded-md bg-transparent p-0 text-left text-md font-medium text-text-label transition-colors duration-150 hover:text-text-soft focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-border-strong'
               type='button'
               onClick={handleRenameClick}
               onPointerDown={stopDrag}
@@ -201,12 +232,12 @@ export const TimerCard = ({
             </button>
             {timer.type === 'Case' && (
               <div
-                class='timer-category-popover-wrapper'
+                className='relative inline-flex items-center'
                 ref={categoryPopoverRef}
                 onClick={(event) => event.stopPropagation()}
               >
                 <button
-                  class='timer-category-badge'
+                  className='inline-flex items-center whitespace-nowrap rounded-sm border border-white-mid bg-white-mid px-1.5 py-0.5 text-sm text-text-soft transition-[background,color,border-color] duration-150 hover:bg-white-mid hover:text-text-bright focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-accent/75'
                   type='button'
                   aria-haspopup='listbox'
                   aria-expanded={isCategoryOpen ? 'true' : 'false'}
@@ -215,13 +246,17 @@ export const TimerCard = ({
                   {currentCategory}
                 </button>
                 {isCategoryOpen && (
-                  <div class='timer-category-popover' role='listbox' aria-label='Case category'>
+                  <div
+                    className='absolute left-0 top-full z-10 mt-1.5 flex min-w-[180px] flex-wrap gap-xs rounded-md border border-white-mid bg-popover-bg p-1.5 shadow-popover'
+                    role='listbox'
+                    aria-label='Case category'
+                  >
                     {CASE_CATEGORIES.map((category) => {
                       const isActive = currentCategory === category
                       return (
                         <button
                           key={category}
-                          class={`timer-category-option ${isActive ? 'timer-category-option--active' : ''}`}
+                          className={`whitespace-nowrap rounded-sm border bg-transparent px-1.5 py-xs text-sm font-semibold transition-[background,color,border-color,box-shadow] duration-150 ${isActive ? 'border-accent/60 bg-accent/30 text-text-bright shadow-inset-accent' : 'border-transparent text-text-soft hover:border-accent/40 hover:bg-accent/10 hover:text-text-bright'}`}
                           type='button'
                           role='option'
                           aria-selected={isActive ? 'true' : 'false'}
@@ -236,7 +271,7 @@ export const TimerCard = ({
               </div>
             )}
             <button
-              class={`timer-copy-btn ${isCopied ? 'timer-copy-btn--copied' : ''}`}
+              className={`inline-flex size-icon-md shrink-0 items-center justify-center rounded-md transition-[background,color,transform] duration-150 active:translate-y-px ${copyToneClass}`}
               type='button'
               onClick={handleCopyClick}
               onPointerDown={stopDrag}
@@ -244,72 +279,75 @@ export const TimerCard = ({
               title={isCopied ? 'Copied' : 'Copy name'}
             >
               {isCopied ? (
-                <Check class='icon' size={12} strokeWidth={2.2} aria-hidden='true' />
+                <Check size={12} strokeWidth={2.2} aria-hidden='true' />
               ) : (
-                <Copy class='icon' size={12} strokeWidth={2.2} aria-hidden='true' />
+                <Copy size={12} strokeWidth={2.2} aria-hidden='true' />
               )}
             </button>
             {notePreview && (
-              <span class='timer-note-preview' title={normalizedNote}>
+              <span
+                className='flex-1 truncate text-md leading-[1.2] text-text-muted'
+                title={normalizedNote}
+              >
                 {notePreview}
               </span>
             )}
           </div>
         </div>
-        <div class='timer-actions'>
+        <div className='flex items-center gap-xs'>
           <button
             type='button'
-            class={`action-btn ${timer.running ? 'action-btn--pause' : 'action-btn--play'} ${shouldGlow ? 'shift-glow' : ''}`}
+            className={`inline-flex size-btn items-center justify-center rounded-md border p-0 transition-[transform,box-shadow,background,color,border-color] duration-150 active:translate-y-px ${actionBorderClass} ${actionToneClass} ${actionShadowClass}`}
             aria-label={timer.running ? 'Pause timer' : 'Start timer'}
             onClick={handleToggleClick}
             onPointerDown={stopDrag}
           >
-            <span class='sr-only'>{timer.running ? 'Pause' : 'Start'}</span>
+            <span className='sr-only'>{timer.running ? 'Pause' : 'Start'}</span>
             {timer.running ? (
-              <Pause class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
+              <Pause size={16} strokeWidth={2.2} aria-hidden='true' />
             ) : (
-              <Play class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
+              <Play size={16} strokeWidth={2.2} aria-hidden='true' />
             )}
           </button>
           <button
             type='button'
-            class='ghost-btn reset-btn'
+            className='inline-flex size-btn items-center justify-center gap-xs rounded-md border border-reset-btn-border bg-reset-btn-bg p-0 text-reset-btn-text shadow-base transition-[transform,box-shadow,background,color] duration-150 hover:bg-reset-btn-bg-hover hover:text-reset-btn-text-hover hover:shadow-button-hover active:translate-y-px'
             onClick={() => onReset(timer.id)}
             onPointerDown={stopDrag}
           >
-            <RotateCcw class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
-            <span class='sr-only'>Reset</span>
+            <RotateCcw size={16} strokeWidth={2.2} aria-hidden='true' />
+            <span className='sr-only'>Reset</span>
           </button>
           <button
             type='button'
-            class='ghost-btn transfer-btn'
+            className='inline-flex size-btn items-center justify-center rounded-md border border-border-default bg-slate-12 p-0 text-text-blue transition-[transform,background,color] duration-150 hover:bg-slate-20 hover:text-text-soft active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50'
             onClick={() => onTransferRequest(timer)}
             onPointerDown={stopDrag}
             aria-label='Move time'
             disabled={!canTransfer}
           >
-            <ArrowLeftRight class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
-            <span class='sr-only'>Move time</span>
+            <ArrowLeftRight size={16} strokeWidth={2.2} aria-hidden='true' />
+            <span className='sr-only'>Move time</span>
           </button>
           <button
             type='button'
-            class='ghost-btn adjust-btn'
+            className='inline-flex size-btn items-center justify-center rounded-md border border-border-default bg-slate-12 p-0 text-text-blue transition-[transform,background,color] duration-150 hover:bg-slate-20 hover:text-text-soft active:translate-y-px'
             onClick={() => onAdjustRequest(timer)}
             onPointerDown={stopDrag}
             aria-label='Adjust time'
           >
-            <ChevronsUpDown class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
-            <span class='sr-only'>Adjust</span>
+            <ChevronsUpDown size={16} strokeWidth={2.2} aria-hidden='true' />
+            <span className='sr-only'>Adjust</span>
           </button>
           <button
-            class='ghost-btn remove-btn'
+            className='inline-flex size-btn items-center justify-center rounded-md border border-text-red/[0.35] bg-text-red/[0.12] p-0 text-text-red transition-[transform,background,color] duration-150 hover:bg-text-red/20 hover:text-text-red-light active:translate-y-px'
             type='button'
             onClick={() => onRemove(timer.id)}
             onPointerDown={stopDrag}
             aria-label='Remove timer'
           >
-            <X class='icon' size={16} strokeWidth={2.2} aria-hidden='true' />
-            <span class='sr-only'>Remove</span>
+            <X size={16} strokeWidth={2.2} aria-hidden='true' />
+            <span className='sr-only'>Remove</span>
           </button>
         </div>
       </div>
