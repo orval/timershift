@@ -367,7 +367,7 @@ function App (): JSX.Element {
       >
         {displayTimers.length > 0 && (
           <section
-            className={`sticky top-0 z-[6] border-b border-white-mid px-xs py-sm shadow-dock ${dockBgClass}`}
+            className={`sticky top-0 z-[6] border-b border-white-mid p-xs shadow-dock ${dockBgClass}`}
           >
             <div className='mx-auto flex w-full max-w-[960px] flex-wrap items-center justify-center gap-lg'>
               {displayTimers.map((timer) => (
