@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    font-family: 'Avenir Next Condensed', 'Helvetica Neue Condensed', 'Arial Narrow', 'Space Grotesk', sans-serif;
+    font-family: 'Cairo', 'Avenir Next Condensed', 'Helvetica Neue Condensed', 'Arial Narrow', 'Space Grotesk', sans-serif;
     color: #e9ecf5;
     background: var(--app-bg);
     text-rendering: optimizeLegibility;

@@ -11,7 +11,6 @@ Run multiple timers at once and easily move chunks of time between timers.
 - note shown on card should split on new line
 - allow duplicate case ID names if categories are different
 - Badges? -- what?
-- Font
 - Check 15 minute ping is working properly
 - Fill in README
 - split tests?
