@@ -384,7 +384,7 @@ function App (): JSX.Element {
           </section>
         )}
         <main className='mx-auto flex max-w-[960px] flex-col gap-lg px-xs pb-xl pt-xs'>
-          <section className='flex flex-col gap-xs'>
+          <section className='flex flex-col gap-0.5'>
             {timers.length === 0 ? (
               <p className='my-lg rounded-lg border border-dashed border-border-default bg-white-low p-xl text-center text-text-muted'>
                 No timers yet. Create one to get started.

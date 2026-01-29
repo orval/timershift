@@ -209,7 +209,7 @@ export const TimerCard = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`timer-card ${typeClass} flex touch-none flex-col gap-xs rounded-md border px-md py-1.5 shadow-lg transition-[border-color,box-shadow,opacity] duration-150 [background:var(--timer-card-bg)] ${cardCursorClass} ${cardVisualClass}`}
+      className={`timer-card ${typeClass} flex touch-none flex-col gap-xs rounded-md border px-md py-xs shadow-lg transition-[border-color,box-shadow,opacity] duration-150 [background:var(--timer-card-bg)] ${cardCursorClass} ${cardVisualClass}`}
       onClick={handleCardClick}
       {...dragHandleProps}
     >
