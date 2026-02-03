@@ -10,7 +10,14 @@ import {
   type Timer,
   type TimerType
 } from '../types'
-import { appendLogEntry, buildLogEntry } from '../utils/history'
+import {
+  appendLogEntry,
+  buildLogEntry,
+  readHistoryBackup,
+  readTimersBackup,
+  writeHistoryBackup,
+  writeTimersBackup
+} from '../utils/history'
 
 const STORAGE_KEY = 'timershift:timers'
 const HISTORY_KEY = 'timershift:history'
@@ -38,6 +45,20 @@ export const useTimers = (): {
   isDuplicateLabel: (label: string, excludeId?: number | null) => boolean
 } => {
   const initLoadErrorRef = useRef<string | null>(null)
+  const timersLoadStateRef = useRef<{
+    savedAt?: number
+    count: number
+    hadValue: boolean
+    parseError?: string
+  }>({ count: 0, hadValue: false })
+  const timersHydratedRef = useRef(false)
+  const historyLoadStateRef = useRef<{
+    savedAt?: number
+    count: number
+    hadValue: boolean
+    parseError?: string
+  }>({ count: 0, hadValue: false })
+  const historyHydratedRef = useRef(false)
   const resolveTimerType = (value: unknown): TimerType =>
     TIMER_TYPES.includes(value as TimerType) ? (value as TimerType) : DEFAULT_TIMER_TYPE
   const resolveCaseCategory = (value: unknown): CaseCategory | undefined =>
@@ -63,13 +84,27 @@ export const useTimers = (): {
       try {
         const parsed = JSON.parse(savedRaw) as { timers?: Timer[], savedAt?: number }
         const restored = (parsed.timers ?? []).map((timer) => normalizeTimer(timer))
+        timersLoadStateRef.current = {
+          savedAt: typeof parsed.savedAt === 'number' ? parsed.savedAt : undefined,
+          count: restored.length,
+          hadValue: true
+        }
         if (restored.length > 0) return restored
       } catch (error) {
         initLoadErrorRef.current = String(error)
+        timersLoadStateRef.current = {
+          count: 0,
+          hadValue: true,
+          parseError: 'timers_parse_failed'
+        }
         // If parsing fails, fall back to defaults below.
       }
     }
 
+    timersLoadStateRef.current = {
+      count: 0,
+      hadValue: false
+    }
     return []
   })
   const [removedTimers, setRemovedTimers] = useState<RemovedTimerEntry[]>(() => {
@@ -80,13 +115,28 @@ export const useTimers = (): {
     const savedRaw = window.localStorage.getItem(HISTORY_KEY)
     if (savedRaw) {
       try {
-        const parsed = JSON.parse(savedRaw) as { removedTimers?: RemovedTimerEntry[] }
-        return parsed.removedTimers ?? []
+        const parsed = JSON.parse(savedRaw) as { removedTimers?: RemovedTimerEntry[], savedAt?: number }
+        const restored = parsed.removedTimers ?? []
+        historyLoadStateRef.current = {
+          savedAt: typeof parsed.savedAt === 'number' ? parsed.savedAt : undefined,
+          count: restored.length,
+          hadValue: true
+        }
+        return restored
       } catch {
+        historyLoadStateRef.current = {
+          count: 0,
+          hadValue: true,
+          parseError: 'history_parse_failed'
+        }
         // Fall back to empty history.
       }
     }
 
+    historyLoadStateRef.current = {
+      count: 0,
+      hadValue: false
+    }
     return []
   })
   const lastRunningTimerIdRef = useRef<number | null>(null)
@@ -155,9 +205,64 @@ export const useTimers = (): {
   }, [hasRunningTimer])
 
   useEffect(() => {
+    let cancelled = false
+    const hydrateTimers = async (): Promise<void> => {
+      try {
+        const backup = await readTimersBackup()
+        if (cancelled) return
+        if (!backup) {
+          timersHydratedRef.current = true
+          return
+        }
+
+        const state = timersLoadStateRef.current
+        const localSavedAt = state.savedAt ?? 0
+        const backupSavedAt = backup.savedAt ?? 0
+        const backupCount = backup.timers.length
+        const shouldRestore =
+          !state.hadValue ||
+          Boolean(state.parseError) ||
+          (state.count === 0 && backupCount > 0 && backupSavedAt >= localSavedAt)
+
+        if (shouldRestore && backupCount > 0) {
+          const normalized = backup.timers.map((timer) => normalizeTimer(timer))
+          setTimers(normalized)
+          timersLoadStateRef.current = {
+            savedAt: backupSavedAt,
+            count: normalized.length,
+            hadValue: true
+          }
+        }
+      } catch (error) {
+        void appendLogEntry(buildLogEntry('error', undefined, {
+          source: 'timers_backup',
+          message: String(error)
+        }))
+      } finally {
+        timersHydratedRef.current = true
+      }
+    }
+
+    void hydrateTimers()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
     timersRef.current = timers
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt: Date.now() }))
+      if (!timersHydratedRef.current) return
+      const savedAt = Date.now()
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ timers, savedAt }))
+      timersLoadStateRef.current = {
+        savedAt,
+        count: timers.length,
+        hadValue: true
+      }
+      if (timers.length > 0) {
+        void writeTimersBackup(timers)
+      }
     } catch (error) {
       void appendLogEntry(buildLogEntry('error', undefined, {
         source: 'localStorage',
@@ -168,8 +273,62 @@ export const useTimers = (): {
   }, [timers])
 
   useEffect(() => {
+    let cancelled = false
+    const hydrateHistory = async (): Promise<void> => {
+      try {
+        const backup = await readHistoryBackup()
+        if (cancelled) return
+        if (!backup) {
+          historyHydratedRef.current = true
+          return
+        }
+
+        const state = historyLoadStateRef.current
+        const localSavedAt = state.savedAt ?? 0
+        const backupSavedAt = backup.savedAt ?? 0
+        const backupCount = backup.removedTimers.length
+        const shouldRestore =
+          !state.hadValue ||
+          Boolean(state.parseError) ||
+          (state.count === 0 && backupCount > 0 && backupSavedAt >= localSavedAt)
+
+        if (shouldRestore && backupCount > 0) {
+          setRemovedTimers(backup.removedTimers)
+          historyLoadStateRef.current = {
+            savedAt: backupSavedAt,
+            count: backupCount,
+            hadValue: true
+          }
+        }
+      } catch (error) {
+        void appendLogEntry(buildLogEntry('error', undefined, {
+          source: 'history_backup',
+          message: String(error)
+        }))
+      } finally {
+        historyHydratedRef.current = true
+      }
+    }
+
+    void hydrateHistory()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
     try {
-      window.localStorage.setItem(HISTORY_KEY, JSON.stringify({ removedTimers, savedAt: Date.now() }))
+      if (!historyHydratedRef.current) return
+      const savedAt = Date.now()
+      window.localStorage.setItem(HISTORY_KEY, JSON.stringify({ removedTimers, savedAt }))
+      historyLoadStateRef.current = {
+        savedAt,
+        count: removedTimers.length,
+        hadValue: true
+      }
+      if (removedTimers.length > 0) {
+        void writeHistoryBackup(removedTimers)
+      }
     } catch (error) {
       void appendLogEntry(buildLogEntry('error', undefined, {
         source: 'localStorage',

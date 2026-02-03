@@ -10,7 +10,11 @@ import { DEFAULT_TIMER_TYPE, type CaseCategory, type LogEntry, type TimerType } 
 
 const historyMocks = vi.hoisted(() => ({
   appendLogEntry: vi.fn().mockResolvedValue(undefined),
-  buildLogEntry: (action: string) => ({ action })
+  buildLogEntry: (action: string) => ({ action }),
+  readHistoryBackup: vi.fn().mockResolvedValue(null),
+  readTimersBackup: vi.fn().mockResolvedValue(null),
+  writeHistoryBackup: vi.fn().mockResolvedValue(undefined),
+  writeTimersBackup: vi.fn().mockResolvedValue(undefined)
 }))
 
 vi.mock('./utils/history', () => historyMocks)
@@ -437,6 +441,85 @@ test('restores a timer from history', async () => {
 
   expect(screen.getByText('Timer 1', { selector: 'button' })).toBeInTheDocument()
   expect(screen.getByText(/no removed timers yet/i)).toBeInTheDocument()
+})
+
+test('restores removed timers from backup when history is empty', async () => {
+  localStorage.setItem('timershift:history', JSON.stringify({
+    removedTimers: [],
+    savedAt: 1
+  }))
+  historyMocks.readHistoryBackup.mockResolvedValueOnce({
+    savedAt: 2,
+    removedTimers: [
+      {
+        entryId: 'backup-1',
+        removedAt: 2,
+        timer: {
+          id: 5,
+          label: 'Recovered Timer',
+          elapsed: 90,
+          running: false,
+          type: DEFAULT_TIMER_TYPE
+        }
+      }
+    ]
+  })
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /history/i }))
+
+  await waitFor(() => {
+    expect(screen.getByText('Recovered Timer')).toBeInTheDocument()
+  })
+  expect(screen.queryByText(/no removed timers yet/i)).toBeNull()
+})
+
+test('restores timers from backup when timers storage is empty', async () => {
+  localStorage.setItem('timershift:timers', JSON.stringify({
+    timers: [],
+    savedAt: 1
+  }))
+  historyMocks.readTimersBackup.mockResolvedValueOnce({
+    savedAt: 2,
+    timers: [
+      {
+        id: 10,
+        label: 'Recovered Live Timer',
+        elapsed: 120,
+        running: false,
+        type: DEFAULT_TIMER_TYPE
+      }
+    ]
+  })
+  render(<App />)
+
+  await waitFor(() => {
+    expect(screen.getByText('Recovered Live Timer', { selector: 'button' })).toBeInTheDocument()
+  })
+  expect(screen.queryByText(/no timers yet/i)).toBeNull()
+})
+
+test('restores timers from backup when timers storage is invalid', async () => {
+  localStorage.setItem('timershift:timers', '{')
+  historyMocks.readTimersBackup.mockResolvedValueOnce({
+    savedAt: 2,
+    timers: [
+      {
+        id: 11,
+        label: 'Recovered After Parse Error',
+        elapsed: 30,
+        running: false,
+        type: DEFAULT_TIMER_TYPE
+      }
+    ]
+  })
+  render(<App />)
+
+  await waitFor(() => {
+    expect(screen.getByText('Recovered After Parse Error', { selector: 'button' })).toBeInTheDocument()
+  })
+  expect(screen.queryByText(/no timers yet/i)).toBeNull()
 })
 
 test('closes the history panel', async () => {
