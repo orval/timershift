@@ -10,6 +10,7 @@ Run multiple timers at once and easily move chunks of time between timers.
 
 - note shown on card should split on new line
 - allow duplicate case ID names if categories are different
+  - allow choice of category when creating a case
 - Badges? -- what?
 - Check 15 minute ping is working properly
 - Fill in README
