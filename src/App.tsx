@@ -271,7 +271,7 @@ function App (): JSX.Element {
     }
 
     if (modalMode === 'add') {
-      addTimer(trimmed, resolvedType)
+      addTimer(trimmed, resolvedType, modalCaseCategory)
     } else if (modalTimerId !== null) {
       setTimerType(modalTimerId, modalType)
       if (modalType === 'Case') {
@@ -469,9 +469,9 @@ function App (): JSX.Element {
           maxLabelLength={MAX_LABEL_LENGTH}
           timerType={modalType}
           onTypeChange={modalMode === 'rename' ? handleModalTypeChange : undefined}
-          caseCategory={modalMode === 'rename' ? modalCaseCategory : undefined}
+          caseCategory={modalCaseCategory}
           caseNote={modalMode === 'rename' ? modalCaseNote : undefined}
-          onCaseCategoryChange={modalMode === 'rename' ? handleModalCaseCategoryChange : undefined}
+          onCaseCategoryChange={handleModalCaseCategoryChange}
           onCaseNoteChange={modalMode === 'rename' ? handleModalCaseNoteChange : undefined}
           inputRef={modalInputRef}
           onClose={closeModal}

@@ -35,7 +35,7 @@ export const useTimers = (): {
   transferTimerMinutes: (sourceId: number, targetId: number, minutes: number) => void
   restoreTimerSnapshot: (snapshot: Timer) => void
   removeTimer: (id: number) => void
-  addTimer: (label: string, type: TimerType) => void
+  addTimer: (label: string, type: TimerType, caseCategory?: CaseCategory) => void
   renameTimer: (id: number, label: string) => void
   setTimerType: (id: number, type: TimerType) => void
   setCaseCategory: (id: number, category: CaseCategory) => void
@@ -510,10 +510,12 @@ export const useTimers = (): {
     })
   }
 
-  const addTimer = (label: string, type: TimerType): void => {
+  const addTimer = (label: string, type: TimerType, caseCategory?: CaseCategory): void => {
     const nextId = Date.now()
     const trimmed = label.trim().slice(0, MAX_LABEL_LENGTH)
-    const caseCategory = type === 'Case' ? DEFAULT_CASE_CATEGORY : undefined
+    const resolvedCaseCategory = type === 'Case'
+      ? (resolveCaseCategory(caseCategory) ?? DEFAULT_CASE_CATEGORY)
+      : undefined
     const caseNote = ''
     setTimers((prev: Timer[]) => [
       ...prev,
@@ -521,7 +523,7 @@ export const useTimers = (): {
         id: nextId,
         label: trimmed,
         type,
-        caseCategory,
+        caseCategory: resolvedCaseCategory,
         caseNote,
         elapsed: 0,
         running: true
@@ -533,7 +535,7 @@ export const useTimers = (): {
       id: nextId,
       label: trimmed,
       type,
-      caseCategory,
+      caseCategory: resolvedCaseCategory,
       caseNote,
       elapsed: 0,
       running: true

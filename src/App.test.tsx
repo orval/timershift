@@ -149,6 +149,25 @@ test('auto-selects case type for 8-digit names', async () => {
   expect(card?.className).toContain('timer-card--type-case')
 })
 
+test('applies selected case category when creating a case timer', async () => {
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+  const input = within(dialog).getByRole('textbox', { name: /timer name/i })
+
+  await user.type(input, '12345678')
+  await user.click(within(dialog).getByRole('radio', { name: /community/i }))
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+
+  const timerCard = screen.getByText('12345678', { selector: 'button' }).closest('.timer-card')
+  expect(timerCard).not.toBeNull()
+  if (!(timerCard instanceof HTMLElement)) return
+
+  expect(within(timerCard).getByRole('button', { name: 'Community' })).toBeInTheDocument()
+})
+
 test('renames a timer from the modal', async () => {
   seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false, type: 'Admin' }])
   render(<App />)
