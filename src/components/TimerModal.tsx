@@ -135,7 +135,7 @@ export const TimerModal = ({
                 Case category
               </label>
               <div
-                className='inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-sm border border-white-mid bg-panel-bg p-px shadow-inset-border'
+                className='inline-flex w-1/2 flex-wrap items-center gap-0.5 rounded-sm border border-white-mid bg-panel-bg p-px shadow-inset-border'
                 role='radiogroup'
                 aria-labelledby='case-category-label'
               >
