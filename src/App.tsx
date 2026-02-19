@@ -84,10 +84,15 @@ function App (): JSX.Element {
   const getAutoTimerType = (label: string): TimerType => (
     isValidCaseLabel(label) ? 'Case' : 'Other'
   )
-  const getLabelError = (label: string, type: TimerType, excludeId: number | null): string => {
+  const getLabelError = (
+    label: string,
+    type: TimerType,
+    caseCategory: CaseCategory,
+    excludeId: number | null
+  ): string => {
     if (!label) return type === 'Case' ? 'Case ID is required.' : 'Name is required.'
     if (type === 'Case' && !isValidCaseLabel(label)) return 'Case ID must be 8 digits.'
-    if (isDuplicateLabel(label, excludeId)) {
+    if (isDuplicateLabel(label, type, caseCategory, excludeId)) {
       return type === 'Case' ? 'Case ID already in use.' : 'Name already in use'
     }
     return ''
@@ -264,7 +269,7 @@ function App (): JSX.Element {
     const trimmed = modalLabel.trim()
     const resolvedType = modalMode === 'add' ? getAutoTimerType(trimmed) : modalType
     const excludeId = modalMode === 'rename' ? modalTimerId : null
-    const error = getLabelError(trimmed, resolvedType, excludeId)
+    const error = getLabelError(trimmed, resolvedType, modalCaseCategory, excludeId)
     if (error) {
       setModalError(error)
       return
@@ -294,7 +299,7 @@ function App (): JSX.Element {
     }
     if (!modalError) return
     const excludeId = modalMode === 'rename' ? modalTimerId : null
-    const error = getLabelError(trimmedValue, nextType, excludeId)
+    const error = getLabelError(trimmedValue, nextType, modalCaseCategory, excludeId)
     setModalError(error)
   }
 
@@ -302,12 +307,18 @@ function App (): JSX.Element {
     setModalType(nextType)
     if (!modalError) return
     const excludeId = modalMode === 'rename' ? modalTimerId : null
-    const error = getLabelError(modalLabel.trim(), nextType, excludeId)
+    const error = getLabelError(modalLabel.trim(), nextType, modalCaseCategory, excludeId)
     setModalError(error)
   }
 
   const handleModalCaseCategoryChange = (category: CaseCategory): void => {
     setModalCaseCategory(category)
+    if (!modalError) return
+    const trimmed = modalLabel.trim()
+    const nextType = modalMode === 'add' ? getAutoTimerType(trimmed) : modalType
+    const excludeId = modalMode === 'rename' ? modalTimerId : null
+    const error = getLabelError(trimmed, nextType, category, excludeId)
+    setModalError(error)
   }
 
   const handleModalCaseNoteChange = (note: string): void => {

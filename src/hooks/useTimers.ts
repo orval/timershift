@@ -42,7 +42,12 @@ export const useTimers = (): {
   setCaseNote: (id: number, note: string) => void
   restoreTimer: (entry: RemovedTimerEntry) => void
   reorderTimers: (sourceId: number, targetId: number) => void
-  isDuplicateLabel: (label: string, excludeId?: number | null) => boolean
+  isDuplicateLabel: (
+    label: string,
+    type: TimerType,
+    caseCategory?: CaseCategory,
+    excludeId?: number | null
+  ) => boolean
 } => {
   const initLoadErrorRef = useRef<string | null>(null)
   const timersLoadStateRef = useRef<{
@@ -624,10 +629,23 @@ export const useTimers = (): {
 
   const normalizeLabel = (label: string): string => label.trim().toLowerCase()
 
-  const isDuplicateLabel = (label: string, excludeId: number | null = null): boolean => {
+  const isDuplicateLabel = (
+    label: string,
+    type: TimerType,
+    caseCategory?: CaseCategory,
+    excludeId: number | null = null
+  ): boolean => {
     const normalized = normalizeLabel(label)
     if (!normalized) return false
-    return timers.some((timer) => timer.id !== excludeId && normalizeLabel(timer.label) === normalized)
+    const targetCaseCategory = resolveCaseCategory(caseCategory) ?? DEFAULT_CASE_CATEGORY
+    return timers.some((timer) => {
+      if (timer.id === excludeId) return false
+      if (normalizeLabel(timer.label) !== normalized) return false
+      if (type !== 'Case') return true
+      if (timer.type !== 'Case') return true
+      const timerCaseCategory = resolveCaseCategory(timer.caseCategory) ?? DEFAULT_CASE_CATEGORY
+      return timerCaseCategory === targetCaseCategory
+    })
   }
 
   return {

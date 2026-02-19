@@ -102,6 +102,65 @@ test('shows an error when submitting a duplicate timer name', async () => {
   expect(screen.getByText('Name already in use')).toBeInTheDocument()
 })
 
+test('allows duplicate case IDs when categories differ', async () => {
+  seedTimers([
+    { id: 1, label: '12345678', elapsed: 0, running: false, type: 'Case', caseCategory: 'Prep' }
+  ])
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+  const input = within(dialog).getByRole('textbox', { name: /timer name/i })
+
+  await user.type(input, '12345678')
+  await user.click(within(dialog).getByRole('radio', { name: /community/i }))
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(screen.getAllByText('12345678', { selector: 'button' })).toHaveLength(2)
+})
+
+test('rejects duplicate case IDs when category is the same', async () => {
+  seedTimers([
+    { id: 1, label: '12345678', elapsed: 0, running: false, type: 'Case', caseCategory: 'Prep' }
+  ])
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+  const input = within(dialog).getByRole('textbox', { name: /timer name/i })
+
+  await user.type(input, '12345678')
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+
+  expect(screen.getByText('Case ID already in use.')).toBeInTheDocument()
+})
+
+test('clears duplicate case ID error when category changes', async () => {
+  seedTimers([
+    { id: 1, label: '12345678', elapsed: 0, running: false, type: 'Case', caseCategory: 'Prep' }
+  ])
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getByRole('button', { name: /add new timer/i }))
+  const dialog = screen.getByRole('dialog')
+  const input = within(dialog).getByRole('textbox', { name: /timer name/i })
+
+  await user.type(input, '12345678')
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+  expect(within(dialog).getByText('Case ID already in use.')).toBeInTheDocument()
+
+  await user.click(within(dialog).getByRole('radio', { name: /community/i }))
+  expect(within(dialog).queryByText('Case ID already in use.')).toBeNull()
+
+  await user.click(within(dialog).getByRole('button', { name: /create/i }))
+  expect(screen.queryByRole('dialog')).toBeNull()
+  expect(screen.getAllByText('12345678', { selector: 'button' })).toHaveLength(2)
+})
+
 test('clears the modal error when input becomes valid', async () => {
   render(<App />)
   const user = userEvent.setup()
