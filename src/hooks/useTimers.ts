@@ -18,12 +18,13 @@ import {
   writeHistoryBackup,
   writeTimersBackup
 } from '../utils/history'
+import { formatStatusMins } from '../utils/time'
 
 const STORAGE_KEY = 'timershift:timers'
 const HISTORY_KEY = 'timershift:history'
 const HISTORY_LIMIT = 40
 
-export const useTimers = (): {
+export const useTimers = ({ onTick }: { onTick?: (title: string) => void } = {}): {
   timers: Timer[]
   displayTimers: Timer[]
   removedTimers: RemovedTimerEntry[]
@@ -148,6 +149,8 @@ export const useTimers = (): {
   const timersRef = useRef<Timer[]>(timers)
   const lastTickRef = useRef<number | null>(null)
   const tickRemainderRef = useRef<number>(0)
+  const onTickRef = useRef(onTick)
+  onTickRef.current = onTick
 
   const runningTimers = useMemo(
     () => timers.filter((timer) => timer.running),
@@ -204,6 +207,10 @@ export const useTimers = (): {
           timer.running ? { ...timer, elapsed: timer.elapsed + deltaSeconds } : timer
         )
       )
+      const firstRunning = timersRef.current.find((t) => t.running)
+      if (firstRunning) {
+        onTickRef.current?.(`${firstRunning.label} ${formatStatusMins(firstRunning.elapsed + deltaSeconds)}`)
+      }
     }, 1000)
 
     return () => clearInterval(interval)

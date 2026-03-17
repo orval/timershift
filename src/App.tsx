@@ -23,6 +23,7 @@ const ALERT_SOUND_SRC = alertSoundUrl
 const DEFAULT_NEW_TIMER_TYPE: TimerType = 'Other'
 
 function App (): JSX.Element {
+  const isTauri = typeof window !== 'undefined' && '__TAURI__' in window
   const {
     timers,
     displayTimers,
@@ -43,7 +44,9 @@ function App (): JSX.Element {
     restoreTimer,
     reorderTimers,
     isDuplicateLabel
-  } = useTimers()
+  } = useTimers({
+    onTick: isTauri ? (title) => { void invoke('set_tray_title', { title }) } : undefined
+  })
   const [toast, setToast] = useState<{
     id: number
     message: string
@@ -75,7 +78,6 @@ function App (): JSX.Element {
     useSensor(pointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
-  const isTauri = typeof window !== 'undefined' && '__TAURI__' in window
   const trayIconState = hasRunningTimer ? 'play' : 'pause'
   const trayTitle = displayTimers.length > 0
     ? `${displayTimers[0].label} ${formatStatusMins(displayTimers[0].elapsed)}`
