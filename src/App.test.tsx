@@ -734,6 +734,47 @@ test('reorders timers after a drag end event', async () => {
   })
 })
 
+test('undoes a delete from the toast', async () => {
+  seedTimers([{ id: 1, label: 'DeleteMe', elapsed: 30, running: false }])
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  // Find and delete the timer
+  await user.click(screen.getByRole('button', { name: /remove timer/i }))
+
+  // Verify the timer is deleted and toast appears
+  expect(screen.queryByRole('button', { name: /edit timer details/i })).toBeNull()
+  expect(screen.getByText('"DeleteMe" deleted')).toBeInTheDocument()
+
+  // Click undo in the toast
+  await user.click(screen.getByRole('button', { name: /undo/i }))
+
+  // Verify the timer is restored
+  expect(screen.getByRole('button', { name: /edit timer details/i })).toBeInTheDocument()
+  expect(screen.queryByText('"DeleteMe" deleted')).toBeNull()
+})
+
+test('dismisses delete toast without undoing', async () => {
+  seedTimers([{ id: 1, label: 'DismissMe', elapsed: 30, running: false }])
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  // Delete the timer
+  await user.click(screen.getByRole('button', { name: /remove timer/i }))
+
+  // Verify the toast appears
+  expect(screen.getByText('"DismissMe" deleted')).toBeInTheDocument()
+
+  // Click dismiss button
+  await user.click(screen.getAllByRole('button', { name: /dismiss/i })[0])
+
+  // Verify toast is gone and timer stays deleted
+  expect(screen.queryByText('"DismissMe" deleted')).toBeNull()
+  expect(screen.queryByRole('button', { name: /edit timer details/i })).toBeNull()
+})
+
 test('logs summary entries on beforeunload', () => {
   render(<App />)
 

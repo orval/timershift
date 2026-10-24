@@ -11,7 +11,7 @@ import { TimerModal } from './components/TimerModal'
 import { TimerTransferModal } from './components/TimerTransferModal'
 import { MAX_LABEL_LENGTH } from './constants'
 import { useTimers } from './hooks/useTimers'
-import { DEFAULT_CASE_CATEGORY, type CaseCategory, type Timer, type TimerType } from './types'
+import { DEFAULT_CASE_CATEGORY, type CaseCategory, type RemovedTimerEntry, type Timer, type TimerType } from './types'
 import { DndContext, SortableContext } from './utils/dndKitPreact'
 import { appendLogEntry, buildLogEntry } from './utils/history'
 import { formatStatusMins, formatTime } from './utils/time'
@@ -130,7 +130,7 @@ function App (): JSX.Element {
     if (!toast) return
     const timeoutId = window.setTimeout(() => {
       setToast((current) => (current?.id === toast.id ? null : current))
-    }, 8000)
+    }, 5000)
     return () => window.clearTimeout(timeoutId)
   }, [toast])
 
@@ -352,6 +352,29 @@ function App (): JSX.Element {
     })
   }
 
+  const handleRemove = (id: number): void => {
+    const timer = timers.find((timer) => timer.id === id)
+    if (!timer) return
+    const now = Date.now()
+    const entryId = `${now}-${Math.random().toString(36).slice(2, 8)}`
+    const removedEntry: RemovedTimerEntry = {
+      entryId,
+      timer: { ...timer, running: false },
+      removedAt: now
+    }
+    removeTimer(id)
+    const toastId = Date.now()
+    setToast({
+      id: toastId,
+      message: `"${timer.label}" deleted`,
+      actionLabel: 'Undo',
+      onAction: () => {
+        restoreTimer(removedEntry)
+        setToast(null)
+      }
+    })
+  }
+
   const adjustTimer = adjustTimerId !== null
     ? timers.find((timer) => timer.id === adjustTimerId)
     : null
@@ -411,7 +434,7 @@ function App (): JSX.Element {
                       timer={timer}
                       onToggle={toggleTimer}
                       onReset={handleReset}
-                      onRemove={removeTimer}
+                      onRemove={handleRemove}
                       onAdjustRequest={openAdjustModal}
                       onTransferRequest={openTransferModal}
                       onRenameRequest={openRenameModal}
