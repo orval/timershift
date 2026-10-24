@@ -2,6 +2,7 @@ import type { JSX } from 'preact'
 import { useMemo } from 'preact/hooks'
 import type { Timer } from '../types'
 import { formatTime } from '../utils/time'
+import { TimerTypeIcon } from './TimerModal'
 import { buttonSecondaryClass, modalOverlayClass, modalShellBaseClass } from './uiClasses'
 
 const PRESET_MINUTES = [1, 5, 10, 15, 25, 30, 45, 60]
@@ -146,7 +147,13 @@ export const TimerTransferModal = ({
                   <p className='m-0 text-sm text-text-muted'>No full minutes to move yet.</p>
                 )}
                 <div className='grid max-h-[min(240px,35vh)] gap-xs overflow-y-auto pr-0.5'>
-                  {targets.map((target) => (
+                  {targets.map((target) => {
+                  const typeTint = target.type === 'Admin'
+                    ? 'var(--timer-tint-admin)'
+                    : target.type === 'Case'
+                        ? 'var(--timer-tint-case)'
+                        : 'var(--timer-tint-break)'
+                  return (
                     <button
                       key={target.id}
                       className='flex items-center justify-between gap-lg rounded-md border border-white-mid bg-white-low p-sm text-left text-text-bright transition-[background,transform] duration-150 hover:bg-white-mid active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60'
@@ -154,10 +161,23 @@ export const TimerTransferModal = ({
                       onClick={() => onTransfer(target.id)}
                       disabled={!isTransferReady}
                     >
-                      <span className='text-md font-semibold text-text-bright'>{target.label}</span>
-                      <span className='text-sm tabular-nums text-text-muted'>{formatTime(target.elapsed)}</span>
+                      <div className='flex min-w-0 flex-1 flex-col gap-xs'>
+                        <div className='flex min-w-0 items-center justify-between gap-lg'>
+                          <span className='truncate text-md font-semibold text-text-bright'>{target.label}</span>
+                          <div className='inline-flex shrink-0 items-center justify-center rounded-sm border px-1.5 py-0.5 transition-colors' style={{ backgroundColor: typeTint, borderColor: typeTint } as JSX.CSSProperties}>
+                            <TimerTypeIcon type={target.type} />
+                          </div>
+                        </div>
+                        <div className='flex items-center justify-between gap-lg text-sm'>
+                          <span className='tabular-nums text-text-muted'>{formatTime(target.elapsed)}</span>
+                          {target.type === 'Case' && target.caseCategory && (
+                            <span className='shrink-0 text-text-muted'>{target.caseCategory}</span>
+                          )}
+                        </div>
+                      </div>
                     </button>
-                  ))}
+                  )
+                })}
                 </div>
               </>
             )}

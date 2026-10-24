@@ -496,6 +496,38 @@ test('moves time between timers', async () => {
   expect(within(breakCard).queryByText('00:00:00')).toBeNull()
 })
 
+test('transfer modal shows type and category to distinguish timers', async () => {
+  seedTimers([
+    { id: 1, label: 'Focus', type: 'Other', elapsed: 600, running: false },
+    { id: 2, label: 'Focus', type: 'Admin', elapsed: 0, running: false },
+    { id: 3, label: 'Focus', type: 'Case', caseCategory: 'Prep', elapsed: 0, running: false }
+  ])
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getAllByRole('button', { name: /move time/i })[0])
+
+  const dialog = screen.getByRole('dialog', { name: /move time/i })
+  const receiverSection = within(dialog).getByText('Tap a timer to receive').parentElement
+  expect(receiverSection).not.toBeNull()
+  if (!(receiverSection instanceof HTMLElement)) return
+
+  const targetButtons = within(receiverSection).getAllByRole('button')
+
+  // Should have 2 target buttons (3 total timers minus the source)
+  expect(targetButtons.length).toBe(2)
+
+  // First target (Admin type) - should have icon
+  const firstSvg = targetButtons[0].querySelector('svg')
+  expect(firstSvg).toBeInTheDocument()
+
+  // Second target (Case type with category) - should have icon and category
+  const secondSvg = targetButtons[1].querySelector('svg')
+  expect(secondSvg).toBeInTheDocument()
+  expect(within(targetButtons[1]).getByText('Prep')).toBeInTheDocument()
+})
+
 test('removes a timer', async () => {
   seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
