@@ -496,6 +496,38 @@ test('moves time between timers', async () => {
   expect(within(breakCard).queryByText('00:00:00')).toBeNull()
 })
 
+test('transfer modal shows type and category to distinguish timers', async () => {
+  seedTimers([
+    { id: 1, label: 'Focus', type: 'Other', elapsed: 600, running: false },
+    { id: 2, label: 'Focus', type: 'Admin', elapsed: 0, running: false },
+    { id: 3, label: 'Focus', type: 'Case', caseCategory: 'Prep', elapsed: 0, running: false }
+  ])
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  await user.click(screen.getAllByRole('button', { name: /move time/i })[0])
+
+  const dialog = screen.getByRole('dialog', { name: /move time/i })
+  const receiverSection = within(dialog).getByText('Tap a timer to receive').parentElement
+  expect(receiverSection).not.toBeNull()
+  if (!(receiverSection instanceof HTMLElement)) return
+
+  const targetButtons = within(receiverSection).getAllByRole('button')
+
+  // Should have 2 target buttons (3 total timers minus the source)
+  expect(targetButtons.length).toBe(2)
+
+  // First target (Admin type) - should have icon
+  const firstSvg = targetButtons[0].querySelector('svg')
+  expect(firstSvg).toBeInTheDocument()
+
+  // Second target (Case type with category) - should have icon and category
+  const secondSvg = targetButtons[1].querySelector('svg')
+  expect(secondSvg).toBeInTheDocument()
+  expect(within(targetButtons[1]).getByText('Prep')).toBeInTheDocument()
+})
+
 test('removes a timer', async () => {
   seedTimers([{ id: 1, label: 'Timer 1', elapsed: 0, running: false }])
   render(<App />)
@@ -700,6 +732,47 @@ test('reorders timers after a drag end event', async () => {
       'Timer A'
     ])
   })
+})
+
+test('undoes a delete from the toast', async () => {
+  seedTimers([{ id: 1, label: 'DeleteMe', elapsed: 30, running: false }])
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  // Find and delete the timer
+  await user.click(screen.getByRole('button', { name: /remove timer/i }))
+
+  // Verify the timer is deleted and toast appears
+  expect(screen.queryByRole('button', { name: /edit timer details/i })).toBeNull()
+  expect(screen.getByText('"DeleteMe" deleted')).toBeInTheDocument()
+
+  // Click undo in the toast
+  await user.click(screen.getByRole('button', { name: /undo/i }))
+
+  // Verify the timer is restored
+  expect(screen.getByRole('button', { name: /edit timer details/i })).toBeInTheDocument()
+  expect(screen.queryByText('"DeleteMe" deleted')).toBeNull()
+})
+
+test('dismisses delete toast without undoing', async () => {
+  seedTimers([{ id: 1, label: 'DismissMe', elapsed: 30, running: false }])
+
+  render(<App />)
+  const user = userEvent.setup()
+
+  // Delete the timer
+  await user.click(screen.getByRole('button', { name: /remove timer/i }))
+
+  // Verify the toast appears
+  expect(screen.getByText('"DismissMe" deleted')).toBeInTheDocument()
+
+  // Click dismiss button
+  await user.click(screen.getAllByRole('button', { name: /dismiss/i })[0])
+
+  // Verify toast is gone and timer stays deleted
+  expect(screen.queryByText('"DismissMe" deleted')).toBeNull()
+  expect(screen.queryByRole('button', { name: /edit timer details/i })).toBeNull()
 })
 
 test('logs summary entries on beforeunload', () => {
